@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../../../../dummypage.dart';
 
+import '../../../../dummypage.dart';
 class SplashController extends GetxController {
   static SplashController get instance => Get.find();
 
