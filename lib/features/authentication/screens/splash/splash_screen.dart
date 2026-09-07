@@ -22,7 +22,7 @@ class SplashScreen extends StatelessWidget {
               width: 200,
             ),
             const SizedBox(height: 20),
-            // App Name or Tagline (optional)
+            // App Name
             Text(
               "EduTrack",
               style: Theme.of(context).textTheme.headlineMedium,

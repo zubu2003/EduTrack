@@ -10,7 +10,7 @@ class Dummypage extends StatelessWidget {
         child: Container(
           height: 200,
           width: 200,
-          color: Colors.purpleAccent,
+          color: Colors.red,
         ),
       ),
     );

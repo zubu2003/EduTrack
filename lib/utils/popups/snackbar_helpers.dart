@@ -18,7 +18,7 @@ class SSnackBarHelpers {
             margin: const EdgeInsets.symmetric(horizontal: 30.0),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
-                color: SHelperFunctions.isDarkMode(Get.context!) ? SColors.darkerGrey.withValues(alpha: 0.9) : SColors.grey.withValues(alpha: 0.9)
+                color: SHelperFunctions.isDarkMode(Get.context!) ? SColors.primaryColor.withValues(alpha: 0.9) : SColors.grey.withValues(alpha: 0.9)
             ),
             child: Center(child: Text(message,style: Theme.of(Get.context!).textTheme.labelLarge,),),
           ),
@@ -45,7 +45,7 @@ class SSnackBarHelpers {
         isDismissible: true,
         shouldIconPulse: true,
         colorText: SColors.white,
-        backgroundColor: SColors.primary,
+        backgroundColor: SColors.primaryColor,
         snackPosition: SnackPosition.BOTTOM,
         duration: Duration(seconds: duration),
         margin: const EdgeInsets.all(10),

@@ -1,65 +1,52 @@
-
-class SSize{
-  SSize._();
-
-  // Padding and margin sizes
-  static const double xs = 4.0; // extra small
-  static const double sm = 8.0; // small
-  static const double md = 16.0; // medium
-  static const double lg = 24.0; //large
-  static const double xl = 32.0; //extra large
-
-  // Icon sizes
-  static const double iconXs = 12.0; // extra small
-  static const double iconSm = 16.0; // small
-  static const double iconMd = 24.0; // medium
-  static const double iconLg = 32.0; // large
-
-  // Font sizes
-  static const double fontSizeSm = 14.0; // small
-  static const double fontSizeMd = 16.0; // medium
-  static const double fontSizeLg = 18.0; // large
-
-  // Button sizes
-  static const double buttonHeight = 18.0;
-  static const double buttonRadius = 12.0;
-  static const double buttonWidth = 120.0;
-  static const double searchBarHeight = 55.0;
-
-  // AppBar height
-  static const double appBarHeight = 56.0;
-
-  // Default spacing between sections
+class SSize {
+  // Padding & Margin
   static const double defaultSpace = 24.0;
   static const double spaceBtwItems = 16.0;
   static const double spaceBtwSections = 32.0;
 
-  // Border radius
-  static const double borderRadiusSm = 4.0;
-  static const double borderRadiusMd = 8.0;
-  static const double borderRadiusLg = 12.0;
+  // Spacing
+  static const double xs = 4.0;
+  static const double sm = 8.0;
+  static const double md = 16.0;
+  static const double lg = 24.0;
+  static const double xl = 32.0;
 
-  // Product item dimensions
-  static const double productImageRadius = 16.0;
+  // Icon Sizes
+  static const double iconXs = 12.0;
+  static const double iconSm = 16.0;
+  static const double iconMd = 24.0;
+  static const double iconLg = 32.0;
 
-  // Input field
-  static const double inputFieldRadius = 12.0;
-  static const double spaceBtwInputFields = 16.0;
+  // Button
+  static const double buttonHeight = 56.0;
+  static const double buttonRadius = 100.0;
+  static const double buttonWidth = double.infinity;
 
-  // Card sizes
-  static const double cardRadiusLg = 16.0;
-  static const double cardRadiusMd = 12.0;
-  static const double cardRadiusSm = 10.0;
-  static const double cardRadiusXs = 6.0;
+  // Input Field
+  static const double inputFieldHeight = 56.0;
+  static const double inputFieldRadius = 100.0;
 
-  // Grid view spacing
-  static const double gridViewSpacing = 16.0;
+  // Border Radius
+  static const double borderRadiusSm = 8.0;
+  static const double borderRadiusMd = 12.0;
+  static const double borderRadiusLg = 16.0;
+  static const double borderRadiusXl = 24.0;
+  static const double borderRadiusPill = 100.0;
 
-  // Card Sizes
-  static const double homePrimaryHeaderHeight = 320.0; // 320
-  static const double storePrimaryHeaderHeight = 170.0; // 170
-  static const double profilePrimaryHeaderHeight = 170.0; // 170
+  // Font Sizes
+  static const double fontSizeSm = 12.0;
+  static const double fontSizeMd = 14.0;
+  static const double fontSizeLg = 16.0;
+  static const double fontSizeXl = 20.0;
+  static const double fontSizeXxl = 24.0;
 
-  static const double brandCardWidth = 170.0; // 170
-  static const double brandCardHeight = 70.0; // 70
+  // Card
+  static const double cardRadius = 32.0;
+  static const double cardElevation = 0.0;
+
+  // Image
+  static const double imageSize = 80.0;
+
+  // AppBar
+  static const double appBarHeight = 56.0;
 }
