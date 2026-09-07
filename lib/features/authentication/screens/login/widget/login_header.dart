@@ -3,6 +3,8 @@ import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
 
+import '../../../../../common/widget/logo/app_logo.dart';
+
 class LoginHeader extends StatelessWidget {
   const LoginHeader({super.key});
 
@@ -12,25 +14,9 @@ class LoginHeader extends StatelessWidget {
       children: [
         const SizedBox(height: SSize.xl * 2),
 
-        // EA Logo Design
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: SColors.primary,
-            borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
-          ),
-          child: const Center(
-            child: Text(
-              "EA",
-              style: TextStyle(
-                color: SColors.white,
-                fontSize: SSize.fontSizeXxl,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
+        // Logo
+        SAppLogo(showText: true),
+
 
         const SizedBox(height: SSize.spaceBtwSections),
 

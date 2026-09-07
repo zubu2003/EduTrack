@@ -8,4 +8,15 @@ class STextStrings {
   static const String signIn = 'Sign In';
   static const String dontHaveAccount = "Don't have an account?";
   static const String createOne = 'Create one';
+
+  // Sign Up Screen
+  static const String signUpTitle = 'Create Your Account to start';
+  static const String signUpSubtitle = 'Create your account to start';
+  static const String fullName = 'Full Name';
+  static const String studentTeacherId = 'Student ID / Teacher ID';
+  static const String universityEmail = 'University Email';
+  static const String department = 'Department';
+  static const String confirmPassword = 'Confirm Password';
+  static const String createAccount = 'Create Account';
+  static const String alreadyHaveAccount = 'Already have an account?';
 }
