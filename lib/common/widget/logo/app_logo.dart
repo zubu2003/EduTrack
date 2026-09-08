@@ -28,17 +28,7 @@ class SAppLogo extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset(
-              SImages.appLogoIconLight,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  Icons.school,
-                  color: Colors.white,
-                  size: (size ?? 60) * 0.6,
-                );
-              },
-            ),
+            child: Image(image: AssetImage(SImages.appLogoIconLight),)
           ),
         ),
 

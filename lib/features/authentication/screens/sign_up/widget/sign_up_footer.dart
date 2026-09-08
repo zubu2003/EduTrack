@@ -23,7 +23,7 @@ class SignUpFooter extends StatelessWidget {
             Get.offAll(LoginScreen());
           },
           child: Text(
-            STextStrings.signIn,
+            " ${STextStrings.signIn}",
             style: TextStyle(
               color: SColors.primary,
               fontWeight: FontWeight.bold,
