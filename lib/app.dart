@@ -1,3 +1,4 @@
+import 'package:edutrack/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,6 +15,8 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: SAppTheme.lightTheme,
       darkTheme: SAppTheme.darkTheme,
+      initialRoute: AppRoutes.studentDashboard, // Set initial route
+      getPages: AppRoutes.pages,
       home: const SplashScreen(),
     );
   }

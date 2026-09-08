@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import '../../../../common/widget/appbar/common_appbar.dart';
+import '../../../../common/widget/bottom_nav/student_bottom_nav.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/dashboard_todays_classes.dart';
 import 'widgets/dashboard_class_schedule.dart';
 import 'widgets/dashboard_upcoming_cts.dart';
-import 'widgets/dashboard_bottom_nav.dart';
 
 class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({super.key});
@@ -14,8 +14,7 @@ class StudentDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SAppbar(
-
+      appBar: const SAppbar(
         showBackButton: false,
       ),
       backgroundColor: SColors.backgroundColor,
@@ -48,7 +47,9 @@ class StudentDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const DashboardBottomNav(),
+        bottomNavigationBar: const StudentBottomNav(
+          currentIndex: 0,  // Home tab selected
+        ),
     );
   }
 }

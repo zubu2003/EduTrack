@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/utils/constant/text_strings.dart';
+import 'package:edutrack/routes/app_routes.dart';
 import 'dashboard_class_card.dart';
 
 class DashboardTodaysClasses extends StatelessWidget {
@@ -12,7 +13,6 @@ class DashboardTodaysClasses extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header with View All
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -24,12 +24,7 @@ class DashboardTodaysClasses extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('View All Classes'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
+                Get.toNamed(AppRoutes.studentTodaysClasses);
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -46,10 +41,7 @@ class DashboardTodaysClasses extends StatelessWidget {
             ),
           ],
         ),
-
         const SizedBox(height: SSize.spaceBtwItems),
-
-        // Live Class Card
         const DashboardClassCard(
           courseName: 'CSE 356 Software Engineering',
           time: '10:00 AM - 11:30',
@@ -57,10 +49,7 @@ class DashboardTodaysClasses extends StatelessWidget {
           teacher: 'Dr. XYZ',
           isLive: true,
         ),
-
         const SizedBox(height: SSize.spaceBtwItems),
-
-        // Upcoming Class Card
         const DashboardClassCard(
           courseName: 'EEE 201 Electrical Circuits',
           time: 'Lab 02',

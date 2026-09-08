@@ -41,7 +41,7 @@ class SSize {
   static const double fontSizeXxl = 24.0;
 
   // Card
-  static const double cardRadius = 32.0;
+  static const double cardRadius = 28.0;
   static const double cardElevation = 0.0;
 
   // Image

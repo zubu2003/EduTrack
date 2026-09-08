@@ -7,6 +7,7 @@ import 'package:iconsax/iconsax.dart';
 
 import '../../../../../common/widget/button/SElevatedbutton.dart';
 import '../../../../student/screens/dashboard/student_dashboard_screen.dart';
+import '../../forget_password/forgot_password_screen.dart';
 
 class LoginFormSection extends StatelessWidget {
   const LoginFormSection({super.key});
@@ -74,7 +75,7 @@ class LoginFormSection extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () {},
+            onPressed: () => Get.to(ForgotPasswordScreen()),
             child: Text(
               STextStrings.forgotPassword,
               style: const TextStyle(

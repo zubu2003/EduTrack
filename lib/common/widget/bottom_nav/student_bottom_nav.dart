@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:edutrack/utils/constant/colors.dart';
+import 'package:edutrack/routes/app_routes.dart';
 import 'package:iconsax/iconsax.dart';
 
-class DashboardBottomNav extends StatelessWidget {
-  const DashboardBottomNav({super.key});
+class StudentBottomNav extends StatelessWidget {
+  final int currentIndex;
+
+  const StudentBottomNav({
+    super.key,
+    this.currentIndex = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +32,24 @@ class DashboardBottomNav extends StatelessWidget {
         unselectedItemColor: SColors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        currentIndex: 0,
+        currentIndex: currentIndex,
         onTap: (index) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Navigation to tab ${index + 1}'),
-              duration: const Duration(seconds: 1),
-            ),
-          );
+          if (index == currentIndex) return;
+
+          switch (index) {
+            case 0:
+              Get.offAllNamed(AppRoutes.studentDashboard);
+              break;
+            case 1:
+              Get.offAllNamed(AppRoutes.studentCourses);
+              break;
+            case 2:
+              Get.offAllNamed(AppRoutes.studentRoutine);
+              break;
+            case 3:
+              Get.offAllNamed(AppRoutes.profile);
+              break;
+          }
         },
         items: const [
           BottomNavigationBarItem(
@@ -46,10 +63,6 @@ class DashboardBottomNav extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Iconsax.calendar),
             label: 'Routine',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.clipboard),
-            label: 'Attendance',
           ),
           BottomNavigationBarItem(
             icon: Icon(Iconsax.user),
