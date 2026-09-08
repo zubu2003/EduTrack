@@ -12,7 +12,10 @@ class SignUpHeader extends StatelessWidget {
     return Column(
       children: [
 
-        SAppLogo(showText: true),
+        SAppLogo(
+            isCircular: false,
+            showText: true
+        ),
 
         const SizedBox(height: SSize.spaceBtwItems),
 

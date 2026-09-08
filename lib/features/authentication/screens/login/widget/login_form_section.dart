@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../../../common/widget/button/SElevatedbutton.dart';
+import '../../../../student/screens/dashboard/student_dashboard_screen.dart';
 
 class LoginFormSection extends StatelessWidget {
   const LoginFormSection({super.key});
@@ -90,7 +92,10 @@ class LoginFormSection extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           height: SSize.buttonHeight,
-          child: const SElevatedbutton(),
+          child: SElevatedbutton(
+            text: "Sign In",
+            onPressed:()=> Get.to(const StudentDashboardScreen()) ,
+          ),
         ),
       ],
     );

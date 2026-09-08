@@ -6,29 +6,40 @@ import 'package:edutrack/utils/constant/image_string.dart';
 class SAppLogo extends StatelessWidget {
   final double? size;
   final bool showText;
+  final bool isCircular;
 
   const SAppLogo({
     super.key,
     this.size,
     this.showText = true,
+    this.isCircular = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final logoSize = size ?? 80;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // App Icon/Logo
         Container(
-          width: size ?? 80,
-          height: size ?? 80,
+          width: logoSize,
+          height: logoSize,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+            color: Colors.transparent,
+            borderRadius: isCircular
+                ? BorderRadius.circular(logoSize / 2)
+                : BorderRadius.circular(SSize.borderRadiusMd),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image(image: AssetImage(SImages.appLogoIconLight),)
+          child: ClipRRect(
+            borderRadius: isCircular
+                ? BorderRadius.circular(logoSize / 2)
+                : BorderRadius.circular(SSize.borderRadiusMd),
+            child: Image(
+              image: AssetImage(SImages.appLogoIconLight),
+              fit: BoxFit.contain,
+            ),
           ),
         ),
 

@@ -1,4 +1,7 @@
 class STextStrings {
+
+  static const String appName = 'EduTrack AI';
+
   // Login Screen
   static const String loginTitle = 'Welcome Back';
   static const String loginSubtitle = 'Sign in to your account';

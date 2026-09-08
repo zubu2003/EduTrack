@@ -6,13 +6,16 @@ import '../../../utils/constant/size.dart';
 
 class SElevatedbutton extends StatelessWidget {
   const SElevatedbutton({
-    super.key,
+    super.key, required this.onPressed, required this.text,
   });
+
+  final String text;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: SColors.primary,
         foregroundColor: Colors.white,
@@ -21,8 +24,8 @@ class SElevatedbutton extends StatelessWidget {
         ),
         elevation: 0,
       ),
-      child: const Text(
-        "Sign In",
+      child: Text(
+        text,
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
     );

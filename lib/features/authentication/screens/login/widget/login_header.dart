@@ -15,7 +15,10 @@ class LoginHeader extends StatelessWidget {
         const SizedBox(height: SSize.xl * 2),
 
         // Logo
-        SAppLogo(showText: true),
+        SAppLogo(
+        isCircular: false,
+        showText: true
+        ),
 
 
         const SizedBox(height: SSize.spaceBtwSections),

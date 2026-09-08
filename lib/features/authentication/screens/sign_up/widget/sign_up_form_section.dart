@@ -4,6 +4,8 @@ import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../../../../common/widget/button/SElevatedbutton.dart';
+
 class SignUpFormSection extends StatelessWidget {
   const SignUpFormSection({super.key});
 
@@ -233,22 +235,10 @@ class SignUpFormSection extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           height: SSize.buttonHeight,
-          child: ElevatedButton(
+          child: SElevatedbutton(
+            text: "Create Account",
             onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
-              ),
-              elevation: 2,
-            ),
-            child: Text(
-              STextStrings.createAccount,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: SColors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+
           ),
         ),
       ],
