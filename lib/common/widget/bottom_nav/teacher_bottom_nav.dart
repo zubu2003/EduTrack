@@ -4,10 +4,10 @@ import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/routes/app_routes.dart';
 import 'package:iconsax/iconsax.dart';
 
-class StudentBottomNav extends StatelessWidget {
+class TeacherBottomNav extends StatelessWidget {
   final int currentIndex;
 
-  const StudentBottomNav({
+  const TeacherBottomNav({
     super.key,
     this.currentIndex = 0,
   });
@@ -38,16 +38,21 @@ class StudentBottomNav extends StatelessWidget {
 
           switch (index) {
             case 0:
-              Get.offAllNamed(AppRoutes.studentDashboard);
+              Get.offAllNamed(AppRoutes.teacherDashboard);
               break;
             case 1:
-              Get.offAllNamed(AppRoutes.studentCourses);
+              Get.offAllNamed(AppRoutes.teacherCourses);
               break;
             case 2:
-              Get.offAllNamed(AppRoutes.studentRoutine);
+              Get.snackbar(
+                'Coming Soon',
+                'Routine feature coming soon!',
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
               break;
             case 3:
-              Get.offAllNamed(AppRoutes.studentProfile);
+              Get.offAllNamed(AppRoutes.teacherProfile);
               break;
           }
         },
@@ -58,7 +63,7 @@ class StudentBottomNav extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Iconsax.book),
-            label: 'Courses',
+            label: 'Course',
           ),
           BottomNavigationBarItem(
             icon: Icon(Iconsax.calendar),

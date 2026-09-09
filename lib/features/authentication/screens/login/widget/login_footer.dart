@@ -1,3 +1,4 @@
+import 'package:edutrack/features/authentication/controllers/login/login_controller.dart';
 import 'package:edutrack/features/authentication/screens/sign_up/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -5,11 +6,15 @@ import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
 import 'package:get/get.dart';
 
+import '../../../../../routes/app_routes.dart';
+
 class LoginFooter extends StatelessWidget {
   const LoginFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = LoginController.instance;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: SSize.defaultSpace,
@@ -25,9 +30,7 @@ class LoginFooter extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Get.to(SignUpScreen());
-            },
+            onTap: () => Get.toNamed(AppRoutes.signUp),  // ✅ Fixed: Navigate to Sign Up
             child: Text(
               " ${STextStrings.createOne}",
               style: TextStyle(

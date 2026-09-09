@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
-class StudentCoursesHeader extends StatelessWidget {
+class TeacherCoursesHeader extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const StudentCoursesHeader({
+  const TeacherCoursesHeader({
     super.key,
     required this.title,
     required this.subtitle,

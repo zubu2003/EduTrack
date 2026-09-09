@@ -1,16 +1,16 @@
-import 'package:edutrack/features/student/screens/courses/widgets/course_card.dart';
-import 'package:edutrack/features/student/screens/courses/widgets/courses_header.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
-import 'package:edutrack/common/widget/bottom_nav/student_bottom_nav.dart';
+import 'package:edutrack/common/widget/bottom_nav/teacher_bottom_nav.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'widgets/teacher_courses_header.dart';
+import 'widgets/teacher_course_card.dart';
 
-class StudentCoursesScreen extends StatelessWidget {
+class TeacherCoursesScreen extends StatelessWidget {
   final bool showTodayOnly;
 
-  const StudentCoursesScreen({
+  const TeacherCoursesScreen({
     super.key,
     this.showTodayOnly = false,
   });
@@ -21,41 +21,41 @@ class StudentCoursesScreen extends StatelessWidget {
     final title = showTodayOnly ? "Today's Classes" : 'My Courses';
     final subtitle = showTodayOnly
         ? 'Your classes scheduled for today.'
-        : 'Manage your current academic semester.';
+        : 'Manage your teaching courses.';
 
-    // Sample course data
+    // Sample course data for teacher
     final courses = [
       {
         'code': 'CSE 356',
         'name': 'Software Engineering',
-        'teacher': 'Dr. XYZ',
-        'attendance': '85%',
+        'section': 'A',
+        'students': 42,
+        'progress': 0.57,
         'color': SColors.primary,
-        'progress': 0.85,
       },
       {
-        'code': 'MAT 211',
-        'name': 'Linear Algebra',
-        'teacher': 'Prof. ABC',
-        'attendance': '92%',
-        'color': SColors.success,
-        'progress': 0.92,
+        'code': 'CSE 412',
+        'name': 'Artificial Intelligence',
+        'section': 'B',
+        'students': 38,
+        'progress': 0.43,
+        'color': const Color(0xFF6C63FF),
       },
       {
-        'code': 'PHY 131',
-        'name': 'Classical Physics I',
-        'teacher': 'Dr. LMN',
-        'attendance': '74%',
-        'color': SColors.warning,
-        'progress': 0.74,
+        'code': 'CSE 201',
+        'name': 'Data Structures',
+        'section': 'A',
+        'students': 45,
+        'progress': 0.57,
+        'color': const Color(0xFF4A90D9),
       },
       {
-        'code': 'EEE 201',
-        'name': 'Electrical Circuits',
-        'teacher': 'Dr. ABC',
-        'attendance': '72%',
-        'color': SColors.error,
-        'progress': 0.72,
+        'code': 'CSE 301',
+        'name': 'Database Management',
+        'section': 'C',
+        'students': 35,
+        'progress': 0.30,
+        'color': const Color(0xFFF59E0B),
       },
     ];
 
@@ -70,7 +70,7 @@ class StudentCoursesScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          StudentCoursesHeader(
+          TeacherCoursesHeader(
             title: title,
             subtitle: subtitle,
           ),
@@ -86,21 +86,14 @@ class StudentCoursesScreen extends StatelessWidget {
                 final course = displayCourses[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: SSize.spaceBtwItems),
-                  child: StudentCourseCard(
+                  child: TeacherCourseCard(
                     courseCode: course['code'] as String,
                     courseName: course['name'] as String,
-                    teacherName: course['teacher'] as String,
-                    attendance: course['attendance'] as String,
-                    color: course['color'] as Color,
+                    section: course['section'] as String,
+                    students: course['students'] as int,
                     progress: course['progress'] as double,
-                    onTap: () {
-                      Get.snackbar(
-                        'Course Details',
-                        'Opening ${course['code'] as String}',
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: const Duration(seconds: 2),
-                      );
-                    },
+                    color: course['color'] as Color,
+                    // ❌ REMOVED onTap - let the card handle navigation
                   ),
                 );
               },
@@ -108,7 +101,7 @@ class StudentCoursesScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const StudentBottomNav(
+      bottomNavigationBar: const TeacherBottomNav(
         currentIndex: 1,
       ),
     );

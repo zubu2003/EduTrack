@@ -1,44 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:edutrack/common/widget/teacher/teacher_info.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/routes/app_routes.dart';
 import 'package:iconsax/iconsax.dart';
 
-class StudentCourseCard extends StatelessWidget {
+class TeacherCourseCard extends StatelessWidget {
   final String courseCode;
   final String courseName;
-  final String teacherName;
-  final String attendance;
-  final Color color;
+  final String section;
+  final int students;
   final double progress;
-  final VoidCallback? onTap;
+  final Color color;
 
-  const StudentCourseCard({
+  const TeacherCourseCard({
     super.key,
     required this.courseCode,
     required this.courseName,
-    required this.teacherName,
-    required this.attendance,
-    required this.color,
+    required this.section,
+    required this.students,
     required this.progress,
-    this.onTap,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap ??
-              () {
-            Get.toNamed(
-              AppRoutes.studentCourseDetails,
-              arguments: {
-                'courseCode': courseCode,
-                'courseName': courseName,
-              },
-            );
+      onTap: () {
+        // Navigate to course details with arguments
+        Get.toNamed(
+          AppRoutes.teacherCourseDetails,
+          arguments: {
+            'courseCode': courseCode,
+            'courseName': courseName,
+            'students': students,
+            'section': section,
           },
+        );
+      },
       borderRadius: BorderRadius.circular(SSize.cardRadius),
       child: Container(
         padding: const EdgeInsets.all(SSize.md),
@@ -56,12 +55,12 @@ class StudentCourseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Course Code + Color Indicator + Attendance Badge
+            // Top Row: Course Code + Stats
             Row(
               children: [
                 Container(
                   width: 4,
-                  height: 32,
+                  height: 40,
                   decoration: BoxDecoration(
                     color: color,
                     borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
@@ -77,38 +76,61 @@ class StudentCourseCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Students Badge
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: SSize.md,
+                    horizontal: SSize.sm,
                     vertical: SSize.xs,
                   ),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+                    borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.calendar_today_outlined,
+                        Iconsax.people,
                         color: color,
                         size: SSize.iconSm,
                       ),
                       const SizedBox(width: SSize.xs),
                       Text(
-                        attendance,
+                        '$students',
                         style: TextStyle(
                           color: color,
                           fontWeight: FontWeight.bold,
-                          fontSize: SSize.fontSizeMd,
+                          fontSize: SSize.fontSizeSm,
                         ),
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(width: SSize.sm),
+                // Section Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: SSize.sm,
+                    vertical: SSize.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
+                  ),
+                  child: Text(
+                    'Sec $section',
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.w600,
+                      fontSize: SSize.fontSizeSm,
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: SSize.sm),
+
+            // Course Name
             Text(
               courseName,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -116,12 +138,8 @@ class StudentCourseCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: SSize.sm),
-            STeacherInfoWidget(
-              teacherName: teacherName,
-              avatarRadius: 16,
-              fontSize: SSize.fontSizeMd,
-            ),
-            const SizedBox(height: SSize.sm),
+
+            // Progress Section
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -129,14 +147,14 @@ class StudentCourseCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Attendance',
+                      'Class Progress',
                       style: TextStyle(
                         color: SColors.textSecondary,
                         fontSize: SSize.fontSizeSm,
                       ),
                     ),
                     Text(
-                      attendance,
+                      '${(progress * 100).toInt()}%',
                       style: TextStyle(
                         color: color,
                         fontWeight: FontWeight.bold,
@@ -158,6 +176,8 @@ class StudentCourseCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: SSize.sm),
+
+            // View Details Arrow
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
