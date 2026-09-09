@@ -30,7 +30,7 @@ class LoginFooter extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => Get.toNamed(AppRoutes.signUp),  // ✅ Fixed: Navigate to Sign Up
+            onTap: () => Get.toNamed(AppRoutes.signUp),
             child: Text(
               " ${STextStrings.createOne}",
               style: TextStyle(

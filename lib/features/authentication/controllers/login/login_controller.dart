@@ -27,12 +27,7 @@ class LoginController extends GetxController {
 
   // Forgot Password - Demo Only
   void forgotPassword() {
-    Get.snackbar(
-      'Coming Soon',
-      'Password reset feature will be available soon!',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
+    Get.toNamed(AppRoutes.forgotPassword);
   }
 
   // Login - Frontend Only
