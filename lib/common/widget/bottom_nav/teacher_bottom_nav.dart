@@ -44,12 +44,7 @@ class TeacherBottomNav extends StatelessWidget {
               Get.offAllNamed(AppRoutes.teacherCourses);
               break;
             case 2:
-              Get.snackbar(
-                'Coming Soon',
-                'Routine feature coming soon!',
-                snackPosition: SnackPosition.BOTTOM,
-                duration: const Duration(seconds: 2),
-              );
+              Get.offAllNamed(AppRoutes.teacherRoutine);
               break;
             case 3:
               Get.offAllNamed(AppRoutes.teacherProfile);

@@ -2,21 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/student_bottom_nav.dart';
+import 'package:edutrack/common/widget/bottom_nav/teacher_bottom_nav.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'add_routine_screen.dart';
 import 'widgets/routine_header.dart';
 import 'widgets/routine_day_tabs.dart';
 import 'widgets/routine_card.dart';
-import 'add_routine_screen.dart';
 
-class StudentRoutineScreen extends StatefulWidget {
-  const StudentRoutineScreen({super.key});
+class RoutineScreen extends StatefulWidget {
+  final String userRole; // 'student' or 'teacher'
+
+  const RoutineScreen({
+    super.key,
+    this.userRole = 'student',
+  });
 
   @override
-  State<StudentRoutineScreen> createState() => _StudentRoutineScreenState();
+  State<RoutineScreen> createState() => _RoutineScreenState();
 }
 
-class _StudentRoutineScreenState extends State<StudentRoutineScreen> {
+class _RoutineScreenState extends State<RoutineScreen> {
   String selectedDay = 'Sun';
 
   // Hardcoded routine data
@@ -114,6 +120,11 @@ class _StudentRoutineScreenState extends State<StudentRoutineScreen> {
   Widget build(BuildContext context) {
     final currentRoutines = routineData[selectedDay] ?? [];
 
+    // Determine bottom nav based on role
+    final bottomNav = widget.userRole == 'teacher'
+        ? const TeacherBottomNav(currentIndex: 2)
+        : const StudentBottomNav(currentIndex: 2);
+
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
       appBar: const SAppbar(
@@ -178,9 +189,7 @@ class _StudentRoutineScreenState extends State<StudentRoutineScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const StudentBottomNav(
-        currentIndex: 2,
-      ),
+      bottomNavigationBar: bottomNav,
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddScreen,
         backgroundColor: SColors.primary,

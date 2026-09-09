@@ -8,7 +8,7 @@ import 'package:edutrack/features/student/screens/courses/student_courses_screen
 import 'package:edutrack/features/student/screens/course_details/student_course_details_screen.dart';
 import 'package:edutrack/features/student/screens/attendance_history/student_attendance_history_screen.dart';
 import 'package:edutrack/features/student/screens/ct_marks/student_ct_marks_screen.dart';
-import 'package:edutrack/features/student/screens/routine/student_routine_screen.dart';
+import 'package:edutrack/features/student/screens/routine/routine_screen.dart';
 import 'package:edutrack/features/teacher/screens/dashboard/teacher_dashboard_screen.dart';
 import 'package:edutrack/features/teacher/screens/courses/teacher_courses_screen.dart';
 import 'package:edutrack/features/teacher/screens/course_details/teacher_course_details_screen.dart';
@@ -47,6 +47,7 @@ class AppRoutes {
   static const String attendanceHistory = '/attendance-history';
   static const String teacherCtMarks = '/teacher-ct-marks';
   static const String uploadCtMarks = '/upload-ct-marks';
+  static const String teacherRoutine = '/teacher-routine';
   static const String teacherProfile = '/teacher-profile';
 
   // Common Routes
@@ -110,7 +111,7 @@ class AppRoutes {
     ),
     GetPage(
       name: studentRoutine,
-      page: () => const StudentRoutineScreen(),
+      page: () => const RoutineScreen(userRole: 'student'),
     ),
     GetPage(
       name: studentProfile,
@@ -168,6 +169,10 @@ class AppRoutes {
         fullMarks: 20,
       ),
       transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: teacherRoutine,
+      page: () => const RoutineScreen(userRole: 'teacher'),
     ),
     GetPage(
       name: teacherProfile,

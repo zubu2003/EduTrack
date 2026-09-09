@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'package:edutrack/routes/app_routes.dart';
 import 'package:iconsax/iconsax.dart';
+
+import '../../../../../common/widget/dialog/course_selector_dialog.dart';
 
 class TeacherQuickActions extends StatelessWidget {
   const TeacherQuickActions({super.key});
@@ -14,21 +17,33 @@ class TeacherQuickActions extends StatelessWidget {
         'label': 'Take Attendance',
         'icon': Iconsax.clipboard_tick,
         'color': SColors.primary,
+        'route': AppRoutes.takeAttendance,
+        'title': 'Take Attendance',
+        'subtitle': 'Choose a course to take attendance',
       },
       {
-        'label': 'Upload Marks',
+        'label': 'CT Marks',
         'icon': Iconsax.document_upload,
         'color': const Color(0xFF6C63FF),
+        'route': AppRoutes.teacherCtMarks,
+        'title': 'CT Marks',
+        'subtitle': 'Choose a course to manage CT marks',
       },
       {
         'label': 'Send Announcement',
         'icon': Iconsax.notification,
         'color': const Color(0xFF4A90D9),
+        'route': null,
+        'title': 'Send Announcement',
+        'subtitle': 'Choose a course to send announcement',
       },
       {
         'label': 'View Reports',
         'icon': Iconsax.chart,
         'color': const Color(0xFF1A1A2E),
+        'route': null,
+        'title': 'View Reports',
+        'subtitle': 'Choose a course to view reports',
       },
     ];
 
@@ -60,6 +75,9 @@ class TeacherQuickActions extends StatelessWidget {
               action['label'] as String,
               action['icon'] as IconData,
               action['color'] as Color,
+              action['route'] as String?,
+              action['title'] as String,
+              action['subtitle'] as String,
             );
           },
         ),
@@ -72,15 +90,31 @@ class TeacherQuickActions extends StatelessWidget {
       String label,
       IconData icon,
       Color color,
+      String? route,
+      String title,
+      String subtitle,
       ) {
     return InkWell(
       onTap: () {
-        Get.snackbar(
-          'Coming Soon',
-          '$label feature coming soon!',
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 2),
-        );
+        if (route != null) {
+          // Show Course Selector Dialog
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (context) => CourseSelectorDialog(
+              title: 'Select Course',
+              subtitle: subtitle,
+              targetRoute: route,
+            ),
+          );
+        } else {
+          Get.snackbar(
+            'Coming Soon',
+            '$label feature coming soon!',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 2),
+          );
+        }
       },
       borderRadius: BorderRadius.circular(SSize.cardRadius),
       child: Container(

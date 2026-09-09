@@ -6,6 +6,7 @@ import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/student_bottom_nav.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'package:edutrack/routes/app_routes.dart';
 
 class StudentCoursesScreen extends StatelessWidget {
   final bool showTodayOnly;
@@ -94,11 +95,13 @@ class StudentCoursesScreen extends StatelessWidget {
                     color: course['color'] as Color,
                     progress: course['progress'] as double,
                     onTap: () {
-                      Get.snackbar(
-                        'Course Details',
-                        'Opening ${course['code'] as String}',
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: const Duration(seconds: 2),
+                      // Navigate to Student Course Details
+                      Get.toNamed(
+                        AppRoutes.studentCourseDetails,
+                        arguments: {
+                          'courseCode': course['code'] as String,
+                          'courseName': course['name'] as String,
+                        },
                       );
                     },
                   ),

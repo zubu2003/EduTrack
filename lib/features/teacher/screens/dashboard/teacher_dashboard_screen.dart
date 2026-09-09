@@ -53,9 +53,9 @@ class TeacherDashboardScreen extends StatelessWidget {
               const SizedBox(height: SSize.spaceBtwSections),
 
               // 6. AI Insight
-              const TeacherAIInsight(),
+              /*const TeacherAIInsight(),
 
-              const SizedBox(height: SSize.spaceBtwSections),
+              const SizedBox(height: SSize.spaceBtwSections),*/
             ],
           ),
         ),
