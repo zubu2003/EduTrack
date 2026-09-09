@@ -11,7 +11,10 @@ import 'package:edutrack/features/student/screens/routine/student_routine_screen
 import 'package:edutrack/features/personalization/screens/profile/profile_screen.dart';
 import 'package:edutrack/features/personalization/screens/profile/edit_profile_screen.dart';
 
+import '../features/authentication/screens/splash/splash_screen.dart';
+
 class AppRoutes {
+  static const String splash= '/splash';
   static const String login = '/login';
   static const String signUp = '/signup';
   static const String forgotPassword = '/forgot-password';
@@ -26,6 +29,10 @@ class AppRoutes {
   static const String editProfile = '/edit-profile';
 
   static final List<GetPage> pages = [
+    GetPage(
+        name: splash,
+        page: ()=> const SplashScreen(),
+    ),
     GetPage(
       name: login,
       page: () => const LoginScreen(),

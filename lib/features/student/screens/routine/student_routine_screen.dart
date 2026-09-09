@@ -100,6 +100,16 @@ class _StudentRoutineScreenState extends State<StudentRoutineScreen> {
     );
   }
 
+  void _openAddScreen() {
+    Get.to(
+          () => AddRoutineScreen(
+        day: selectedDay,
+        routine: null,
+        index: -1,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentRoutines = routineData[selectedDay] ?? [];
@@ -159,7 +169,7 @@ class _StudentRoutineScreenState extends State<StudentRoutineScreen> {
                       color: routine['color'] as Color,
                       onTap: () {
                         _openEditScreen(selectedDay, index);
-                      }, onDelete: () {  },
+                      },
                     ),
                   );
                 },
@@ -169,7 +179,17 @@ class _StudentRoutineScreenState extends State<StudentRoutineScreen> {
         ],
       ),
       bottomNavigationBar: const StudentBottomNav(
-        currentIndex: 2, // Routine tab selected
+        currentIndex: 2,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddScreen,
+        backgroundColor: SColors.primary,
+        elevation: 4,
+        child: const Icon(
+          Icons.add,
+          color: SColors.white,
+          size: 28,
+        ),
       ),
     );
   }

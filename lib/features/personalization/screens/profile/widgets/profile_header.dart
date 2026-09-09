@@ -54,7 +54,7 @@ class ProfileHeader extends StatelessWidget {
 
           // Name
           Text(
-            'Zubayer Ahmed',
+            'Zubayer Muntasir',
             style: const TextStyle(
               color: SColors.white,
               fontSize: SSize.fontSizeXxl,

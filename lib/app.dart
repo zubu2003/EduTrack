@@ -15,7 +15,7 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: SAppTheme.lightTheme,
       darkTheme: SAppTheme.darkTheme,
-      initialRoute: AppRoutes.studentDashboard, // Set initial route
+      initialRoute: AppRoutes.splash, // Set initial route
       getPages: AppRoutes.pages,
       home: const SplashScreen(),
     );
