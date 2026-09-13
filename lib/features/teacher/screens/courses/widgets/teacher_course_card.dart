@@ -1,43 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
+import 'package:edutrack/utils/constant/departments.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/routes/app_routes.dart';
 import 'package:iconsax/iconsax.dart';
 
 class TeacherCourseCard extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
-  final String section;
-  final int students;
-  final double progress;
-  final Color color;
+  final CourseModel course;
+  final VoidCallback onTap;       //  Tap to view course details
+  final VoidCallback onAssign;    // Assign students
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   const TeacherCourseCard({
     super.key,
-    required this.courseCode,
-    required this.courseName,
-    required this.section,
-    required this.students,
-    required this.progress,
-    required this.color,
+    required this.course,
+    required this.onTap,
+    required this.onAssign,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        // Navigate to course details with arguments
-        Get.toNamed(
-          AppRoutes.teacherCourseDetails,
-          arguments: {
-            'courseCode': courseCode,
-            'courseName': courseName,
-            'students': students,
-            'section': section,
-          },
-        );
-      },
+      onTap: onTap,  //  Tap card opens Course Details
       borderRadius: BorderRadius.circular(SSize.cardRadius),
       child: Container(
         padding: const EdgeInsets.all(SSize.md),
@@ -55,76 +42,56 @@ class TeacherCourseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Course Code + Stats
+            // Header Row
             Row(
               children: [
                 Container(
                   width: 4,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: color,
+                    color: SColors.primary,
                     borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                   ),
                 ),
                 const SizedBox(width: SSize.sm),
                 Expanded(
                   child: Text(
-                    courseCode,
+                    course.courseCode,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: SColors.textPrimary,
                     ),
                   ),
                 ),
-                // Students Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: SSize.sm,
-                    vertical: SSize.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Iconsax.people,
-                        color: color,
-                        size: SSize.iconSm,
+                // Menu
+                PopupMenuButton<String>(
+                  icon: Icon(Iconsax.more, color: SColors.grey),
+                  onSelected: (value) {
+                    if (value == 'edit') onEdit();
+                    if (value == 'delete') onDelete();
+                  },
+                  itemBuilder: (_) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Iconsax.edit, size: 18),
+                          SizedBox(width: 8),
+                          Text('Edit'),
+                        ],
                       ),
-                      const SizedBox(width: SSize.xs),
-                      Text(
-                        '$students',
-                        style: TextStyle(
-                          color: color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: SSize.fontSizeSm,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: SSize.sm),
-                // Section Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: SSize.sm,
-                    vertical: SSize.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
-                  ),
-                  child: Text(
-                    'Sec $section',
-                    style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.w600,
-                      fontSize: SSize.fontSizeSm,
                     ),
-                  ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Iconsax.trash, color: Colors.red, size: 18),
+                          SizedBox(width: 8),
+                          Text('Delete', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -132,74 +99,68 @@ class TeacherCourseCard extends StatelessWidget {
 
             // Course Name
             Text(
-              courseName,
+              course.courseName,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: SSize.sm),
 
-            // Progress Section
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Info Chips
+            Wrap(
+              spacing: SSize.md,
+              runSpacing: SSize.xs,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Class Progress',
-                      style: TextStyle(
-                        color: SColors.textSecondary,
-                        fontSize: SSize.fontSizeSm,
-                      ),
-                    ),
-                    Text(
-                      '${(progress * 100).toInt()}%',
-                      style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.bold,
-                        fontSize: SSize.fontSizeSm,
-                      ),
-                    ),
-                  ],
+                _buildInfoChip(Iconsax.calendar, 'Batch ${course.batch}'),
+                _buildInfoChip(
+                  Iconsax.building,
+                  SDepartments.getDeptName(course.department),
                 ),
-                const SizedBox(height: SSize.xs),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: SColors.grey.withOpacity(0.15),
-                    color: color,
-                    minHeight: 6,
-                  ),
+                _buildInfoChip(Iconsax.people, 'Sec ${course.section}'),
+                _buildInfoChip(
+                  Iconsax.user,
+                  '${course.totalStudents} students',
                 ),
               ],
             ),
-            const SizedBox(height: SSize.sm),
+            const SizedBox(height: SSize.md),
 
-            // View Details Arrow
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'View Details',
-                  style: TextStyle(
-                    color: SColors.primary,
-                    fontSize: SSize.fontSizeSm,
-                    fontWeight: FontWeight.w600,
+            //  Button: "Manage Students" (clearer than "Assign Students")
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton.icon(
+                onPressed: onAssign,
+                icon: const Icon(Iconsax.user_add, size: 18),
+                label: const Text('Manage Students'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: SColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                   ),
                 ),
-                const SizedBox(width: SSize.xs),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: SColors.primary,
-                  size: SSize.iconSm,
-                ),
-              ],
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: SColors.grey),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: SColors.textSecondary,
+            fontSize: SSize.fontSizeSm,
+          ),
+        ),
+      ],
     );
   }
 }

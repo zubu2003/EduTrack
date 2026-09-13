@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:edutrack/data/repositories/authentication_repository.dart';
 import 'package:edutrack/data/repositories/user/user_repository.dart';
 import 'package:edutrack/features/authentication/models/user_model.dart';
 import 'package:edutrack/common/widget/loader/full_screen_loader.dart';
@@ -15,6 +14,7 @@ class ProfileController extends GetxController {
 
   // Form key
   final editProfileFormKey = GlobalKey<FormState>();
+  final addDetailsFormKey = GlobalKey<FormState>();
 
   // Text Controllers
   final nameController = TextEditingController();
@@ -66,12 +66,10 @@ class ProfileController extends GetxController {
   /// Update user profile
   Future<void> updateProfile() async {
     try {
-      // Validate form
       if (!editProfileFormKey.currentState!.validate()) return;
 
       SFullScreenLoader.openLoadingDialog('Updating your profile...');
 
-      // Build updated user
       final updatedUser = user.value.copyWith(
         name: nameController.text.trim(),
         phone: phoneController.text.trim(),
@@ -83,20 +81,50 @@ class ProfileController extends GetxController {
         updatedAt: DateTime.now(),
       );
 
-      // Save to Firestore
       await UserRepository.instance.updateUserRecord(updatedUser);
 
-      // Update local state
       user.value = updatedUser;
 
       SFullScreenLoader.stopLoading();
-
       SSnackBarHelpers.successSnackBar(
         title: 'Success',
         message: 'Profile updated successfully',
       );
 
-      // Navigate back
+      Get.back();
+    } catch (e) {
+      SFullScreenLoader.stopLoading();
+      SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
+    }
+  }
+
+  /// Add missing details (only saves provided fields)
+  Future<void> addDetails() async {
+    try {
+      if (!addDetailsFormKey.currentState!.validate()) return;
+
+      SFullScreenLoader.openLoadingDialog('Saving your details...');
+
+      final updatedUser = user.value.copyWith(
+        phone: phoneController.text.trim(),
+        department: departmentController.text.trim(),
+        batch: batchController.text.trim(),
+        designation: designationController.text.trim(),
+        studentId: studentIdController.text.trim(),
+        teacherId: teacherIdController.text.trim(),
+        updatedAt: DateTime.now(),
+      );
+
+      await UserRepository.instance.updateUserRecord(updatedUser);
+
+      user.value = updatedUser;
+
+      SFullScreenLoader.stopLoading();
+      SSnackBarHelpers.successSnackBar(
+        title: 'Success',
+        message: 'Details added successfully',
+      );
+
       Get.back();
     } catch (e) {
       SFullScreenLoader.stopLoading();

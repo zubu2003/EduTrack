@@ -7,6 +7,7 @@ import 'package:edutrack/common/widget/loader/full_screen_loader.dart';
 import 'package:edutrack/utils/popups/snackbar_helpers.dart';
 
 import '../../../../utils/constant/keys.dart';
+import '../../models/user_model.dart';
 
 class SignUpController extends GetxController {
   static SignUpController get instance => Get.find();
@@ -46,15 +47,14 @@ class SignUpController extends GetxController {
         return;
       }
 
-      // ✅ Role-Email matching validation
+      // Role-Email validation
       final emailLower = email.text.trim().toLowerCase();
       final isStudentEmail = emailLower.contains(SKeys.studentEmailPattern);
 
       if (selectedRole.value == 'student' && !isStudentEmail) {
         SSnackBarHelpers.errorSnackBar(
           title: 'Invalid Student Email',
-          message:
-          'Student emails must contain "@student." (e.g., u1234@student.university.edu)',
+          message: 'Student emails must contain "@student."',
         );
         return;
       }
@@ -65,6 +65,19 @@ class SignUpController extends GetxController {
           message: 'Teachers cannot use student email addresses.',
         );
         return;
+      }
+
+      // ✅ Parse student ID for batch + department
+      String batch = '';
+      String department = '';
+      String studentIdValue = '';
+
+      if (selectedRole.value == 'student') {
+        studentIdValue = idNumber.text.trim();
+        if (studentIdValue.length >= 4) {
+          batch = studentIdValue.substring(0, 2);
+          department = studentIdValue.substring(2, 4);
+        }
       }
 
       SFullScreenLoader.openLoadingDialog('Creating your account...');
@@ -80,13 +93,24 @@ class SignUpController extends GetxController {
       final userCredential = await AuthenticationRepository.instance
           .registerUser(email.text.trim(), password.text.trim());
 
-      // Step 2: Firestore
-      await UserRepository.instance.saveUserRecord(
-        userCredential,
-        role: selectedRole.value,
+      // Step 2: Save user data with parsed batch/department
+      final newUser = UserModel(
+        uid: userCredential.user!.uid,
         name: name.text.trim(),
-        idNumber: idNumber.text.trim(),
+        email: email.text.trim(),
+        phone: '',
+        role: selectedRole.value,
+        profileImage: '',
+        studentId: selectedRole.value == 'student' ? studentIdValue : '',
+        teacherId: selectedRole.value == 'teacher' ? idNumber.text.trim() : '',
+        department: department,   // ✅ Parsed from ID
+        batch: batch,             // ✅ Parsed from ID
+        designation: '',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
+
+      await UserRepository.instance.saveUserData(newUser);
 
       SFullScreenLoader.stopLoading();
 

@@ -27,7 +27,16 @@ class EditProfileScreen extends StatelessWidget {
             );
           }
 
-          final isTeacher = controller.user.value.role == 'teacher';
+          final user = controller.user.value;
+          final isTeacher = user.role == 'teacher';
+
+          // Determine which fields have values
+          final hasPhone = user.phone.trim().isNotEmpty;
+          final hasDepartment = user.department.trim().isNotEmpty;
+          final hasBatch = user.batch.trim().isNotEmpty;
+          final hasDesignation = user.designation.trim().isNotEmpty;
+          final hasStudentId = user.studentId.trim().isNotEmpty;
+          final hasTeacherId = user.teacherId.trim().isNotEmpty;
 
           return SingleChildScrollView(
             child: Padding(
@@ -46,7 +55,6 @@ class EditProfileScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: SSize.xs),
-
                     Text(
                       'Update your personal information',
                       style: TextStyle(
@@ -56,7 +64,7 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: SSize.spaceBtwSections),
 
-                    // Avatar (UI only — no image upload yet)
+                    // Avatar
                     Center(
                       child: Stack(
                         children: [
@@ -118,77 +126,115 @@ class EditProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: SSize.spaceBtwSections),
 
-                    // Full Name
+                    // ✅ Name (always shown — required)
                     _buildTextField(
                       controller: controller.nameController,
                       label: 'Full Name',
                       hint: 'Enter your full name',
                       icon: Iconsax.user,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Please enter your name'
+                          : null,
                     ),
-                    const SizedBox(height: SSize.spaceBtwItems),
 
                     // Email (read-only)
+                    const SizedBox(height: SSize.spaceBtwItems),
                     _buildTextField(
-                      controller: TextEditingController(text: controller.user.value.email),
+                      controller: TextEditingController(text: user.email),
                       label: 'Email',
                       hint: 'Email',
                       icon: Iconsax.sms,
                       enabled: false,
                     ),
-                    const SizedBox(height: SSize.spaceBtwItems),
 
-                    // Phone
-                    _buildTextField(
-                      controller: controller.phoneController,
-                      label: 'Phone',
-                      hint: 'Enter your phone number',
-                      icon: Iconsax.call,
-                    ),
-                    const SizedBox(height: SSize.spaceBtwItems),
+                    // ✅ Only show fields that HAVE values
+                    if (hasPhone) ...[
+                      const SizedBox(height: SSize.spaceBtwItems),
+                      _buildTextField(
+                        controller: controller.phoneController,
+                        label: 'Phone',
+                        hint: 'Enter phone number',
+                        icon: Iconsax.call,
+                      ),
+                    ],
 
-                    // Department
-                    _buildTextField(
-                      controller: controller.departmentController,
-                      label: 'Department',
-                      hint: 'e.g. CSE',
-                      icon: Iconsax.building,
-                    ),
-                    const SizedBox(height: SSize.spaceBtwItems),
+                    if (hasDepartment) ...[
+                      const SizedBox(height: SSize.spaceBtwItems),
+                      _buildTextField(
+                        controller: controller.departmentController,
+                        label: 'Department',
+                        hint: 'e.g. CSE',
+                        icon: Iconsax.building,
+                      ),
+                    ],
 
-                    // Role-specific fields
-                    if (isTeacher) ...[
-                      // Teacher ID
+                    if (isTeacher && hasTeacherId) ...[
+                      const SizedBox(height: SSize.spaceBtwItems),
                       _buildTextField(
                         controller: controller.teacherIdController,
                         label: 'Teacher ID',
                         hint: 'e.g. TCH-001',
                         icon: Iconsax.document,
                       ),
-                      const SizedBox(height: SSize.spaceBtwItems),
+                    ],
 
-                      // Designation
+                    if (isTeacher && hasDesignation) ...[
+                      const SizedBox(height: SSize.spaceBtwItems),
                       _buildTextField(
                         controller: controller.designationController,
                         label: 'Designation',
                         hint: 'e.g. Professor',
                         icon: Iconsax.award,
                       ),
-                    ] else ...[
-                      // Student ID
+                    ],
+
+                    if (!isTeacher && hasStudentId) ...[
+                      const SizedBox(height: SSize.spaceBtwItems),
                       _buildTextField(
                         controller: controller.studentIdController,
                         label: 'Student ID',
                         hint: 'e.g. STU-2024-001',
                         icon: Iconsax.document,
                       ),
-                      const SizedBox(height: SSize.spaceBtwItems),
+                    ],
 
-                      // Batch
+                    if (!isTeacher && hasBatch) ...[
+                      const SizedBox(height: SSize.spaceBtwItems),
                       _buildTextField(
                         controller: controller.batchController,
                         label: 'Batch',
                         hint: 'e.g. 2024',
                         icon: Iconsax.calendar,
+                      ),
+                    ],
+
+                    // Empty state if no editable fields
+                    if (!hasPhone &&
+                        !hasDepartment &&
+                        !hasBatch &&
+                        !hasDesignation &&
+                        !hasStudentId &&
+                        !hasTeacherId) ...[
+                      const SizedBox(height: SSize.spaceBtwSections),
+                      Center(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Iconsax.info_circle,
+                              color: SColors.textSecondary.withOpacity(0.5),
+                              size: 48,
+                            ),
+                            const SizedBox(height: SSize.sm),
+                            Text(
+                              'No details to edit yet.\nAdd details first!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: SColors.textSecondary,
+                                fontSize: SSize.fontSizeMd,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
 
@@ -203,12 +249,16 @@ class EditProfileScreen extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: SColors.primary,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+                            borderRadius:
+                            BorderRadius.circular(SSize.borderRadiusMd),
                           ),
                         ),
                         child: Text(
                           'Save Changes',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
                             color: SColors.white,
                             fontWeight: FontWeight.bold,
                           ),
@@ -231,6 +281,7 @@ class EditProfileScreen extends StatelessWidget {
     required String hint,
     required IconData icon,
     bool enabled = true,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,6 +298,7 @@ class EditProfileScreen extends StatelessWidget {
         TextFormField(
           controller: controller,
           enabled: enabled,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: Icon(
@@ -274,12 +326,6 @@ class EditProfileScreen extends StatelessWidget {
               borderSide: BorderSide.none,
             ),
           ),
-          validator: (value) {
-            if (label == 'Full Name' && (value == null || value.isEmpty)) {
-              return 'Please enter your name';
-            }
-            return null;
-          },
         ),
       ],
     );

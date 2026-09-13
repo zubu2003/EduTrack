@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/logo/app_logo.dart';
 import 'package:edutrack/data/repositories/authentication_repository.dart';
+import 'package:edutrack/data/repositories/user/user_repository.dart';
+import 'package:edutrack/routes/app_routes.dart';
 import 'package:edutrack/utils/constant/colors.dart';
+import 'package:edutrack/utils/constant/keys.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
 import 'package:edutrack/utils/popups/snackbar_helpers.dart';
@@ -21,6 +24,31 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.elevation,
   });
+
+  /// Navigate to Profile based on user role
+  Future<void> _navigateToProfile() async {
+    try {
+      final userData = await UserRepository.instance.getCurrentUserData();
+      if (userData == null) {
+        SSnackBarHelpers.errorSnackBar(
+          title: 'Error',
+          message: 'Could not load profile. Please try again.',
+        );
+        return;
+      }
+
+      if (userData.role == SRoles.teacher) {
+        Get.toNamed(AppRoutes.teacherProfile);
+      } else {
+        Get.toNamed(AppRoutes.studentProfile);
+      }
+    } catch (e) {
+      SSnackBarHelpers.errorSnackBar(
+        title: 'Error',
+        message: e.toString(),
+      );
+    }
+  }
 
   /// Show Logout Confirmation Dialog
   void _showLogoutDialog(BuildContext context) {
@@ -56,7 +84,7 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              Get.back(); // Close dialog first
+              Get.back();
               try {
                 await AuthenticationRepository.instance.logout();
               } catch (e) {
@@ -88,13 +116,7 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
   /// Handle Popup Menu Selection
   void _handleMenuSelection(BuildContext context, String value) {
     if (value == 'profile') {
-      // Navigate to profile based on role
-      // For now, show snackbar
-      SSnackBarHelpers.successSnackBar(
-        title: 'Profile',
-        message: 'Opening profile...',
-      );
-      // TODO: Navigate to profile screen
+      _navigateToProfile();
     } else if (value == 'logout') {
       _showLogoutDialog(context);
     }

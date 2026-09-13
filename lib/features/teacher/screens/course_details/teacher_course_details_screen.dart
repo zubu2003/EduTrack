@@ -10,19 +10,21 @@ import 'widgets/course_details_stats.dart';
 import 'widgets/course_details_action_card.dart';
 
 class TeacherCourseDetailsScreen extends StatelessWidget {
-  const TeacherCourseDetailsScreen({super.key});
+  final String courseCode;
+  final String courseName;
+  final int students;
+  final String section;
+
+  const TeacherCourseDetailsScreen({
+    super.key,
+    this.courseCode = 'CSE 356',
+    this.courseName = 'Software Engineering',
+    this.students = 45,
+    this.section = 'A',
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Get arguments from GetX with proper type casting
-    final arguments = Get.arguments as Map<String, dynamic>?;
-
-    // Default values with proper type casting
-    final courseCode = arguments?['courseCode'] as String? ?? 'CSE 356';
-    final courseName = arguments?['courseName'] as String? ?? 'Software Engineering';
-    final students = arguments?['students'] as int? ?? 45;
-    final section = arguments?['section'] as String? ?? 'A';
-
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
       appBar: SAppbar(
@@ -51,7 +53,7 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
 
               const SizedBox(height: SSize.spaceBtwSections),
 
-              // 3. Take Attendance - Navigates to Take Attendance Screen
+              // 3. Take Attendance
               CourseDetailsActionCard(
                 icon: Icons.person_add_alt_1,
                 title: 'Take Attendance',
@@ -67,7 +69,7 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
 
               const SizedBox(height: SSize.spaceBtwItems),
 
-              // 4. CT Marks - Navigates to CT Marks Screen
+              // 4. CT Marks
               CourseDetailsActionCard(
                 icon: Icons.edit_note,
                 title: 'CT Marks',
@@ -83,11 +85,12 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
 
               const SizedBox(height: SSize.spaceBtwItems),
 
-              // 5. Attendance History - Navigates to Attendance History
+              // 5. Attendance History
               CourseDetailsActionCard(
                 icon: Icons.history,
                 title: 'Attendance History',
-                subtitle: 'View past records, modify entries, and generate exportable reports.',
+                subtitle:
+                'View past records, modify entries, and generate exportable reports.',
                 buttonText: 'VIEW HISTORY',
                 buttonColor: const Color(0xFF4A90D9),
                 routeName: AppRoutes.attendanceHistory,

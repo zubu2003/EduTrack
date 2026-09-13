@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/teacher_bottom_nav.dart';
+import 'package:edutrack/features/teacher/controllers/courses/teacher_courses_controller.dart';
+import 'package:edutrack/features/teacher/screens/courses/assign_students_screen.dart';
+import 'package:edutrack/features/teacher/screens/courses/create_course_screen.dart';
+import 'package:edutrack/features/teacher/screens/course_details/teacher_course_details_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'package:iconsax/iconsax.dart';
 import 'widgets/teacher_courses_header.dart';
 import 'widgets/teacher_course_card.dart';
 
@@ -17,50 +22,7 @@ class TeacherCoursesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine title and subtitle
-    final title = showTodayOnly ? "Today's Classes" : 'My Courses';
-    final subtitle = showTodayOnly
-        ? 'Your classes scheduled for today.'
-        : 'Manage your teaching courses.';
-
-    // Sample course data for teacher
-    final courses = [
-      {
-        'code': 'CSE 356',
-        'name': 'Software Engineering',
-        'section': 'A',
-        'students': 42,
-        'progress': 0.57,
-        'color': SColors.primary,
-      },
-      {
-        'code': 'CSE 412',
-        'name': 'Artificial Intelligence',
-        'section': 'B',
-        'students': 38,
-        'progress': 0.43,
-        'color': const Color(0xFF6C63FF),
-      },
-      {
-        'code': 'CSE 201',
-        'name': 'Data Structures',
-        'section': 'A',
-        'students': 45,
-        'progress': 0.57,
-        'color': const Color(0xFF4A90D9),
-      },
-      {
-        'code': 'CSE 301',
-        'name': 'Database Management',
-        'section': 'C',
-        'students': 35,
-        'progress': 0.30,
-        'color': const Color(0xFFF59E0B),
-      },
-    ];
-
-    // Filter if showing today only
-    final displayCourses = showTodayOnly ? courses.take(2).toList() : courses;
+    final controller = Get.put(TeacherCoursesController());
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
@@ -68,41 +30,111 @@ class TeacherCoursesScreen extends StatelessWidget {
         showBackButton: showTodayOnly,
         onBackPressed: showTodayOnly ? () => Get.back() : null,
       ),
-      body: Column(
-        children: [
-          TeacherCoursesHeader(
-            title: title,
-            subtitle: subtitle,
-          ),
-          const SizedBox(height: SSize.spaceBtwItems),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(
-                horizontal: SSize.defaultSpace,
-                vertical: SSize.sm,
+      body: Obx(
+            () {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: SColors.primary),
+            );
+          }
+
+          return Column(
+            children: [
+              TeacherCoursesHeader(
+                title: showTodayOnly ? "Today's Classes" : 'My Courses',
+                subtitle: showTodayOnly
+                    ? 'Your classes scheduled for today.'
+                    : 'Manage your teaching courses.',
               ),
-              itemCount: displayCourses.length,
-              itemBuilder: (context, index) {
-                final course = displayCourses[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: SSize.spaceBtwItems),
-                  child: TeacherCourseCard(
-                    courseCode: course['code'] as String,
-                    courseName: course['name'] as String,
-                    section: course['section'] as String,
-                    students: course['students'] as int,
-                    progress: course['progress'] as double,
-                    color: course['color'] as Color,
-                    // ❌ REMOVED onTap - let the card handle navigation
+              const SizedBox(height: SSize.spaceBtwItems),
+              Expanded(
+                child: controller.courses.isEmpty
+                    ? _buildEmptyState()
+                    : RefreshIndicator(
+                  onRefresh: controller.fetchTeacherCourses,
+                  color: SColors.primary,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: SSize.defaultSpace,
+                      vertical: SSize.sm,
+                    ),
+                    itemCount: controller.courses.length,
+                    itemBuilder: (context, index) {
+                      final course = controller.courses[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: SSize.spaceBtwItems,
+                        ),
+                        child: TeacherCourseCard(
+                          course: course,
+                          // ✅ Tap card → Course Details
+                          onTap: () => Get.to(
+                                () => TeacherCourseDetailsScreen(
+                              courseCode: course.courseCode,
+                              courseName: course.courseName,
+                              students: course.totalStudents,
+                              section: course.section,
+                            ),
+                          ),
+                          // Manage Students button
+                          onAssign: () => Get.to(
+                                () => AssignStudentsScreen(course: course),
+                          ),
+                          onEdit: () => Get.to(
+                                () => CreateCourseScreen(course: course),
+                          ),
+                          onDelete: () => controller.deleteCourse(course),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
-      bottomNavigationBar: const TeacherBottomNav(
-        currentIndex: 1,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.to(() => const CreateCourseScreen()),
+        backgroundColor: SColors.primary,
+        child: const Icon(Iconsax.add, color: SColors.white, size: 28),
+      ),
+      bottomNavigationBar: const TeacherBottomNav(currentIndex: 1),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(SSize.defaultSpace),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Iconsax.book,
+              size: 80,
+              color: SColors.primary.withOpacity(0.3),
+            ),
+            const SizedBox(height: SSize.spaceBtwItems),
+            Text(
+              'No Courses Yet',
+              style: TextStyle(
+                color: SColors.textPrimary,
+                fontSize: SSize.fontSizeLg,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: SSize.xs),
+            Text(
+              'Tap the + button to create your first course',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: SColors.textSecondary,
+                fontSize: SSize.fontSizeMd,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,44 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:edutrack/common/widget/teacher/teacher_info.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
+import 'package:edutrack/utils/constant/departments.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/routes/app_routes.dart';
 import 'package:iconsax/iconsax.dart';
 
 class StudentCourseCard extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
-  final String teacherName;
-  final String attendance;
-  final Color color;
-  final double progress;
-  final VoidCallback? onTap;
+  final CourseModel course;
+  final VoidCallback onTap;
 
   const StudentCourseCard({
     super.key,
-    required this.courseCode,
-    required this.courseName,
-    required this.teacherName,
-    required this.attendance,
-    required this.color,
-    required this.progress,
-    this.onTap,
+    required this.course,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap ??
-              () {
-            Get.toNamed(
-              AppRoutes.studentCourseDetails,
-              arguments: {
-                'courseCode': courseCode,
-                'courseName': courseName,
-              },
-            );
-          },
+      onTap: onTap,
       borderRadius: BorderRadius.circular(SSize.cardRadius),
       child: Container(
         padding: const EdgeInsets.all(SSize.md),
@@ -56,21 +36,20 @@ class StudentCourseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Course Code + Color Indicator + Attendance Badge
             Row(
               children: [
                 Container(
                   width: 4,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: color,
+                    color: SColors.primary,
                     borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                   ),
                 ),
                 const SizedBox(width: SSize.sm),
                 Expanded(
                   child: Text(
-                    courseCode,
+                    course.courseCode,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: SColors.textPrimary,
@@ -79,80 +58,65 @@ class StudentCourseCard extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: SSize.md,
+                    horizontal: SSize.sm,
                     vertical: SSize.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+                    color: SColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        color: color,
-                        size: SSize.iconSm,
-                      ),
-                      const SizedBox(width: SSize.xs),
-                      Text(
-                        attendance,
-                        style: TextStyle(
-                          color: color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: SSize.fontSizeMd,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Sec ${course.section}',
+                    style: TextStyle(
+                      color: SColors.primary,
+                      fontSize: SSize.fontSizeSm,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: SSize.sm),
             Text(
-              courseName,
+              course.courseName,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: SSize.sm),
-            STeacherInfoWidget(
-              teacherName: teacherName,
-              avatarRadius: 16,
-              fontSize: SSize.fontSizeMd,
-            ),
-            const SizedBox(height: SSize.sm),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Attendance',
-                      style: TextStyle(
-                        color: SColors.textSecondary,
-                        fontSize: SSize.fontSizeSm,
-                      ),
-                    ),
-                    Text(
-                      attendance,
-                      style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.bold,
-                        fontSize: SSize.fontSizeSm,
-                      ),
-                    ),
-                  ],
+                Icon(Iconsax.user, size: 14, color: SColors.grey),
+                const SizedBox(width: 4),
+                Text(
+                  course.teacherName,
+                  style: TextStyle(
+                    color: SColors.textSecondary,
+                    fontSize: SSize.fontSizeSm,
+                  ),
                 ),
-                const SizedBox(height: SSize.xs),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: SColors.grey.withOpacity(0.15),
-                    color: color,
-                    minHeight: 6,
+              ],
+            ),
+            const SizedBox(height: SSize.xs),
+            Row(
+              children: [
+                Icon(Iconsax.building, size: 14, color: SColors.grey),
+                const SizedBox(width: 4),
+                Text(
+                  SDepartments.getDeptName(course.department),
+                  style: TextStyle(
+                    color: SColors.textSecondary,
+                    fontSize: SSize.fontSizeSm,
+                  ),
+                ),
+                const SizedBox(width: SSize.md),
+                Icon(Iconsax.award, size: 14, color: SColors.grey),
+                const SizedBox(width: 4),
+                Text(
+                  '${course.credit} Credits',
+                  style: TextStyle(
+                    color: SColors.textSecondary,
+                    fontSize: SSize.fontSizeSm,
                   ),
                 ),
               ],
@@ -170,11 +134,8 @@ class StudentCourseCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: SSize.xs),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: SColors.primary,
-                  size: SSize.iconSm,
-                ),
+                Icon(Icons.arrow_forward_ios,
+                    color: SColors.primary, size: SSize.iconSm),
               ],
             ),
           ],

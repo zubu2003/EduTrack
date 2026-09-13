@@ -11,6 +11,7 @@ import 'package:edutrack/features/student/screens/ct_marks/student_ct_marks_scre
 import 'package:edutrack/features/student/screens/routine/routine_screen.dart';
 import 'package:edutrack/features/teacher/screens/dashboard/teacher_dashboard_screen.dart';
 import 'package:edutrack/features/teacher/screens/courses/teacher_courses_screen.dart';
+import 'package:edutrack/features/teacher/screens/courses/create_course_screen.dart';
 import 'package:edutrack/features/teacher/screens/course_details/teacher_course_details_screen.dart';
 import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
 import 'package:edutrack/features/teacher/screens/attendance/attendance_history_screen.dart';
@@ -42,6 +43,7 @@ class AppRoutes {
   static const String teacherDashboard = '/teacher-dashboard';
   static const String teacherCourses = '/teacher-courses';
   static const String teacherTodaysClasses = '/teacher-todays-classes';
+  static const String createCourse = '/create-course';
   static const String teacherCourseDetails = '/teacher-course-details';
   static const String takeAttendance = '/take-attendance';
   static const String attendanceHistory = '/attendance-history';
@@ -130,6 +132,11 @@ class AppRoutes {
     GetPage(
       name: teacherTodaysClasses,
       page: () => const TeacherCoursesScreen(showTodayOnly: true),
+    ),
+    GetPage(
+      name: createCourse,
+      page: () => const CreateCourseScreen(),
+      transition: Transition.rightToLeft,
     ),
     GetPage(
       name: teacherCourseDetails,
