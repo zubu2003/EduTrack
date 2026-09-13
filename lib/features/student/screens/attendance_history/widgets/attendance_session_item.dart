@@ -17,6 +17,12 @@ class AttendanceSessionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPresent = status == 'Present';
+    final isLate = status == 'Late';
+    final badgeColor = isPresent
+        ? SColors.success
+        : isLate
+            ? Colors.amber.shade800
+            : SColors.error;
 
     return Container(
       width: double.infinity,
@@ -32,7 +38,7 @@ class AttendanceSessionItem extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: isPresent ? SColors.success.withOpacity(0.1) : SColors.error.withOpacity(0.1),
+          color: badgeColor.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -78,13 +84,13 @@ class AttendanceSessionItem extends StatelessWidget {
               vertical: SSize.xs,
             ),
             decoration: BoxDecoration(
-              color: isPresent ? SColors.success.withOpacity(0.1) : SColors.error.withOpacity(0.1),
+              color: badgeColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
             ),
             child: Text(
               status.toUpperCase(),
               style: TextStyle(
-                color: isPresent ? SColors.success : SColors.error,
+                color: badgeColor,
                 fontSize: SSize.fontSizeSm,
                 fontWeight: FontWeight.bold,
               ),

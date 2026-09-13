@@ -3,7 +3,18 @@ import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
 class CourseDetailsStats extends StatelessWidget {
-  const CourseDetailsStats({super.key});
+  final double attendancePercent;
+  final int presentCount;
+  final int totalCount;
+  final bool isAttendanceLoading;
+
+  const CourseDetailsStats({
+    super.key,
+    this.attendancePercent = 0,
+    this.presentCount = 0,
+    this.totalCount = 0,
+    this.isAttendanceLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +50,9 @@ class CourseDetailsStats extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '85%',
+                      isAttendanceLoading
+                          ? '--'
+                          : '${attendancePercent.toStringAsFixed(0)}%',
                       style: TextStyle(
                         color: SColors.textPrimary,
                         fontSize: SSize.fontSizeXxl,
@@ -48,7 +61,9 @@ class CourseDetailsStats extends StatelessWidget {
                     ),
                     const SizedBox(width: SSize.xs),
                     Text(
-                      '(42/50)',
+                      isAttendanceLoading
+                          ? ''
+                          : '($presentCount/$totalCount)',
                       style: TextStyle(
                         color: SColors.textSecondary,
                         fontSize: SSize.fontSizeMd,

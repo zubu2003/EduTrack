@@ -3,10 +3,24 @@ import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
 class AttendanceSummaryCard extends StatelessWidget {
-  const AttendanceSummaryCard({super.key});
+  final double percentage;
+  final int presentCount;
+  final int absentCount;
+  final int totalCount;
+
+  const AttendanceSummaryCard({
+    super.key,
+    required this.percentage,
+    required this.presentCount,
+    required this.absentCount,
+    required this.totalCount,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final percentText = percentage.toStringAsFixed(0);
+    final progress = (percentage / 100).clamp(0.0, 1.0);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(SSize.md),
@@ -23,12 +37,11 @@ class AttendanceSummaryCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Percentage Row
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '85%',
+                '$percentText%',
                 style: TextStyle(
                   color: SColors.textPrimary,
                   fontSize: SSize.fontSizeXxl * 1.5,
@@ -50,17 +63,14 @@ class AttendanceSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: SSize.sm),
-
-          // Required Progress
           Row(
             children: [
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                   child: LinearProgressIndicator(
-                    value: 0.85,
+                    value: progress,
                     backgroundColor: SColors.grey.withOpacity(0.15),
                     color: SColors.primary,
                     minHeight: 8,
@@ -78,18 +88,14 @@ class AttendanceSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: SSize.spaceBtwItems),
-
-          // Stats Row (Present, Absent, Total)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // Present
               Column(
                 children: [
                   Text(
-                    '42',
+                    '$presentCount',
                     style: TextStyle(
                       color: SColors.success,
                       fontSize: SSize.fontSizeLg,
@@ -106,11 +112,10 @@ class AttendanceSummaryCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Absent
               Column(
                 children: [
                   Text(
-                    '8',
+                    '$absentCount',
                     style: TextStyle(
                       color: SColors.error,
                       fontSize: SSize.fontSizeLg,
@@ -127,11 +132,10 @@ class AttendanceSummaryCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Total
               Column(
                 children: [
                   Text(
-                    '50',
+                    '$totalCount',
                     style: TextStyle(
                       color: SColors.textPrimary,
                       fontSize: SSize.fontSizeLg,

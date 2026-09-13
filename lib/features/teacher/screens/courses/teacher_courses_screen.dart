@@ -67,13 +67,10 @@ class TeacherCoursesScreen extends StatelessWidget {
                         ),
                         child: TeacherCourseCard(
                           course: course,
-                          // ✅ Tap card → Course Details
+                          // ✅ FIXED: Pass full course object
                           onTap: () => Get.to(
                                 () => TeacherCourseDetailsScreen(
-                              courseCode: course.courseCode,
-                              courseName: course.courseName,
-                              students: course.totalStudents,
-                              section: course.section,
+                              course: course,
                             ),
                           ),
                           // Manage Students button
@@ -83,7 +80,8 @@ class TeacherCoursesScreen extends StatelessWidget {
                           onEdit: () => Get.to(
                                 () => CreateCourseScreen(course: course),
                           ),
-                          onDelete: () => controller.deleteCourse(course),
+                          onDelete: () =>
+                              controller.deleteCourse(course),
                         ),
                       );
                     },

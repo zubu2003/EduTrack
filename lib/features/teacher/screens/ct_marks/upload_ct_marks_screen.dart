@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'widgets/upload_ct_marks_header.dart';
@@ -8,15 +9,13 @@ import 'widgets/upload_ct_marks_form.dart';
 import 'widgets/upload_ct_marks_actions.dart';
 
 class UploadCtMarksScreen extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
+  final CourseModel course;
   final String ctTitle;
   final int fullMarks;
 
   const UploadCtMarksScreen({
     super.key,
-    required this.courseCode,
-    required this.courseName,
+    required this.course,
     required this.ctTitle,
     required this.fullMarks,
   });
@@ -37,7 +36,7 @@ class UploadCtMarksScreen extends StatelessWidget {
             children: [
               // Header
               UploadCtMarksHeader(
-                courseCode: courseCode,
+                courseCode: course.courseCode,
                 ctTitle: ctTitle,
               ),
 

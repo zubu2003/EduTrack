@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -7,11 +6,13 @@ class AttendanceSummaryFooter extends StatelessWidget {
   final int presentCount;
   final int absentCount;
   final bool isEditing;
+  final VoidCallback onSubmit;
 
   const AttendanceSummaryFooter({
     super.key,
     required this.presentCount,
     required this.absentCount,
+    required this.onSubmit,
     this.isEditing = false,
   });
 
@@ -89,23 +90,15 @@ class AttendanceSummaryFooter extends StatelessWidget {
 
           const SizedBox(height: SSize.spaceBtwItems),
 
-          // Submit/Update Button
+          // Submit Button
           SizedBox(
             width: double.infinity,
             height: SSize.buttonHeight,
             child: ElevatedButton(
-              onPressed: () {
-                Get.snackbar(
-                  isEditing ? 'Updated' : 'Success',
-                  isEditing
-                      ? 'Attendance updated successfully!'
-                      : 'Attendance submitted successfully!',
-                  snackPosition: SnackPosition.BOTTOM,
-                  duration: const Duration(seconds: 2),
-                );
-              },
+              onPressed: onSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isEditing ? Colors.amber : SColors.primary,
+                backgroundColor:
+                isEditing ? Colors.amber : SColors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                 ),
@@ -114,8 +107,8 @@ class AttendanceSummaryFooter extends StatelessWidget {
                 isEditing ? 'Update Attendance' : 'Submit Attendance',
                 style: TextStyle(
                   color: isEditing ? SColors.textPrimary : SColors.white,
-                  fontSize: SSize.fontSizeLg,
                   fontWeight: FontWeight.bold,
+                  fontSize: SSize.fontSizeLg,
                 ),
               ),
             ),

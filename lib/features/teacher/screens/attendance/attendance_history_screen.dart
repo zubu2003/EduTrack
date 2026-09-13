@@ -2,80 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/teacher_bottom_nav.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/teacher/controllers/attendance/teacher_attendance_controller.dart';
+import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/routes/app_routes.dart';
+import 'package:iconsax/iconsax.dart';
 import 'widgets/attendance_history_header.dart';
 import 'widgets/attendance_date_card.dart';
 
 class AttendanceHistoryScreen extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
+  final CourseModel course;
 
   const AttendanceHistoryScreen({
     super.key,
-    required this.courseCode,
-    required this.courseName,
+    required this.course,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Hardcoded attendance data
-    final attendanceData = [
-      {
-        'date': '10 Aug 2026',
-        'lecture': 'Lecture 6: Advanced Cloud Architectures',
-        'present': 41,
-        'absent': 4,
-        'total': 45,
-      },
-      {
-        'date': '08 Aug 2026',
-        'lecture': 'Lecture 5: Container Orchestration',
-        'present': 43,
-        'absent': 2,
-        'total': 45,
-      },
-      {
-        'date': '05 Aug 2026',
-        'lecture': 'Lecture 4: Microservices Deployment',
-        'present': 40,
-        'absent': 5,
-        'total': 45,
-      },
-      {
-        'date': '03 Aug 2026',
-        'lecture': 'Lecture 3: CI/CD Pipelines',
-        'present': 40,
-        'absent': 3,
-        'total': 45,
-      },
-      {
-        'date': '01 Aug 2026',
-        'lecture': 'Lecture 2: Serverless Computing',
-        'present': 39,
-        'absent': 6,
-        'total': 45,
-      },
-      {
-        'date': '29 Jul 2026',
-        'lecture': 'Lecture 1: Introduction to Cloud Infrastructure',
-        'present': 42,
-        'absent': 3,
-        'total': 45,
-      },
-    ];
+    final controller = Get.put(
+      TeacherAttendanceController(course: course),
+      tag: 'history_${course.courseId}',
+    );
 
-    // Calculate average attendance
-    int totalPresent = 0;
-    int totalStudents = 0;
-    for (var item in attendanceData) {
-      totalPresent += item['present'] as int;
-      totalStudents += item['total'] as int;
-    }
-    final avgAttendance = totalStudents > 0
-        ? ((totalPresent / totalStudents) * 100).toStringAsFixed(1)
-        : '0';
+    // Fetch sessions on load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchSessions();
+    });
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
@@ -83,60 +37,106 @@ class AttendanceHistoryScreen extends StatelessWidget {
         showBackButton: true,
         onBackPressed: () => Get.back(),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
-          child: Column(
-            children: [
-              const SizedBox(height: SSize.sm),
+      body: Obx(() {
+        if (controller.sessions.isEmpty) {
+          return _buildEmptyState();
+        }
 
-              // Header
-              AttendanceHistoryHeader(
-                courseCode: courseCode,
-                courseName: courseName,
-              ),
+        // Compute average
+        int totalPresent = 0;
+        int totalStudents = 0;
+        for (var s in controller.sessions) {
+          totalPresent += s.presentCount;
+          totalStudents += s.totalStudents;
+        }
+        final avg = totalStudents > 0
+            ? ((totalPresent / totalStudents) * 100).toStringAsFixed(1)
+            : '0';
 
-              const SizedBox(height: SSize.spaceBtwItems),
+        return SingleChildScrollView(
+          child: Padding(
+            padding:
+            const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
+            child: Column(
+              children: [
+                const SizedBox(height: SSize.sm),
 
+                AttendanceHistoryHeader(
+                  courseCode: course.courseCode,
+                  courseName: course.courseName,
+                ),
 
-              // History List
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: attendanceData.length,
-                itemBuilder: (context, index) {
-                  final item = attendanceData[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: SSize.spaceBtwItems),
-                    child: AttendanceDateCard(
-                      date: item['date']! as String,
-                      lecture: item['lecture']! as String ,
-                      present: item['present']! as int,
-                      absent: item['absent']! as int,
-                      total: item['total']! as int,
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.takeAttendance,
-                          arguments: {
-                            'courseCode': courseCode,
-                            'courseName': courseName,
-                            'isEditing': true,
-                            'date': item['date'],
-                          },
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
+                const SizedBox(height: SSize.spaceBtwItems),
 
-              const SizedBox(height: SSize.spaceBtwSections),
-            ],
+                // Session List
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.sessions.length,
+                  itemBuilder: (context, index) {
+                    final session = controller.sessions[index];
+                    return Padding(
+                      padding:
+                      const EdgeInsets.only(bottom: SSize.spaceBtwItems),
+                      child: AttendanceDateCard(
+                        date: session.formattedDate,
+                        lecture: session.lecture,
+                        present: session.presentCount,
+                        absent: session.absentCount,
+                        total: session.totalStudents,
+                        onTap: () => Get.to(
+                              () => TakeAttendanceScreen(
+                            course: course,
+                            session: session,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: SSize.spaceBtwSections),
+              ],
+            ),
           ),
+        );
+      }),
+      bottomNavigationBar: const TeacherBottomNav(currentIndex: 1),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(SSize.defaultSpace),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Iconsax.calendar_remove,
+              size: 80,
+              color: SColors.primary.withOpacity(0.3),
+            ),
+            const SizedBox(height: SSize.spaceBtwItems),
+            Text(
+              'No Attendance Sessions',
+              style: TextStyle(
+                color: SColors.textPrimary,
+                fontSize: SSize.fontSizeLg,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: SSize.xs),
+            Text(
+              'Take your first attendance to see it here',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: SColors.textSecondary,
+                fontSize: SSize.fontSizeMd,
+              ),
+            ),
+          ],
         ),
-      ),
-      bottomNavigationBar: const TeacherBottomNav(
-        currentIndex: 1,
       ),
     );
   }

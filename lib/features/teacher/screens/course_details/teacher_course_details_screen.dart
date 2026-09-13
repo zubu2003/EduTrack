@@ -2,25 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/teacher_bottom_nav.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/teacher/screens/attendance/attendance_history_screen.dart';
+import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
+import 'package:edutrack/features/teacher/screens/ct_marks/teacher_ct_marks_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/routes/app_routes.dart';
 import 'widgets/course_details_header.dart';
 import 'widgets/course_details_stats.dart';
 import 'widgets/course_details_action_card.dart';
 
 class TeacherCourseDetailsScreen extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
-  final int students;
-  final String section;
+  final CourseModel course;
 
   const TeacherCourseDetailsScreen({
     super.key,
-    this.courseCode = 'CSE 356',
-    this.courseName = 'Software Engineering',
-    this.students = 45,
-    this.section = 'A',
+    required this.course,
   });
 
   @override
@@ -38,54 +35,48 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
             children: [
               const SizedBox(height: SSize.sm),
 
-              // 1. Header Card
               CourseDetailsHeader(
-                courseCode: courseCode,
-                courseName: courseName,
-                students: students,
-                section: section,
+                courseCode: course.courseCode,
+                courseName: course.courseName,
+                students: course.totalStudents,
+                section: course.section,
               ),
 
               const SizedBox(height: SSize.spaceBtwSections),
 
-              // 2. Stats Row (3 cards)
               const CourseDetailsStats(),
 
               const SizedBox(height: SSize.spaceBtwSections),
 
-              // 3. Take Attendance
+              // Take Attendance
               CourseDetailsActionCard(
                 icon: Icons.person_add_alt_1,
                 title: 'Take Attendance',
                 subtitle: 'Mark present, absent, or late for today\'s session.',
                 buttonText: 'START SESSION',
                 buttonColor: SColors.primary,
-                routeName: AppRoutes.takeAttendance,
-                arguments: {
-                  'courseCode': courseCode,
-                  'courseName': courseName,
-                },
+                onTap: () => Get.to(
+                      () => TakeAttendanceScreen(course: course),
+                ),
               ),
 
               const SizedBox(height: SSize.spaceBtwItems),
 
-              // 4. CT Marks
+              // CT Marks
               CourseDetailsActionCard(
                 icon: Icons.edit_note,
                 title: 'CT Marks',
                 subtitle: 'Enter and review Class Test scores and distributions.',
                 buttonText: 'MANAGE MARKS',
                 buttonColor: const Color(0xFF6C63FF),
-                routeName: AppRoutes.teacherCtMarks,
-                arguments: {
-                  'courseCode': courseCode,
-                  'courseName': courseName,
-                },
+                onTap: () => Get.to(
+                      () => TeacherCtMarksScreen(course: course),
+                ),
               ),
 
               const SizedBox(height: SSize.spaceBtwItems),
 
-              // 5. Attendance History
+              // Attendance History
               CourseDetailsActionCard(
                 icon: Icons.history,
                 title: 'Attendance History',
@@ -93,11 +84,9 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
                 'View past records, modify entries, and generate exportable reports.',
                 buttonText: 'VIEW HISTORY',
                 buttonColor: const Color(0xFF4A90D9),
-                routeName: AppRoutes.attendanceHistory,
-                arguments: {
-                  'courseCode': courseCode,
-                  'courseName': courseName,
-                },
+                onTap: () => Get.to(
+                      () => AttendanceHistoryScreen(course: course),
+                ),
               ),
 
               const SizedBox(height: SSize.spaceBtwSections),
@@ -105,9 +94,7 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const TeacherBottomNav(
-        currentIndex: 1,
-      ),
+      bottomNavigationBar: const TeacherBottomNav(currentIndex: 1),
     );
   }
 }

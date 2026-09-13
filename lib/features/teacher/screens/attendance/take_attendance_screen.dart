@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
+import 'package:edutrack/features/course/models/attendance_session_model.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/teacher/controllers/attendance/teacher_attendance_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'widgets/attendance_header.dart';
@@ -8,37 +11,27 @@ import 'widgets/attendance_student_item.dart';
 import 'widgets/attendance_summary_footer.dart';
 
 class TakeAttendanceScreen extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
-  final bool isEditing;
-  final String? date;
+  final CourseModel course;
+  final AttendanceSessionModel? session;
 
   const TakeAttendanceScreen({
     super.key,
-    required this.courseCode,
-    required this.courseName,
-    this.isEditing = false,
-    this.date,
+    required this.course,
+    this.session,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Hardcoded student data (will come from backend later)
-    final students = [
-      {'name': 'John Doe', 'id': '112233445', 'isPresent': true},
-      {'name': 'Alice Smith', 'id': '112233446', 'isPresent': true},
-      {'name': 'Bob Johnson', 'id': '112233447', 'isPresent': false},
-      {'name': 'Emily White', 'id': '112233448', 'isPresent': true},
-      {'name': 'Michael Davis', 'id': '112233449', 'isPresent': true},
-      {'name': 'Sarah Lee', 'id': '112233450', 'isPresent': false},
-      {'name': 'David Brown', 'id': '112233451', 'isPresent': true},
-    ];
+    final tag = '${course.courseId}_${session?.date ?? 'today'}';
 
-    // Calculate stats
-    final presentCount = students.where((s) => s['isPresent'] == true).length;
-    final absentCount = students.where((s) => s['isPresent'] == false).length;
+    if (Get.isRegistered<TeacherAttendanceController>(tag: tag)) {
+      Get.delete<TeacherAttendanceController>(tag: tag);
+    }
 
-    final displayDate = date ?? '10 Aug 2026';
+    final controller = Get.put(
+      TeacherAttendanceController(course: course, session: session),
+      tag: tag,
+    );
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
@@ -48,40 +41,80 @@ class TakeAttendanceScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Header
-          AttendanceHeader(
-            courseCode: courseCode,
-            courseName: courseName,
-            date: displayDate,
-            isEditing: isEditing,
-          ),
+          Obx(() => AttendanceHeader(
+                courseCode: course.courseCode,
+                courseName: course.courseName,
+                date: controller.displayDate,
+                isEditing: controller.isEditing,
+                onMarkAllPresent: controller.markAllPresent,
+              )),
           const SizedBox(height: SSize.spaceBtwItems),
-
-          // Student List
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
-              itemCount: students.length,
-              itemBuilder: (context, index) {
-                final student = students[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: SSize.sm),
-                  child: AttendanceStudentItem(
-                    name: student['name']! as String,
-                    id: student['id']! as String,
-                    isPresent: student['isPresent']! as bool,
+            child: Obx(() {
+              if (controller.isStudentsLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(color: SColors.primary),
+                );
+              }
+
+              if (controller.enrolledStudents.isEmpty) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(SSize.defaultSpace),
+                    child: Text(
+                      'No students enrolled in this course.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: SColors.textSecondary,
+                        fontSize: SSize.fontSizeMd,
+                      ),
+                    ),
                   ),
                 );
-              },
-            ),
-          ),
+              }
 
-          // Footer with Submit Button
-          AttendanceSummaryFooter(
-            presentCount: presentCount,
-            absentCount: absentCount,
-            isEditing: isEditing,
+              // Must be read here (not in itemBuilder) so Obx tracks the map
+              final attendance =
+                  Map<String, String>.from(controller.attendanceMap);
+              final students = controller.enrolledStudents.toList();
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: SSize.defaultSpace,
+                ),
+                itemCount: students.length,
+                itemBuilder: (context, index) {
+                  final student = students[index];
+                  final status = attendance[student.studentId] ?? 'absent';
+
+                  return Padding(
+                    key: ValueKey('${student.studentId}_$status'),
+                    padding: const EdgeInsets.only(bottom: SSize.sm),
+                    child: AttendanceStudentItem(
+                      name: student.studentName,
+                      id: student.studentCode,
+                      isPresent: status == 'present',
+                      onTap: () => controller.toggleStudentStatus(
+                        student.studentId,
+                      ),
+                    ),
+                  );
+                },
+              );
+            }),
           ),
+          Obx(() {
+            final _ = controller.attendanceMap.length;
+            return AttendanceSummaryFooter(
+              presentCount: controller.presentCount,
+              absentCount: controller.absentCount,
+              isEditing: controller.isEditing,
+              onSubmit: () => controller.saveSession(
+                isEditing: controller.isEditing,
+                sessionId: controller.currentSession.value?.sessionId,
+              ),
+            );
+          }),
           const SizedBox(height: SSize.sm),
         ],
       ),

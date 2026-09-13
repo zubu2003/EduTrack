@@ -68,10 +68,7 @@ class StudentCoursesScreen extends StatelessWidget {
                           onTap: () {
                             Get.toNamed(
                               AppRoutes.studentCourseDetails,
-                              arguments: {
-                                'courseCode': course.courseCode,
-                                'courseName': course.courseName,
-                              },
+                              arguments: course,
                             );
                           },
                         ),

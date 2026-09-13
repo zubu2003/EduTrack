@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/features/authentication/screens/login/login_screen.dart';
 import 'package:edutrack/features/authentication/screens/sign_up/sign_up_screen.dart';
 import 'package:edutrack/features/authentication/screens/forget_password/forgot_password_screen.dart';
@@ -12,11 +13,6 @@ import 'package:edutrack/features/student/screens/routine/routine_screen.dart';
 import 'package:edutrack/features/teacher/screens/dashboard/teacher_dashboard_screen.dart';
 import 'package:edutrack/features/teacher/screens/courses/teacher_courses_screen.dart';
 import 'package:edutrack/features/teacher/screens/courses/create_course_screen.dart';
-import 'package:edutrack/features/teacher/screens/course_details/teacher_course_details_screen.dart';
-import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
-import 'package:edutrack/features/teacher/screens/attendance/attendance_history_screen.dart';
-import 'package:edutrack/features/teacher/screens/ct_marks/teacher_ct_marks_screen.dart';
-import 'package:edutrack/features/teacher/screens/ct_marks/upload_ct_marks_screen.dart';
 import 'package:edutrack/features/personalization/screens/profile/profile_screen.dart';
 import 'package:edutrack/features/personalization/screens/profile/edit_profile_screen.dart';
 
@@ -44,11 +40,6 @@ class AppRoutes {
   static const String teacherCourses = '/teacher-courses';
   static const String teacherTodaysClasses = '/teacher-todays-classes';
   static const String createCourse = '/create-course';
-  static const String teacherCourseDetails = '/teacher-course-details';
-  static const String takeAttendance = '/take-attendance';
-  static const String attendanceHistory = '/attendance-history';
-  static const String teacherCtMarks = '/teacher-ct-marks';
-  static const String uploadCtMarks = '/upload-ct-marks';
   static const String teacherRoutine = '/teacher-routine';
   static const String teacherProfile = '/teacher-profile';
 
@@ -92,17 +83,19 @@ class AppRoutes {
     ),
     GetPage(
       name: studentCourseDetails,
-      page: () => const StudentCourseDetailsScreen(
-        courseCode: 'CSE 356',
-        courseName: 'Software Engineering',
-      ),
+      page: () {
+        final args = Get.arguments;
+        final course = args is CourseModel ? args : CourseModel.empty();
+        return StudentCourseDetailsScreen(course: course);
+      },
     ),
     GetPage(
       name: studentAttendanceHistory,
-      page: () => const StudentAttendanceHistoryScreen(
-        courseCode: 'CSE 356',
-        courseName: 'Software Engineering',
-      ),
+      page: () {
+        final args = Get.arguments;
+        final course = args is CourseModel ? args : CourseModel.empty();
+        return StudentAttendanceHistoryScreen(course: course);
+      },
     ),
     GetPage(
       name: studentCtMarks,
@@ -136,45 +129,6 @@ class AppRoutes {
     GetPage(
       name: createCourse,
       page: () => const CreateCourseScreen(),
-      transition: Transition.rightToLeft,
-    ),
-    GetPage(
-      name: teacherCourseDetails,
-      page: () => const TeacherCourseDetailsScreen(),
-      transition: Transition.rightToLeft,
-    ),
-    GetPage(
-      name: takeAttendance,
-      page: () => const TakeAttendanceScreen(
-        courseCode: 'CSE 356',
-        courseName: 'Software Engineering',
-      ),
-      transition: Transition.rightToLeft,
-    ),
-    GetPage(
-      name: attendanceHistory,
-      page: () => const AttendanceHistoryScreen(
-        courseCode: 'CSE 356',
-        courseName: 'Software Engineering',
-      ),
-      transition: Transition.rightToLeft,
-    ),
-    GetPage(
-      name: teacherCtMarks,
-      page: () => const TeacherCtMarksScreen(
-        courseCode: 'CSE 356',
-        courseName: 'Software Engineering',
-      ),
-      transition: Transition.rightToLeft,
-    ),
-    GetPage(
-      name: uploadCtMarks,
-      page: () => const UploadCtMarksScreen(
-        courseCode: 'CSE 356',
-        courseName: 'Software Engineering',
-        ctTitle: 'CT-2',
-        fullMarks: 20,
-      ),
       transition: Transition.rightToLeft,
     ),
     GetPage(

@@ -5,72 +5,83 @@ import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
 
 class SSnackBarHelpers {
-  // Success Snackbar
   static void successSnackBar({
     required String title,
     String message = '',
     int duration = 3,
   }) {
-    Get.snackbar(
-      title,
-      message,
-      isDismissible: true,
-      shouldIconPulse: true,
-      colorText: SColors.white,
+    _show(
+      title: title,
+      message: message,
       backgroundColor: SColors.success,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: duration),
-      margin: const EdgeInsets.all(SSize.md),
-      icon: const Icon(
-        Iconsax.tick_circle,
-        color: SColors.white,
-      ),
+      icon: Iconsax.tick_circle,
+      duration: duration,
     );
   }
 
-  // Error Snackbar
   static void errorSnackBar({
     required String title,
     String message = '',
     int duration = 3,
   }) {
-    Get.snackbar(
-      title,
-      message,
-      isDismissible: true,
-      shouldIconPulse: true,
-      colorText: SColors.white,
+    _show(
+      title: title,
+      message: message,
       backgroundColor: SColors.error,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: duration),
-      margin: const EdgeInsets.all(SSize.md),
-      icon: const Icon(
-        Iconsax.close_circle,
-        color: SColors.white,
-      ),
+      icon: Iconsax.close_circle,
+      duration: duration,
     );
   }
 
-  // Warning Snackbar
   static void warningSnackBar({
     required String title,
     String message = '',
     int duration = 3,
   }) {
-    Get.snackbar(
-      title,
-      message,
-      isDismissible: true,
-      shouldIconPulse: true,
-      colorText: SColors.white,
+    _show(
+      title: title,
+      message: message,
       backgroundColor: SColors.warning,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: duration),
-      margin: const EdgeInsets.all(SSize.md),
-      icon: const Icon(
-        Iconsax.warning_2,
-        color: SColors.white,
-      ),
+      icon: Iconsax.warning_2,
+      duration: duration,
     );
+  }
+
+  /// ScaffoldMessenger avoids GetX snackbar overlay LateInitializationError.
+  static void _show({
+    required String title,
+    required String message,
+    required Color backgroundColor,
+    required IconData icon,
+    required int duration,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = Get.context;
+      if (context == null || !context.mounted) return;
+
+      final text = message.isEmpty ? title : '$title\n$message';
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(icon, color: SColors.white),
+                const SizedBox(width: SSize.sm),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: const TextStyle(color: SColors.white),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: backgroundColor,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(SSize.md),
+            duration: Duration(seconds: duration),
+          ),
+        );
+    });
   }
 }
