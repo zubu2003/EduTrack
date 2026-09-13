@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
+import 'package:edutrack/data/repositories/authentication_repository.dart';
 
-import '../../screens/login/login_screen.dart';
 class SplashController extends GetxController {
   static SplashController get instance => Get.find();
 
@@ -10,8 +10,11 @@ class SplashController extends GetxController {
     startTimer();
   }
 
-  void startTimer() async {
+  Future<void> startTimer() async {
+    // Show splash for 4 seconds
     await Future.delayed(const Duration(seconds: 4));
-    Get.offAll(() => const LoginScreen());
+
+    // Then let repository decide where to go
+    await AuthenticationRepository.instance.screenRedirect();
   }
 }

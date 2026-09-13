@@ -1,99 +1,123 @@
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({super.key});
+  final String name;
+  final String email;
+  final String role;
+  final String profileImage;
+
+  const ProfileHeader({
+    super.key,
+    required this.name,
+    required this.email,
+    required this.role,
+    this.profileImage = '',
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(SSize.md),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF667eea),
-            Color(0xFF764ba2),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(SSize.cardRadius),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF667eea).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Avatar
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: SColors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: SColors.white.withOpacity(0.3),
-                width: 3,
-              ),
+    // Determine role label
+    final roleLabel = role.toLowerCase() == 'teacher' ? 'Teacher' : 'Student';
+
+    return Column(
+      children: [
+        // Avatar
+        Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: SColors.primary,
+              width: 3,
             ),
-            child: const Center(
+            boxShadow: [
+              BoxShadow(
+                color: SColors.primary.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: profileImage.isNotEmpty
+                ? CachedNetworkImage(
+              imageUrl: profileImage,
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+              placeholder: (context, url) => Container(
+                color: SColors.primary.withOpacity(0.1),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: SColors.primary,
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => Container(
+                color: SColors.primary.withOpacity(0.1),
+                child: Icon(
+                  Icons.person,
+                  color: SColors.primary,
+                  size: 50,
+                ),
+              ),
+            )
+                : Container(
+              color: SColors.primary.withOpacity(0.1),
               child: Icon(
                 Icons.person,
-                color: SColors.white,
+                color: SColors.primary,
                 size: 50,
               ),
             ),
           ),
-          const SizedBox(height: SSize.spaceBtwItems),
+        ),
+        const SizedBox(height: SSize.spaceBtwItems),
 
-          // Name
-          Text(
-            'Zubayer Muntasir',
-            style: const TextStyle(
-              color: SColors.white,
-              fontSize: SSize.fontSizeXxl,
-              fontWeight: FontWeight.bold,
-            ),
+        // Name
+        Text(
+          name,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: SColors.textPrimary,
           ),
-          const SizedBox(height: SSize.xs),
+        ),
+        const SizedBox(height: SSize.xs),
 
-          // Email
-          Text(
-            'zubayer@university.edu',
+        // Email
+        Text(
+          email,
+          style: TextStyle(
+            color: SColors.textSecondary,
+            fontSize: SSize.fontSizeMd,
+          ),
+        ),
+        const SizedBox(height: SSize.xs),
+
+        // Role Badge
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: SSize.md,
+            vertical: SSize.xs,
+          ),
+          decoration: BoxDecoration(
+            color: SColors.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+          ),
+          child: Text(
+            roleLabel,
             style: TextStyle(
-              color: SColors.white.withOpacity(0.8),
-              fontSize: SSize.fontSizeMd,
+              color: SColors.primary,
+              fontWeight: FontWeight.w600,
+              fontSize: SSize.fontSizeSm,
             ),
           ),
-          const SizedBox(height: SSize.xs),
-
-          // Role & Department
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: SSize.md,
-              vertical: SSize.xs,
-            ),
-            decoration: BoxDecoration(
-              color: SColors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
-            ),
-            child: const Text(
-              'Student • CSE Department',
-              style: TextStyle(
-                color: SColors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: SSize.fontSizeSm,
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

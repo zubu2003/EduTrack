@@ -4,16 +4,69 @@ import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
 
 class ProfileInfoCard extends StatelessWidget {
-  const ProfileInfoCard({super.key});
+  final String uid;
+  final String studentId;
+  final String teacherId;
+  final String department;
+  final String batch;
+  final String designation;
+  final String email;
+  final String phone;
+  final String role;
+
+  const ProfileInfoCard({
+    super.key,
+    required this.uid,
+    required this.studentId,
+    required this.teacherId,
+    required this.department,
+    required this.batch,
+    required this.designation,
+    required this.email,
+    required this.phone,
+    required this.role,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final infoItems = [
-      {'icon': Iconsax.document, 'label': 'Student/Teacher ID', 'value': 'STU-2024-001'},
-      {'icon': Iconsax.building, 'label': 'Department', 'value': 'CSE'},
-      {'icon': Iconsax.calendar, 'label': 'Batch/Year', 'value': '2024'},
-      {'icon': Iconsax.sms, 'label': 'Email', 'value': 'zubayer@university.edu'},
-      {'icon': Iconsax.call, 'label': 'Phone', 'value': '+880 1234 567890'},
+    final isTeacher = role.toLowerCase() == 'teacher';
+
+    // Build info items based on role
+    final List<Map<String, dynamic>> infoItems = [
+      {
+        'icon': Iconsax.user,
+        'label': isTeacher ? 'Teacher ID' : 'Student ID',
+        'value': isTeacher
+            ? (teacherId.isNotEmpty ? teacherId : 'Not set')
+            : (studentId.isNotEmpty ? studentId : 'Not set'),
+      },
+      {
+        'icon': Iconsax.building,
+        'label': 'Department',
+        'value': department.isNotEmpty ? department : 'Not set',
+      },
+      if (!isTeacher)
+        {
+          'icon': Iconsax.calendar,
+          'label': 'Batch',
+          'value': batch.isNotEmpty ? batch : 'Not set',
+        },
+      if (isTeacher)
+        {
+          'icon': Iconsax.award,
+          'label': 'Designation',
+          'value': designation.isNotEmpty ? designation : 'Not set',
+        },
+      {
+        'icon': Iconsax.sms,
+        'label': 'Email',
+        'value': email.isNotEmpty ? email : 'Not set',
+      },
+      {
+        'icon': Iconsax.call,
+        'label': 'Phone',
+        'value': phone.isNotEmpty ? phone : 'Not set',
+      },
     ];
 
     return Container(
@@ -32,7 +85,7 @@ class ProfileInfoCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Card Title
+          // Header
           Row(
             children: [
               Icon(
@@ -53,7 +106,6 @@ class ProfileInfoCard extends StatelessWidget {
           ),
           const SizedBox(height: SSize.spaceBtwItems),
 
-          // Divider
           Divider(
             color: SColors.grey.withOpacity(0.2),
             height: 1,
@@ -91,6 +143,8 @@ class ProfileInfoCard extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

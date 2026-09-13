@@ -11,6 +11,6 @@ class SImages{
   static const String appLogoIconDark = "assets/logo/app_logo_icon_dark.jpg";
 
   //animation
-  static const String loadingAnimation = "assets/animations/loading.json";
+  static const String loadingAnimation = "assets/animation/loading.json";
 
 }

@@ -1,9 +1,9 @@
+import 'package:edutrack/bindings/bindings.dart';
 import 'package:edutrack/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'utils/theme/theme.dart';
-import 'features/authentication/screens/splash/splash_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -15,9 +15,9 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: SAppTheme.lightTheme,
       darkTheme: SAppTheme.darkTheme,
-      initialRoute: AppRoutes.splash, // Set initial route
+      initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
-      home: const SplashScreen(),
+      initialBinding: AppBindings(),
     );
   }
 }

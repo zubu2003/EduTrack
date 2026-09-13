@@ -1,247 +1,231 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:edutrack/features/authentication/controllers/sign_up/sign_up_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
 import 'package:iconsax/iconsax.dart';
-
-import '../../../../../common/widget/button/SElevatedbutton.dart';
 
 class SignUpFormSection extends StatelessWidget {
   const SignUpFormSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Full Name
-        TextFormField(
-          decoration: InputDecoration(
-            hintText: STextStrings.fullName,
-            hintStyle: TextStyle(color: SColors.textSecondary.withOpacity(0.7)),
-            prefixIcon: const Icon(Iconsax.user, color: SColors.grey),
-            filled: true,
-            fillColor: SColors.inputFieldBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
+    final controller = Get.put(SignUpController());
+
+    return Form(
+      key: controller.signUpFormKey,
+      child: Column(
+        children: [
+          // Role Selector
+          Obx(
+                () => Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: SColors.grey.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+              ),
+              child: Row(
+                children: [
+                  // Student
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => controller.selectRole('student'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: SSize.sm),
+                        decoration: BoxDecoration(
+                          color: controller.selectedRole.value == 'student'
+                              ? SColors.white
+                              : SColors.transparent,
+                          borderRadius:
+                          BorderRadius.circular(SSize.borderRadiusMd),
+                        ),
+                        child: Text(
+                          'Student',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: controller.selectedRole.value == 'student'
+                                ? SColors.primary
+                                : SColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Teacher
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => controller.selectRole('teacher'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: SSize.sm),
+                        decoration: BoxDecoration(
+                          color: controller.selectedRole.value == 'teacher'
+                              ? SColors.white
+                              : SColors.transparent,
+                          borderRadius:
+                          BorderRadius.circular(SSize.borderRadiusMd),
+                        ),
+                        child: Text(
+                          'Teacher',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: controller.selectedRole.value == 'teacher'
+                                ? SColors.primary
+                                : SColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: const BorderSide(color: SColors.primary, width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
           ),
-        ),
 
-        const SizedBox(height: SSize.spaceBtwItems),
+          const SizedBox(height: SSize.spaceBtwItems),
 
-        // Student ID / Teacher ID
-        TextFormField(
-          decoration: InputDecoration(
-            hintText: STextStrings.studentTeacherId,
-            hintStyle: TextStyle(color: SColors.textSecondary.withOpacity(0.7)),
-            prefixIcon: const Icon(Iconsax.document, color: SColors.grey),
-            filled: true,
-            fillColor: SColors.inputFieldBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: const BorderSide(color: SColors.primary, width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-          ),
-        ),
-
-        const SizedBox(height: SSize.spaceBtwItems),
-
-        // University Email
-        TextFormField(
-          keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            hintText: STextStrings.universityEmail,
-            hintStyle: TextStyle(color: SColors.textSecondary.withOpacity(0.7)),
-            prefixIcon: const Icon(Iconsax.sms, color: SColors.grey),
-            filled: true,
-            fillColor: SColors.inputFieldBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: const BorderSide(color: SColors.primary, width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-          ),
-        ),
-
-        const SizedBox(height: SSize.spaceBtwItems),
-
-        // Department Dropdown
-        Container(
-          decoration: BoxDecoration(
-            color: SColors.inputFieldBackground,
-            borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-          ),
-          child: DropdownButtonFormField<String>(
+          // Full Name
+          TextFormField(
+            controller: controller.name,
             decoration: InputDecoration(
-              hintText: STextStrings.department,
-              hintStyle: TextStyle(color: SColors.textSecondary.withOpacity(0.7)),
-              prefixIcon: const Icon(Iconsax.building, color: SColors.grey),
+              hintText: STextStrings.fullName,
+              prefixIcon: const Icon(Iconsax.user, color: SColors.grey),
+              filled: true,
+              fillColor: SColors.inputFieldBackground,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
                 borderSide: BorderSide.none,
               ),
-              enabledBorder: OutlineInputBorder(
+            ),
+            validator: (value) =>
+            value!.isEmpty ? 'Please enter your full name' : null,
+          ),
+          const SizedBox(height: SSize.spaceBtwItems),
+
+          // Student/Teacher ID
+          TextFormField(
+            controller: controller.idNumber,
+            decoration: InputDecoration(
+              hintText: STextStrings.studentTeacherId,
+              prefixIcon: const Icon(Iconsax.document, color: SColors.grey),
+              filled: true,
+              fillColor: SColors.inputFieldBackground,
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
                 borderSide: BorderSide.none,
               ),
-              focusedBorder: OutlineInputBorder(
+            ),
+          ),
+          const SizedBox(height: SSize.spaceBtwItems),
+
+          // Email
+          TextFormField(
+            controller: controller.email,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              hintText: STextStrings.universityEmail,
+              prefixIcon: const Icon(Iconsax.sms, color: SColors.grey),
+              filled: true,
+              fillColor: SColors.inputFieldBackground,
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-                borderSide: const BorderSide(color: SColors.primary, width: 1),
+                borderSide: BorderSide.none,
               ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
             ),
-            /// list of department
-            items: const [
-              DropdownMenuItem(
-                value: "CSE",
-                child: Text("CSE"),
-              ),
-              DropdownMenuItem(
-                value: "EEE",
-                child: Text("EEE"),
-              ),
-              DropdownMenuItem(
-                value: "CE",
-                child: Text("CE"),
-              ),
-              DropdownMenuItem(
-                value: "ME",
-                child: Text("ME"),
-              ),
-              DropdownMenuItem(
-                value: "ETE",
-                child: Text("ETE"),
-              ),
-              DropdownMenuItem(
-                value: "BME",
-                child: Text("BME"),
-              ),
-              DropdownMenuItem(
-                value: "MIE",
-                child: Text("MIE"),
-              ),
-              DropdownMenuItem(
-                value: "WRE",
-                child: Text("WRE"),
-              ),
-              DropdownMenuItem(
-                value: "PME",
-                child: Text("PME"),
-              ),
-              DropdownMenuItem(
-                value: "MSE",
-                child: Text("MSE"),
-              ),
-              DropdownMenuItem(
-                value: "NE",
-                child: Text("NE"),
-              ),
-            ],
-
-
-            onChanged: (value) {},
-            icon: const Icon(Iconsax.arrow_down_1, color: SColors.grey),
-            dropdownColor: SColors.white,
-            style: TextStyle(color: SColors.textPrimary),
+            validator: (value) {
+              if (value!.isEmpty) return 'Please enter email';
+              if (!value.contains('@')) return 'Invalid email';
+              return null;
+            },
           ),
-        ),
+          const SizedBox(height: SSize.spaceBtwItems),
 
-        const SizedBox(height: SSize.spaceBtwItems),
-
-        // Password
-        TextFormField(
-          obscureText: true,
-          decoration: InputDecoration(
-            hintText: STextStrings.password,
-            hintStyle: TextStyle(color: SColors.textSecondary.withOpacity(0.7)),
-            prefixIcon: const Icon(Iconsax.lock, color: SColors.grey),
-            suffixIcon: const Icon(Iconsax.eye_slash, color: SColors.grey),
-            filled: true,
-            fillColor: SColors.inputFieldBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
+          // Password
+          Obx(
+                () => TextFormField(
+              controller: controller.password,
+              obscureText: controller.isPasswordHidden.value,
+              decoration: InputDecoration(
+                hintText: STextStrings.password,
+                prefixIcon: const Icon(Iconsax.lock, color: SColors.grey),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    controller.isPasswordHidden.value
+                        ? Iconsax.eye_slash
+                        : Iconsax.eye,
+                    color: SColors.grey,
+                  ),
+                  onPressed: controller.togglePasswordVisibility,
+                ),
+                filled: true,
+                fillColor: SColors.inputFieldBackground,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              validator: (value) =>
+              value!.length < 6 ? 'Password must be 6+ characters' : null,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: const BorderSide(color: SColors.primary, width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
           ),
-        ),
+          const SizedBox(height: SSize.spaceBtwItems),
 
-        const SizedBox(height: SSize.spaceBtwItems),
-
-        // Confirm Password
-        TextFormField(
-          obscureText: true,
-          decoration: InputDecoration(
-            hintText: STextStrings.confirmPassword,
-            hintStyle: TextStyle(color: SColors.textSecondary.withOpacity(0.7)),
-            prefixIcon: const Icon(Iconsax.lock, color: SColors.grey),
-            suffixIcon: const Icon(Iconsax.eye_slash, color: SColors.grey),
-            filled: true,
-            fillColor: SColors.inputFieldBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
+          // Confirm Password
+          Obx(
+                () => TextFormField(
+              controller: controller.confirmPassword,
+              obscureText: controller.isConfirmPasswordHidden.value,
+              decoration: InputDecoration(
+                hintText: STextStrings.confirmPassword,
+                prefixIcon: const Icon(Iconsax.lock, color: SColors.grey),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    controller.isConfirmPasswordHidden.value
+                        ? Iconsax.eye_slash
+                        : Iconsax.eye,
+                    color: SColors.grey,
+                  ),
+                  onPressed: controller.toggleConfirmPasswordVisibility,
+                ),
+                filled: true,
+                fillColor: SColors.inputFieldBackground,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              validator: (value) =>
+              value!.isEmpty ? 'Please confirm password' : null,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
-              borderSide: const BorderSide(color: SColors.primary, width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
           ),
-        ),
 
-        const SizedBox(height: SSize.spaceBtwSections),
+          const SizedBox(height: SSize.spaceBtwSections),
 
-        // Create Account Button
-        SizedBox(
-          width: double.infinity,
-          height: SSize.buttonHeight,
-          child: SElevatedbutton(
-            text: "Create Account",
-            onPressed: () {},
-
+          // Create Account Button
+          SizedBox(
+            width: double.infinity,
+            height: SSize.buttonHeight,
+            child: ElevatedButton(
+              onPressed: controller.registerUser,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: SColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+                ),
+              ),
+              child: const Text(
+                'Create Account',
+                style: TextStyle(
+                  color: SColors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

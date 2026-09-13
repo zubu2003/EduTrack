@@ -1,28 +1,46 @@
-class SKeys{
-  SKeys._();
+class SKeys {
+  // Storage Keys
+  static const String rememberMeEmail = 'rememberMeEmail';
+  static const String rememberMePassword = 'rememberMePassword';
+  static const String rememberMeCheckbox = 'rememberMeCheckbox';
+  static const String isFirstTime = 'isFirstTime';
+  static const String userRole = 'userRole';
 
-  static const String userCollection='Users';
-  static const String categoryCollection='Categories';
-  static const String bannerCollection='Banners';
-  static const String brandCollection='Brands';
-  static const String productCollection='Products';
+  /// Student email must contain this pattern
+  static const String studentEmailPattern = '@student.';
 
-  //remember login email and pass
-  static const String rememberMeEmail='Remember_email';
-  static const String rememberMePassword='Remember_password';
-  static const String rememberMeCheckbox='Remember_checkbox';
+  // Google Sign-In
+  static const String googleWebClientId =
+      '460723661177-b831lnoh4kgmc2rm8s8tltihhasdu63s.apps.googleusercontent.com';
+}
 
-  //cloudinary related keys
-  static const String cloudname='dvhlep9ov';
-  static const String uploadPreset='upload_image';
-  static const String profileFolder='Profile_Pictures';
-  static const String apiKey='723351754777293';
-  static const String apiSecret='O4G_X5_SyVmMQm7vbz4liXrlkeY';
+class SCollections {
+  // Firestore Collections
+  static const String users = 'users';
+  static const String courses = 'courses';
+  static const String attendance = 'attendance';
+  static const String ctMarks = 'ct_marks';
+  static const String routines = 'routines';
+}
 
-  static const String categoryFolder='Category_Pictures';
-  static const String bannerFolder='Banner_Pictures';
-  static const String brandFolder='Brand_Pictures';
-  static const String productFolder='Product_Pictures';
+class SUserFields {
+  // User Document Fields
+  static const String uid = 'uid';
+  static const String name = 'name';
+  static const String email = 'email';
+  static const String phone = 'phone';
+  static const String role = 'role';
+  static const String profileImage = 'profileImage';
+  static const String studentId = 'studentId';
+  static const String teacherId = 'teacherId';
+  static const String department = 'department';
+  static const String batch = 'batch';
+  static const String designation = 'designation';
+  static const String createdAt = 'createdAt';
+  static const String updatedAt = 'updatedAt';
+}
 
-
+class SRoles {
+  static const String student = 'student';
+  static const String teacher = 'teacher';
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:edutrack/features/authentication/controllers/login/login_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
+import 'package:edutrack/utils/constant/keys.dart';
 import 'package:edutrack/utils/constant/size.dart';
-
-import '../../../controllers/login/login_controller.dart';
 
 class LoginRoleSelector extends StatelessWidget {
   const LoginRoleSelector({super.key});
@@ -21,18 +21,18 @@ class LoginRoleSelector extends StatelessWidget {
       child: Obx(
             () => Row(
           children: [
-            // Student Button
+            // Student
             Expanded(
               child: GestureDetector(
-                onTap: () => controller.selectRole('Student'),
+                onTap: () => controller.selectRole(SRoles.student),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: SSize.sm),
                   decoration: BoxDecoration(
-                    color: controller.selectedRole.value == 'Student'
+                    color: controller.selectedRole.value == SRoles.student
                         ? SColors.white
                         : SColors.transparent,
                     borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
-                    boxShadow: controller.selectedRole.value == 'Student'
+                    boxShadow: controller.selectedRole.value == SRoles.student
                         ? [
                       BoxShadow(
                         color: SColors.black.withOpacity(0.05),
@@ -46,7 +46,7 @@ class LoginRoleSelector extends StatelessWidget {
                     'Student',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: controller.selectedRole.value == 'Student'
+                      color: controller.selectedRole.value == SRoles.student
                           ? SColors.primary
                           : SColors.textSecondary,
                       fontWeight: FontWeight.w600,
@@ -56,20 +56,18 @@ class LoginRoleSelector extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Teacher Button
+            // Teacher
             Expanded(
               child: GestureDetector(
-                onTap: () => controller.selectRole('Teacher'),
-
+                onTap: () => controller.selectRole(SRoles.teacher),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: SSize.sm),
                   decoration: BoxDecoration(
-                    color: controller.selectedRole.value == 'Teacher'
+                    color: controller.selectedRole.value == SRoles.teacher
                         ? SColors.white
                         : SColors.transparent,
                     borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
-                    boxShadow: controller.selectedRole.value == 'Teacher'
+                    boxShadow: controller.selectedRole.value == SRoles.teacher
                         ? [
                       BoxShadow(
                         color: SColors.black.withOpacity(0.05),
@@ -83,7 +81,7 @@ class LoginRoleSelector extends StatelessWidget {
                     'Teacher',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: controller.selectedRole.value == 'Teacher'
+                      color: controller.selectedRole.value == SRoles.teacher
                           ? SColors.primary
                           : SColors.textSecondary,
                       fontWeight: FontWeight.w600,

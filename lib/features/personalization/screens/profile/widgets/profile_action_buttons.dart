@@ -13,12 +13,10 @@ class ProfileActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Edit Profile Button (Outline - Primary)
+        // Edit Profile
         Expanded(
           child: OutlinedButton(
-            onPressed: () {
-              Get.toNamed(AppRoutes.editProfile);
-            },
+            onPressed: () => Get.toNamed(AppRoutes.editProfile),
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: SColors.primary),
               shape: RoundedRectangleBorder(
@@ -49,7 +47,7 @@ class ProfileActionButtons extends StatelessWidget {
         ),
         const SizedBox(width: SSize.spaceBtwItems),
 
-        // Add Details Button (Filled - Secondary/Accent Color)
+        // Add Details
         Expanded(
           child: ElevatedButton(
             onPressed: () {

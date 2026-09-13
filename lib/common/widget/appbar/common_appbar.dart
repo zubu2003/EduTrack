@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:edutrack/common/widget/logo/app_logo.dart';  // ✅ Correct path
+import 'package:get/get.dart';
+import 'package:edutrack/common/widget/logo/app_logo.dart';
+import 'package:edutrack/data/repositories/authentication_repository.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
+import 'package:edutrack/utils/popups/snackbar_helpers.dart';
 import 'package:iconsax/iconsax.dart';
 
 class SAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -19,6 +22,84 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
     this.elevation,
   });
 
+  /// Show Logout Confirmation Dialog
+  void _showLogoutDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(SSize.cardRadius),
+        ),
+        title: Text(
+          'Logout',
+          style: TextStyle(
+            color: SColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(
+            color: SColors.textSecondary,
+            fontSize: SSize.fontSizeMd,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: SColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Get.back(); // Close dialog first
+              try {
+                await AuthenticationRepository.instance.logout();
+              } catch (e) {
+                SSnackBarHelpers.errorSnackBar(
+                  title: 'Error',
+                  message: e.toString(),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SColors.error,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+              ),
+            ),
+            child: const Text(
+              'Logout',
+              style: TextStyle(
+                color: SColors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Handle Popup Menu Selection
+  void _handleMenuSelection(BuildContext context, String value) {
+    if (value == 'profile') {
+      // Navigate to profile based on role
+      // For now, show snackbar
+      SSnackBarHelpers.successSnackBar(
+        title: 'Profile',
+        message: 'Opening profile...',
+      );
+      // TODO: Navigate to profile screen
+    } else if (value == 'logout') {
+      _showLogoutDialog(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -33,14 +114,12 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
           : null,
       title: Row(
         children: [
-          // App Logo (Circular, Small)
           const SAppLogo(
             size: 40,
             showText: false,
             isCircular: true,
           ),
           const SizedBox(width: SSize.xs),
-          // App Name
           Text(
             STextStrings.appName,
             style: TextStyle(
@@ -53,25 +132,8 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        // Profile Icon with Dropdown
         PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'profile') {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Navigate to Profile'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            } else if (value == 'logout') {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logout'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
-          },
+          onSelected: (value) => _handleMenuSelection(context, value),
           offset: const Offset(0, 45),
           color: SColors.white,
           shape: RoundedRectangleBorder(
@@ -101,12 +163,12 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
             ),
-            const PopupMenuItem<String>(
+            PopupMenuItem<String>(
               value: 'logout',
               child: Row(
                 children: [
                   Icon(Iconsax.logout, color: SColors.error),
-                  SizedBox(width: SSize.sm),
+                  const SizedBox(width: SSize.sm),
                   Text(
                     'Logout',
                     style: TextStyle(color: SColors.error),
