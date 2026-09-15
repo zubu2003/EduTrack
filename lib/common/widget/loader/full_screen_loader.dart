@@ -16,50 +16,58 @@ class SFullScreenLoader {
           color: SColors.textPrimary.withOpacity(0.6),
           width: double.infinity,
           height: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(SSize.lg),
-                margin: const EdgeInsets.symmetric(horizontal: SSize.lg),
-                decoration: BoxDecoration(
-                  color: SColors.white,
-                  borderRadius: BorderRadius.circular(SSize.cardRadius),
-                  boxShadow: [
-                    BoxShadow(
-                      color: SColors.black.withOpacity(0.1),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(SSize.lg),
+              margin: const EdgeInsets.symmetric(
+                horizontal: SSize.lg,
+              ),
+              decoration: BoxDecoration(
+                color: SColors.white,
+                borderRadius: BorderRadius.circular(
+                  SSize.cardRadius,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Lottie Loading Animation
-                    Lottie.asset(
-                      SImages.loadingAnimation,
-                      height: 120,
-                      width: 120,
-                      fit: BoxFit.contain,
-                      repeat: true,
-                    ),
-                    const SizedBox(height: SSize.spaceBtwItems),
+                boxShadow: [
+                  BoxShadow(
+                    color: SColors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Lottie Loading Animation
+                  Lottie.asset(
+                    SImages.loadingAnimation,
+                    height: 120,
+                    width: 120,
+                    fit: BoxFit.contain,
+                    repeat: true,
+                  ),
 
-                    // Message
-                    Text(
+                  const SizedBox(
+                    height: SSize.spaceBtwItems,
+                  ),
+
+                  // Loading Message
+                  SizedBox(
+                    width: 220,
+                    child: Text(
                       text,
                       textAlign: TextAlign.center,
+                      softWrap: true,
                       style: const TextStyle(
                         color: SColors.textPrimary,
                         fontSize: SSize.fontSizeMd,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -67,6 +75,8 @@ class SFullScreenLoader {
   }
 
   static void stopLoading() {
-    Navigator.of(Get.overlayContext!).pop();
+    if (Get.isDialogOpen ?? false) {
+      Navigator.of(Get.overlayContext!).pop();
+    }
   }
 }

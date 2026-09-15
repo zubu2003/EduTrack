@@ -12,6 +12,18 @@ class SKeys {
   // Google Sign-In
   static const String googleWebClientId =
       '460723661177-b831lnoh4kgmc2rm8s8tltihhasdu63s.apps.googleusercontent.com';
+
+
+  //Cloudinary Keys
+  static const String cloudname = 'dvhlep9ov';
+  static const String apiKey = '723351754777293';
+  static const String apiSecret = 'O4G_X5_SyVmMQm7vbz4liXrlkeY';
+  static const String uploadPreset = 'edutrack';
+
+  //Cloudinary Folders
+  static const String studentProfileFolder = 'edutrack/student_profiles';
+  static const String teacherProfileFolder = 'edutrack/teacher_profiles';
+
 }
 
 class SCollections {
@@ -31,6 +43,7 @@ class SUserFields {
   static const String phone = 'phone';
   static const String role = 'role';
   static const String profileImage = 'profileImage';
+  static const String profileImagePublicId = 'profileImagePublicId';
   static const String studentId = 'studentId';
   static const String teacherId = 'teacherId';
   static const String department = 'department';
@@ -43,4 +56,13 @@ class SUserFields {
 class SRoles {
   static const String student = 'student';
   static const String teacher = 'teacher';
+}
+
+class SApiUrls {
+  // Cloudinary
+  static String uploadApi(String cloudName) =>
+      'https://api.cloudinary.com/v1_1/$cloudName/image/upload';
+
+  static String deleteApi(String cloudName) =>
+      'https://api.cloudinary.com/v1_1/$cloudName/image/destroy';
 }

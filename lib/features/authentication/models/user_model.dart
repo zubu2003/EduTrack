@@ -8,6 +8,7 @@ class UserModel {
   final String phone;
   final String role;
   final String profileImage;
+  final String profileImagePublicId;
   final String studentId;
   final String teacherId;
   final String department;
@@ -23,6 +24,7 @@ class UserModel {
     required this.phone,
     required this.role,
     required this.profileImage,
+    this.profileImagePublicId = '',
     required this.studentId,
     required this.teacherId,
     required this.department,
@@ -40,6 +42,7 @@ class UserModel {
     phone: '',
     role: '',
     profileImage: '',
+    profileImagePublicId: '',
     studentId: '',
     teacherId: '',
     department: '',
@@ -58,13 +61,16 @@ class UserModel {
       phone: json[SUserFields.phone] ?? '',
       role: json[SUserFields.role] ?? '',
       profileImage: json[SUserFields.profileImage] ?? '',
+      profileImagePublicId: json[SUserFields.profileImagePublicId] ?? '',
       studentId: json[SUserFields.studentId] ?? '',
       teacherId: json[SUserFields.teacherId] ?? '',
       department: json[SUserFields.department] ?? '',
       batch: json[SUserFields.batch] ?? '',
       designation: json[SUserFields.designation] ?? '',
-      createdAt: (json[SUserFields.createdAt] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt: (json[SUserFields.updatedAt] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (json[SUserFields.createdAt] as Timestamp?)?.toDate() ??
+          DateTime.now(),
+      updatedAt: (json[SUserFields.updatedAt] as Timestamp?)?.toDate() ??
+          DateTime.now(),
     );
   }
 
@@ -77,6 +83,7 @@ class UserModel {
       SUserFields.phone: phone,
       SUserFields.role: role,
       SUserFields.profileImage: profileImage,
+      SUserFields.profileImagePublicId: profileImagePublicId,
       SUserFields.studentId: studentId,
       SUserFields.teacherId: teacherId,
       SUserFields.department: department,
@@ -95,6 +102,7 @@ class UserModel {
     String? phone,
     String? role,
     String? profileImage,
+    String? profileImagePublicId,
     String? studentId,
     String? teacherId,
     String? department,
@@ -110,6 +118,7 @@ class UserModel {
       phone: phone ?? this.phone,
       role: role ?? this.role,
       profileImage: profileImage ?? this.profileImage,
+      profileImagePublicId: profileImagePublicId ?? this.profileImagePublicId,
       studentId: studentId ?? this.studentId,
       teacherId: teacherId ?? this.teacherId,
       department: department ?? this.department,
