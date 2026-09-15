@@ -4,7 +4,6 @@ import 'package:edutrack/data/repositories/course/course_repository.dart';
 import 'package:edutrack/data/repositories/user/user_repository.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
-import 'package:edutrack/utils/constant/departments.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -20,7 +19,11 @@ class CourseSelectorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(_CourseSelectorController());
+    //  Use a controller to fetch teacher's courses
+    final controller = Get.put(
+      _CourseSelectorController(),
+      tag: 'course_selector',
+    );
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -31,6 +34,7 @@ class CourseSelectorDialog extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(SSize.md),
         child: Obx(() {
+          // Loading
           if (controller.isLoading.value) {
             return const SizedBox(
               height: 200,
@@ -40,6 +44,7 @@ class CourseSelectorDialog extends StatelessWidget {
             );
           }
 
+          // Empty state
           if (controller.courses.isEmpty) {
             return SizedBox(
               height: 200,
@@ -135,12 +140,12 @@ class CourseSelectorDialog extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
+                              // Icon
                               Container(
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color:
-                                  SColors.primary.withOpacity(0.08),
+                                  color: SColors.primary.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(
                                       SSize.borderRadiusMd),
                                 ),
@@ -151,6 +156,8 @@ class CourseSelectorDialog extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: SSize.spaceBtwItems),
+
+                              // Info
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
@@ -192,8 +199,7 @@ class CourseSelectorDialog extends StatelessWidget {
                                         ),
                                         const SizedBox(width: SSize.sm),
                                         Container(
-                                          padding:
-                                          const EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                             horizontal: SSize.sm,
                                             vertical: 2,
                                           ),
@@ -218,6 +224,8 @@ class CourseSelectorDialog extends StatelessWidget {
                                   ],
                                 ),
                               ),
+
+                              // Arrow
                               Icon(
                                 Icons.arrow_forward_ios,
                                 color: SColors.grey,
@@ -234,7 +242,7 @@ class CourseSelectorDialog extends StatelessWidget {
 
               const SizedBox(height: SSize.spaceBtwItems),
 
-              // Cancel Button
+              // Cancel
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
@@ -270,11 +278,17 @@ class _CourseSelectorController extends GetxController {
   Future<void> _fetchCourses() async {
     try {
       isLoading.value = true;
-      final user = await UserRepository.instance.getCurrentUserData();
-      if (user == null) return;
 
+      final user = await UserRepository.instance.getCurrentUserData();
+      if (user == null) {
+        isLoading.value = false;
+        return;
+      }
+
+      // Fetch teacher's courses from Firestore
       final list =
       await CourseRepository.instance.getTeacherCourses(user.uid);
+
       courses.value = list;
     } catch (e) {
       // silent

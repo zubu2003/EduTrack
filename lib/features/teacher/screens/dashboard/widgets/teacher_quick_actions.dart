@@ -11,7 +11,6 @@ import 'package:iconsax/iconsax.dart';
 class TeacherQuickActions extends StatelessWidget {
   const TeacherQuickActions({super.key});
 
-  /// Show Course Selector and handle the result
   Future<void> _showCourseSelector(
       BuildContext context, {
         required String title,
@@ -128,7 +127,6 @@ class TeacherQuickActions extends StatelessWidget {
           return;
         }
 
-        // ✅ Show course selector, then navigate
         if (type == 'attendance') {
           _showCourseSelector(
             context,
