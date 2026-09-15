@@ -54,8 +54,11 @@ class RoutineDayTabs extends StatelessWidget {
                   child: Text(
                     day,
                     style: TextStyle(
-                      color: isSelected ? SColors.white : SColors.textSecondary,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected
+                          ? SColors.white
+                          : SColors.textSecondary,
+                      fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.w500,
                       fontSize: SSize.fontSizeMd,
                     ),
                   ),

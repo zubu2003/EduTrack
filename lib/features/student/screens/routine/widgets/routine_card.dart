@@ -8,9 +8,9 @@ class RoutineCard extends StatelessWidget {
   final String courseCode;
   final String courseName;
   final String room;
-  final String teacher;
   final Color color;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   const RoutineCard({
     super.key,
@@ -19,9 +19,9 @@ class RoutineCard extends StatelessWidget {
     required this.courseCode,
     required this.courseName,
     required this.room,
-    required this.teacher,
     required this.color,
-    required this.onTap,
+    this.onTap,
+    this.onDelete,
   });
 
   @override
@@ -49,7 +49,7 @@ class RoutineCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Left Border Color Indicator
+            // Color indicator
             Container(
               width: 4,
               height: 60,
@@ -60,7 +60,7 @@ class RoutineCard extends StatelessWidget {
             ),
             const SizedBox(width: SSize.spaceBtwItems),
 
-            // Time Badge
+            // Time badge
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: SSize.sm,
@@ -93,69 +93,65 @@ class RoutineCard extends StatelessWidget {
             ),
             const SizedBox(width: SSize.spaceBtwItems),
 
-            // Course Info
+            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    courseCode,
+                    courseName,
                     style: TextStyle(
                       color: SColors.textPrimary,
                       fontSize: SSize.fontSizeMd,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: SSize.xs),
-                  Text(
-                    courseName,
-                    style: TextStyle(
-                      color: SColors.textSecondary,
-                      fontSize: SSize.fontSizeSm,
+                  if (courseCode.isNotEmpty && courseCode != 'Others') ...[
+                    const SizedBox(height: SSize.xs),
+                    Text(
+                      courseCode,
+                      style: TextStyle(
+                        color: SColors.textSecondary,
+                        fontSize: SSize.fontSizeSm,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: SSize.xs),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        color: SColors.grey,
-                        size: SSize.iconSm,
-                      ),
-                      const SizedBox(width: SSize.xs),
-                      Text(
-                        room,
-                        style: TextStyle(
-                          color: SColors.textSecondary,
-                          fontSize: SSize.fontSizeSm,
+                  ],
+                  if (room.isNotEmpty) ...[
+                    const SizedBox(height: SSize.xs),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_outlined,
+                          color: SColors.grey,
+                          size: SSize.iconSm,
                         ),
-                      ),
-                      const SizedBox(width: SSize.md),
-                      Icon(
-                        Icons.person_outline,
-                        color: SColors.grey,
-                        size: SSize.iconSm,
-                      ),
-                      const SizedBox(width: SSize.xs),
-                      Text(
-                        teacher,
-                        style: TextStyle(
-                          color: SColors.textSecondary,
-                          fontSize: SSize.fontSizeSm,
+                        const SizedBox(width: SSize.xs),
+                        Text(
+                          room,
+                          style: TextStyle(
+                            color: SColors.textSecondary,
+                            fontSize: SSize.fontSizeSm,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
 
-            // Arrow
-            Icon(
-              Icons.arrow_forward_ios,
-              color: SColors.grey,
-              size: SSize.iconSm,
-            ),
+            // Delete button
+            if (onDelete != null)
+              IconButton(
+                onPressed: onDelete,
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: SColors.error,
+                  size: SSize.iconMd,
+                ),
+              ),
           ],
         ),
       ),
