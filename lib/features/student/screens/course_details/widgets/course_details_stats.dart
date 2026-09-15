@@ -8,19 +8,27 @@ class CourseDetailsStats extends StatelessWidget {
   final int totalCount;
   final bool isAttendanceLoading;
 
+  // ✅ New: CT data
+  final double ctAverage;
+  final double ctFullMarks;
+  final bool isCtLoading;
+
   const CourseDetailsStats({
     super.key,
     this.attendancePercent = 0,
     this.presentCount = 0,
     this.totalCount = 0,
     this.isAttendanceLoading = false,
+    this.ctAverage = 0,
+    this.ctFullMarks = 20,
+    this.isCtLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Total Attendance Card
+        // ─── Attendance Card ───
         Expanded(
           child: Container(
             padding: const EdgeInsets.all(SSize.md),
@@ -78,7 +86,7 @@ class CourseDetailsStats extends StatelessWidget {
 
         const SizedBox(width: SSize.spaceBtwItems),
 
-        // Average CT Marks Card
+        // ─── CT Average Card ───
         Expanded(
           child: Container(
             padding: const EdgeInsets.all(SSize.md),
@@ -108,7 +116,9 @@ class CourseDetailsStats extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '16.5',
+                      isCtLoading
+                          ? '--'
+                          : ctAverage.toStringAsFixed(1),
                       style: TextStyle(
                         color: SColors.textPrimary,
                         fontSize: SSize.fontSizeXxl,
@@ -117,7 +127,9 @@ class CourseDetailsStats extends StatelessWidget {
                     ),
                     const SizedBox(width: SSize.xs),
                     Text(
-                      '/ 20',
+                      isCtLoading
+                          ? ''
+                          : '/ ${ctFullMarks.toInt()}',
                       style: TextStyle(
                         color: SColors.textSecondary,
                         fontSize: SSize.fontSizeMd,

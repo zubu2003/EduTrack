@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'package:iconsax/iconsax.dart';
 
 class CtMarksSummary extends StatelessWidget {
-  const CtMarksSummary({super.key});
+  final double best3Total;
+  final double average;
+  final double percentage;
+  final int bestOfCount;
+  final double fullMarks;
+
+  const CtMarksSummary({
+    super.key,
+    required this.best3Total,
+    required this.average,
+    required this.percentage,
+    required this.bestOfCount,
+    required this.fullMarks,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Card 1: Best 3 Total
+        // Best 3 Total Card
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(SSize.md),
@@ -38,7 +52,7 @@ class CtMarksSummary extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Best 3 Total',
+                    'Best $bestOfCount Total',
                     style: TextStyle(
                       color: SColors.white.withOpacity(0.7),
                       fontSize: SSize.fontSizeMd,
@@ -50,7 +64,7 @@ class CtMarksSummary extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '50',
+                        best3Total.toStringAsFixed(0),
                         style: TextStyle(
                           color: SColors.white,
                           fontSize: SSize.fontSizeXxl * 1.5,
@@ -61,7 +75,7 @@ class CtMarksSummary extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 6),
                         child: Text(
-                          '/ 60',
+                          '/ ${(fullMarks * bestOfCount).toInt()}',
                           style: TextStyle(
                             color: SColors.white.withOpacity(0.6),
                             fontSize: SSize.fontSizeLg,
@@ -90,7 +104,7 @@ class CtMarksSummary extends StatelessWidget {
 
         const SizedBox(height: SSize.spaceBtwItems),
 
-        // Card 2: Average Score
+        // Average Card
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(SSize.md),
@@ -131,7 +145,7 @@ class CtMarksSummary extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '16.67',
+                        average.toStringAsFixed(2),
                         style: TextStyle(
                           color: SColors.white,
                           fontSize: SSize.fontSizeXxl * 1.5,
@@ -142,7 +156,7 @@ class CtMarksSummary extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 6),
                         child: Text(
-                          '/ 20',
+                          '/ ${fullMarks.toInt()}',
                           style: TextStyle(
                             color: SColors.white.withOpacity(0.6),
                             fontSize: SSize.fontSizeLg,
@@ -154,15 +168,24 @@ class CtMarksSummary extends StatelessWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.all(SSize.sm),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: SSize.md,
+                  vertical: SSize.sm,
+                ),
                 decoration: BoxDecoration(
                   color: SColors.success.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
+                  border: Border.all(
+                    color: SColors.success.withOpacity(0.2),
+                  ),
                 ),
-                child: Icon(
-                  Icons.trending_up_rounded,
-                  color: SColors.success,
-                  size: SSize.iconLg,
+                child: Text(
+                  '${percentage.toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    color: SColors.success,
+                    fontSize: SSize.fontSizeXxl,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -173,7 +196,7 @@ class CtMarksSummary extends StatelessWidget {
 
         // Subtitle
         Text(
-          'Based on 4 Class Tests (Best 3 counted)',
+          'Based on best $bestOfCount of all Class Tests',
           style: TextStyle(
             color: SColors.textSecondary,
             fontSize: SSize.fontSizeSm,

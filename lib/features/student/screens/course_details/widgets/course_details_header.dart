@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
+import 'package:iconsax/iconsax.dart';
 
 class CourseDetailsHeader extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
+  final CourseModel course;
 
   const CourseDetailsHeader({
     super.key,
-    required this.courseCode,
-    required this.courseName,
+    required this.course,
   });
 
   @override
@@ -38,11 +38,11 @@ class CourseDetailsHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Course Code and Type
+          // Course Code + Credit Badge
           Row(
             children: [
               Text(
-                courseCode,
+                course.courseCode,
                 style: const TextStyle(
                   color: SColors.white,
                   fontSize: SSize.fontSizeLg,
@@ -50,24 +50,25 @@ class CourseDetailsHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: SSize.sm),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: SSize.sm,
-                  vertical: SSize.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: SColors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
-                ),
-                child: const Text(
-                  'Core',
-                  style: TextStyle(
-                    color: SColors.white,
-                    fontSize: SSize.fontSizeSm,
-                    fontWeight: FontWeight.w500,
+              if (course.credit > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: SSize.sm,
+                    vertical: SSize.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: SColors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
+                  ),
+                  child: Text(
+                    '${course.credit} Credits',
+                    style: const TextStyle(
+                      color: SColors.white,
+                      fontSize: SSize.fontSizeSm,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
 
@@ -75,7 +76,7 @@ class CourseDetailsHeader extends StatelessWidget {
 
           // Course Name
           Text(
-            courseName,
+            course.courseName,
             style: const TextStyle(
               color: SColors.white,
               fontSize: SSize.fontSizeXxl,
@@ -83,47 +84,27 @@ class CourseDetailsHeader extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: SSize.spaceBtwItems),
-
           // Teacher Info
-          const Row(
-            children: [
-              Icon(
-                Icons.person_outline,
-                color: SColors.white,
-                size: SSize.iconSm,
-              ),
-              SizedBox(width: SSize.xs),
-              Text(
-                'Dr. XYZ',
-                style: TextStyle(
+          if (course.teacherName.isNotEmpty) ...[
+            const SizedBox(height: SSize.spaceBtwItems),
+            Row(
+              children: [
+                const Icon(
+                  Icons.person_outline,
                   color: SColors.white,
-                  fontSize: SSize.fontSizeMd,
+                  size: SSize.iconSm,
                 ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: SSize.xs),
-
-          // Schedule
-          const Row(
-            children: [
-              Icon(
-                Icons.calendar_today_outlined,
-                color: SColors.white,
-                size: SSize.iconSm,
-              ),
-              SizedBox(width: SSize.xs),
-              Text(
-                'Mon, Wed 10:00 AM',
-                style: TextStyle(
-                  color: SColors.white,
-                  fontSize: SSize.fontSizeMd,
+                const SizedBox(width: SSize.xs),
+                Text(
+                  course.teacherName,
+                  style: const TextStyle(
+                    color: SColors.white,
+                    fontSize: SSize.fontSizeMd,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );

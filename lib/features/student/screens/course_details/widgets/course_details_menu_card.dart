@@ -37,7 +37,6 @@ class CourseDetailsMenuCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Icon
             Container(
               width: 48,
               height: 48,
@@ -52,8 +51,6 @@ class CourseDetailsMenuCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: SSize.spaceBtwItems),
-
-            // Text Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,8 +74,6 @@ class CourseDetailsMenuCard extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Arrow
             Icon(
               Icons.arrow_forward_ios,
               color: SColors.grey,

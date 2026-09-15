@@ -99,17 +99,17 @@ class AppRoutes {
     ),
     GetPage(
       name: studentCtMarks,
-      page: () => const StudentCtMarksScreen(
-        courseCode: 'CSE 356',
-        courseName: 'Software Engineering',
-      ),
+      page: () {
+        final args = Get.arguments;
+        final course = args is CourseModel ? args : CourseModel.empty();
+        return StudentCtMarksScreen(course: course);
+      },
     ),
     GetPage(
       name: studentRoutine,
       page: () {
         final args = Get.arguments;
-        final initialDay =
-        args is Map ? args['initialDay'] as String? : null;
+        final initialDay = args is Map ? args['initialDay'] as String? : null;
         return RoutineScreen(userRole: 'student', initialDay: initialDay);
       },
     ),
@@ -140,8 +140,7 @@ class AppRoutes {
       name: teacherRoutine,
       page: () {
         final args = Get.arguments;
-        final initialDay =
-        args is Map ? args['initialDay'] as String? : null;
+        final initialDay = args is Map ? args['initialDay'] as String? : null;
         return RoutineScreen(userRole: 'teacher', initialDay: initialDay);
       },
     ),

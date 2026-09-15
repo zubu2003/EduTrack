@@ -2,52 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/student_bottom_nav.dart';
+import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/student/controllers/ct_marks/student_ct_marks_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
-import 'widgets/ct_marks_header.dart';
 import 'widgets/ct_marks_summary.dart';
 import 'widgets/ct_marks_list_item.dart';
+import 'widgets/ct_marks_header.dart';
 
 class StudentCtMarksScreen extends StatelessWidget {
-  final String courseCode;
-  final String courseName;
+  final CourseModel course;
 
   const StudentCtMarksScreen({
     super.key,
-    required this.courseCode,
-    required this.courseName,
+    required this.course,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Hardcoded CT data outside builder
-    final List<Map<String, dynamic>> ctList = [
-      {
-        'title': 'Class Test 1',
-        'marks': '17/20',
-        'date': 'Oct 12, 2023',
-        'icon': Iconsax.document_text,
-      },
-      {
-        'title': 'Class Test 2',
-        'marks': '15/20',
-        'date': 'Nov 05, 2023',
-        'icon': Iconsax.document,
-      },
-      {
-        'title': 'Class Test 3',
-        'marks': '18/20',
-        'date': 'Dec 10, 2023',
-        'icon': Iconsax.document,
-      },
-      {
-        'title': 'Class Test 4',
-        'marks': '14/20',
-        'date': 'Jan 15, 2024',
-        'icon': Iconsax.document,
-      },
-    ];
+    final controller = Get.put(
+      StudentCtMarksController(course: course),
+      tag: 'student_ct_${course.courseId}',
+    );
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
@@ -55,64 +32,120 @@ class StudentCtMarksScreen extends StatelessWidget {
         showBackButton: true,
         onBackPressed: () => Get.back(),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: SSize.sm),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(color: SColors.primary),
+          );
+        }
 
-              // Header
-              CtMarksHeader(
-                courseCode: courseCode,
-                courseName: courseName,
-              ),
+        final ctData = controller.ctData.value;
 
-              const SizedBox(height: SSize.spaceBtwItems),
+        if (ctData == null || ctData.cts.isEmpty) {
+          return _buildEmptyState();
+        }
 
-              // Summary Card
-              const CtMarksSummary(),
+        final ctKeys = ctData.sortedCtKeys;
 
-              const SizedBox(height: SSize.spaceBtwItems),
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: SSize.defaultSpace,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: SSize.sm),
 
-              // CT List Title
-              Text(
-                'All Class Tests',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: SColors.textPrimary,
+                // Header
+                CtMarksHeader(
+                  courseCode: course.courseCode,
+                  courseName: course.courseName,
                 ),
-              ),
 
-              const SizedBox(height: SSize.spaceBtwItems),
+                const SizedBox(height: SSize.spaceBtwItems),
 
-              // CT List
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ctList.length,
-                itemBuilder: (context, index) {
-                  final ct = ctList[index];
+                // Summary (Best 3 + Average)
+                CtMarksSummary(
+                  best3Total: controller.getBest3Total(),
+                  average: controller.getAverage(),
+                  percentage: controller.getPercentage(),
+                  bestOfCount: ctData.bestOfCount,
+                  fullMarks: ctData.fullMarks,
+                ),
+
+                const SizedBox(height: SSize.spaceBtwSections),
+
+                // CT List
+                Text(
+                  'All Class Tests',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: SColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: SSize.spaceBtwItems),
+
+                ...ctKeys.map((ctTitle) {
+                  final ct = ctData.cts[ctTitle]!;
+                  final mark = controller.getMarkForCt(ctTitle);
+                  final isPublished = ct.isPublished;
+
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: SSize.spaceBtwItems),
+                    padding: const EdgeInsets.only(
+                      bottom: SSize.spaceBtwItems,
+                    ),
                     child: CtMarksListItem(
-                      title: ct['title'] as String,
-                      marks: ct['marks'] as String,
-                      date: ct['date'] as String,
-                      icon: ct['icon'] as IconData,
+                      ctTitle: ctTitle,
+                      mark: mark,
+                      fullMarks: ctData.fullMarks,
+                      isPublished: isPublished,
                     ),
                   );
-                },
-              ),
+                }).toList(),
 
-              const SizedBox(height: SSize.spaceBtwSections),
-            ],
+                const SizedBox(height: SSize.spaceBtwSections),
+              ],
+            ),
           ),
+        );
+      }),
+      bottomNavigationBar: const StudentBottomNav(currentIndex: 1),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(SSize.defaultSpace),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Iconsax.document_text,
+              size: 80,
+              color: SColors.primary.withOpacity(0.3),
+            ),
+            const SizedBox(height: SSize.spaceBtwItems),
+            Text(
+              'No CT Marks Yet',
+              style: TextStyle(
+                color: SColors.textPrimary,
+                fontSize: SSize.fontSizeLg,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: SSize.xs),
+            Text(
+              'Your teacher hasn\'t uploaded any CT marks yet.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: SColors.textSecondary,
+                fontSize: SSize.fontSizeMd,
+              ),
+            ),
+          ],
         ),
-      ),
-      bottomNavigationBar: const StudentBottomNav(
-        currentIndex: 1,
       ),
     );
   }

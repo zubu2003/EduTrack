@@ -4,38 +4,37 @@ import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
 
 class CtMarksListItem extends StatelessWidget {
-  final String title;
-  final String marks;
-  final String date;
-  final IconData icon;
+  final String ctTitle;
+  final double? mark;
+  final double fullMarks;
+  final bool isPublished;
 
   const CtMarksListItem({
     super.key,
-    required this.title,
-    required this.marks,
-    required this.date,
-    this.icon = Iconsax.document_text,
+    required this.ctTitle,
+    required this.mark,
+    required this.fullMarks,
+    required this.isPublished,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Parse marks to determine color
-    final marksParts = marks.split('/');
-    final obtained = double.tryParse(marksParts[0]) ?? 0;
-    final total = double.tryParse(marksParts[1]) ?? 20;
-    final percentage = (obtained / total) * 100;
-
+    // Performance color
     Color statusColor;
-    if (percentage >= 80) {
-      statusColor = SColors.success;
-    } else if (percentage >= 60) {
-      statusColor = Colors.amber;
+    if (mark == null) {
+      statusColor = SColors.grey;
     } else {
-      statusColor = SColors.error;
+      final pct = (mark! / fullMarks) * 100;
+      if (pct >= 80) {
+        statusColor = SColors.success;
+      } else if (pct >= 60) {
+        statusColor = SColors.warning;
+      } else {
+        statusColor = SColors.error;
+      }
     }
 
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(SSize.md),
       decoration: BoxDecoration(
         color: SColors.white,
@@ -48,82 +47,70 @@ class CtMarksListItem extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: statusColor.withOpacity(0.15),
+          color: statusColor.withOpacity(0.25),
           width: 1.5,
         ),
       ),
       child: Row(
         children: [
-          // Icon Container (Blue Theme)
+          // Icon
           Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: SColors.primary.withOpacity(0.1),
+              color: SColors.primary.withOpacity(0.08),
               borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
             ),
             child: Icon(
-              icon,
+              Iconsax.document_text,
               color: SColors.primary,
               size: SSize.iconMd,
             ),
           ),
           const SizedBox(width: SSize.spaceBtwItems),
 
-          // Title and Date
+          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  ctTitle,
                   style: TextStyle(
                     color: SColors.textPrimary,
                     fontSize: SSize.fontSizeMd,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: SSize.xs),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      color: SColors.grey,
-                      size: SSize.iconSm,
-                    ),
-                    const SizedBox(width: SSize.xs),
-                    Text(
-                      date,
-                      style: TextStyle(
-                        color: SColors.textSecondary,
-                        fontSize: SSize.fontSizeSm,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                Text(
+                  'Full Marks: ${fullMarks.toInt()}',
+                  style: TextStyle(
+                    color: SColors.textSecondary,
+                    fontSize: SSize.fontSizeSm,
+                  ),
                 ),
               ],
             ),
           ),
 
-          // Marks with Status Color
+          // Mark badge (solid colored background + white text)
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: SSize.md,
               vertical: SSize.sm,
             ),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
-              border: Border.all(
-                color: statusColor.withOpacity(0.2),
-                width: 1,
-              ),
+              color: mark != null ? statusColor : SColors.grey.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
             ),
             child: Text(
-              marks,
+              mark != null
+                  ? '${mark!.toStringAsFixed(0)}/${fullMarks.toInt()}'
+                  : '--',
               style: TextStyle(
-                color: statusColor,
-                fontSize: SSize.fontSizeLg,
+                color: mark != null ? SColors.white : SColors.grey,
+                fontSize: SSize.fontSizeMd,
                 fontWeight: FontWeight.bold,
               ),
             ),
