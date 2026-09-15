@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/routes/app_routes.dart';
+import '../../../../../routes/app_routes.dart';
 import 'dashboard_class_card.dart';
 
 class DashboardTodaysClasses extends StatelessWidget {
@@ -10,6 +11,8 @@ class DashboardTodaysClasses extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<StudentDashboardController>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -42,23 +45,55 @@ class DashboardTodaysClasses extends StatelessWidget {
           ],
         ),
         const SizedBox(height: SSize.spaceBtwItems),
-        const DashboardClassCard(
-          courseName: 'CSE 356 Software Engineering',
-          time: '10:00 AM - 11:30',
-          room: 'Room 301',
-          teacher: 'Dr. XYZ',
-          isLive: true,
-        ),
-        const SizedBox(height: SSize.spaceBtwItems),
-        const DashboardClassCard(
-          courseName: 'EEE 201 Electrical Circuits',
-          time: 'Lab 02',
-          room: '',
-          teacher: 'Dr. ABC',
-          isLive: false,
-          isUpcoming: true,
-          upcomingInfo: 'UPCOMING • STARTS IN 2 HOURS',
-        ),
+
+        Obx(() {
+          if (controller.todayClasses.isEmpty) {
+            return Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(SSize.md),
+              decoration: BoxDecoration(
+                color: SColors.white,
+                borderRadius: BorderRadius.circular(SSize.cardRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: SColors.black.withOpacity(0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.event_busy,
+                    color: SColors.grey,
+                    size: 40,
+                  ),
+                  const SizedBox(height: SSize.sm),
+                  Text(
+                    'No classes today',
+                    style: TextStyle(
+                      color: SColors.textSecondary,
+                      fontSize: SSize.fontSizeMd,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            children: controller.todayClasses.map((routine) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: SSize.spaceBtwItems),
+                child: DashboardClassCard(
+                  routine: routine,
+                  onTap: () => controller.openCourseDetails(routine),
+                ),
+              );
+            }).toList(),
+          );
+        }),
       ],
     );
   }

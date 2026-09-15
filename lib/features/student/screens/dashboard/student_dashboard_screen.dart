@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import '../../../../common/widget/appbar/common_appbar.dart';
@@ -13,43 +15,52 @@ class StudentDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(StudentDashboardController());
+
     return Scaffold(
       appBar: const SAppbar(
         showBackButton: false,
       ),
       backgroundColor: SColors.backgroundColor,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              // 1. Header
-              DashboardHeader(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Get.find<StudentDashboardController>().fetchDashboardData();
+        },
+        color: SColors.primary,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                // 1. Header
+                DashboardHeader(),
 
-              SizedBox(height: SSize.spaceBtwSections),
+                SizedBox(height: SSize.spaceBtwSections),
 
-              // 2. Today's Classes
-              DashboardTodaysClasses(),
+                // 2. Today's Classes
+                DashboardTodaysClasses(),
 
-              SizedBox(height: SSize.spaceBtwSections),
+                SizedBox(height: SSize.spaceBtwSections),
 
-              // 3. Class Schedule
-              DashboardClassSchedule(),
+                // 3. Class Schedule
+                DashboardClassSchedule(),
 
-              SizedBox(height: SSize.spaceBtwSections),
+                SizedBox(height: SSize.spaceBtwSections),
 
-              // 4. Upcoming CTs
-              DashboardUpcomingCTs(),
+                // 4. Upcoming CTs
+                DashboardUpcomingCTs(),
 
-              SizedBox(height: SSize.spaceBtwSections),
-            ],
+                SizedBox(height: SSize.spaceBtwSections),
+              ],
+            ),
           ),
         ),
       ),
-        bottomNavigationBar: const StudentBottomNav(
-          currentIndex: 0,  // Home tab selected
-        ),
+      bottomNavigationBar: const StudentBottomNav(
+        currentIndex: 0,
+      ),
     );
   }
 }

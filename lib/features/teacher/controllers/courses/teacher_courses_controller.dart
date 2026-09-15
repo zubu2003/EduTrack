@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/data/repositories/course/course_repository.dart';
+import 'package:edutrack/data/repositories/routine/routine_repository.dart';
 import 'package:edutrack/data/repositories/user/user_repository.dart';
 import 'package:edutrack/features/authentication/models/user_model.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
-import 'package:edutrack/features/course/models/enrollment_model.dart';
 import 'package:edutrack/common/widget/loader/full_screen_loader.dart';
 import 'package:edutrack/utils/constant/departments.dart';
 import 'package:edutrack/utils/helper/student_id_parser.dart';
@@ -13,11 +13,18 @@ import 'package:edutrack/utils/popups/snackbar_helpers.dart';
 class TeacherCoursesController extends GetxController {
   static TeacherCoursesController get instance => Get.find();
 
-  // Observable list
+  // ================================================================
+  // OBSERVABLES
+  // ================================================================
   RxList<CourseModel> courses = <CourseModel>[].obs;
   RxBool isLoading = true.obs;
 
-  // Create/Edit Course form
+  // Flag: filter to today's classes only
+  bool showTodayOnly = false;
+
+  // ================================================================
+  // CREATE / EDIT COURSE FORM
+  // ================================================================
   final createCourseFormKey = GlobalKey<FormState>();
   final courseCodeController = TextEditingController();
   final courseNameController = TextEditingController();
@@ -27,7 +34,9 @@ class TeacherCoursesController extends GetxController {
   final maxStudentsController = TextEditingController(text: '66');
   RxString selectedDept = '04'.obs;
 
-  // Assign Students
+  // ================================================================
+  // ASSIGN STUDENTS FORM
+  // ================================================================
   final assignFormKey = GlobalKey<FormState>();
   final assignBatchController = TextEditingController();
   final assignStartRollController = TextEditingController();
@@ -37,21 +46,49 @@ class TeacherCoursesController extends GetxController {
   RxList<UserModel> foundStudents = <UserModel>[].obs;
   RxMap<String, bool> selectedStudents = <String, bool>{}.obs;
 
+  // ================================================================
+  // LIFECYCLE
+  // ================================================================
   @override
   void onInit() {
     super.onInit();
     fetchTeacherCourses();
   }
 
-  /// Fetch teacher's courses
+  // ================================================================
+  // FETCH COURSES (auto-handles Today's mode via showTodayOnly flag)
+  // ================================================================
   Future<void> fetchTeacherCourses() async {
     try {
       isLoading.value = true;
+
       final user = await UserRepository.instance.getCurrentUserData();
       if (user == null) return;
 
-      final list = await CourseRepository.instance.getTeacherCourses(user.uid);
-      courses.value = list;
+      // Fetch all teacher's courses
+      final allCourses =
+      await CourseRepository.instance.getTeacherCourses(user.uid);
+
+      // Not today-only → just set all
+      if (!showTodayOnly) {
+        courses.value = allCourses;
+        return;
+      }
+
+      // Today-only → filter by today's routine
+      final routines =
+      await RoutineRepository.instance.getUserRoutines(user.uid);
+
+      final todayDay = _todayDayName();
+      final todayCourseIds = routines
+          .where((r) => r.day == todayDay && r.courseCode != 'Others')
+          .map((r) => r.courseId)
+          .where((id) => id.isNotEmpty)
+          .toSet();
+
+      courses.value = allCourses
+          .where((c) => todayCourseIds.contains(c.courseId))
+          .toList();
     } catch (e) {
       SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
     } finally {
@@ -59,15 +96,17 @@ class TeacherCoursesController extends GetxController {
     }
   }
 
-  /// Create new course
+  // ================================================================
+  // CREATE COURSE
+  // ================================================================
   Future<void> createCourse() async {
     try {
       if (!createCourseFormKey.currentState!.validate()) return;
 
       final startRoll = int.tryParse(startRollController.text.trim()) ?? 1;
-      final maxStudents = int.tryParse(maxStudentsController.text.trim()) ?? 66;
+      final maxStudents =
+          int.tryParse(maxStudentsController.text.trim()) ?? 66;
 
-      // Roll range check
       if (startRoll < 1 || startRoll > 132) {
         SSnackBarHelpers.errorSnackBar(
           title: 'Invalid Roll',
@@ -76,7 +115,6 @@ class TeacherCoursesController extends GetxController {
         return;
       }
 
-      // Max students check (min only)
       if (maxStudents < 1) {
         SSnackBarHelpers.errorSnackBar(
           title: 'Invalid Count',
@@ -85,7 +123,6 @@ class TeacherCoursesController extends GetxController {
         return;
       }
 
-      // WARNING: Exceeds max roll range
       if (startRoll + maxStudents - 1 > 132) {
         SSnackBarHelpers.warningSnackBar(
           title: 'Notice',
@@ -138,7 +175,9 @@ class TeacherCoursesController extends GetxController {
     }
   }
 
-  /// Update existing course
+  // ================================================================
+  // UPDATE COURSE
+  // ================================================================
   Future<void> updateCourse(CourseModel course) async {
     try {
       if (!createCourseFormKey.currentState!.validate()) return;
@@ -179,10 +218,15 @@ class TeacherCoursesController extends GetxController {
     }
   }
 
-  /// Delete course with warning
+  // ================================================================
+  // DELETE COURSE
+  // ================================================================
   Future<void> deleteCourse(CourseModel course) async {
     Get.dialog(
       AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: const Text('Delete Course'),
         content: Text(
           'Are you sure you want to delete "${course.courseCode} - ${course.courseName}"?\n\n'
@@ -212,20 +256,22 @@ class TeacherCoursesController extends GetxController {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: const Text('Delete',
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 
-  // ==================== ASSIGN STUDENTS ====================
-
-  /// Preview students matching filter
+  // ================================================================
+  // ASSIGN STUDENTS
+  // ================================================================
   Future<void> previewStudents() async {
     try {
       final batch = assignBatchController.text.trim();
-      final startRoll = int.tryParse(assignStartRollController.text.trim()) ?? 1;
+      final startRoll =
+          int.tryParse(assignStartRollController.text.trim()) ?? 1;
       final maxStudents =
           int.tryParse(assignMaxStudentsController.text.trim()) ?? 66;
 
@@ -248,7 +294,6 @@ class TeacherCoursesController extends GetxController {
 
       foundStudents.value = students;
 
-      // Default all selected
       selectedStudents.clear();
       for (final s in students) {
         selectedStudents[s.uid] = true;
@@ -268,13 +313,12 @@ class TeacherCoursesController extends GetxController {
     }
   }
 
-  /// Toggle student selection
   void toggleStudent(String uid) {
-    selectedStudents[uid] = !(selectedStudents[uid] ?? false);
+    final current = selectedStudents[uid] ?? false;
+    selectedStudents[uid] = !current;
     selectedStudents.refresh();
   }
 
-  /// Select all / none
   void selectAllStudents(bool select) {
     for (final s in foundStudents) {
       selectedStudents[s.uid] = select;
@@ -282,12 +326,10 @@ class TeacherCoursesController extends GetxController {
     selectedStudents.refresh();
   }
 
-  /// Assign selected students
   Future<void> assignSelectedStudents(String courseId) async {
     try {
-      final selected = foundStudents
-          .where((s) => selectedStudents[s.uid] == true)
-          .toList();
+      final selected =
+      foundStudents.where((s) => selectedStudents[s.uid] == true).toList();
 
       if (selected.isEmpty) {
         SSnackBarHelpers.warningSnackBar(
@@ -318,18 +360,16 @@ class TeacherCoursesController extends GetxController {
     }
   }
 
-  /// Load students already in course
-  Future<List<EnrollmentModel>> loadEnrolledStudents(String courseId) async {
-    return await CourseRepository.instance.getEnrolledStudents(courseId);
-  }
-
+  // ================================================================
+  // FORM HELPERS
+  // ================================================================
   void clearCreateForm() {
     courseCodeController.clear();
     courseNameController.clear();
     creditController.clear();
     batchController.clear();
-    startRollController.text='1';
-    maxStudentsController.text = '132';
+    startRollController.clear();
+    maxStudentsController.text = '66';
     selectedDept.value = '04';
   }
 
@@ -350,6 +390,31 @@ class TeacherCoursesController extends GetxController {
     assignDept.value = course.department;
     foundStudents.clear();
     selectedStudents.clear();
+  }
+
+  // ================================================================
+  // HELPERS
+  // ================================================================
+  String _todayDayName() {
+    final now = DateTime.now();
+    switch (now.weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return 'Sun';
+    }
   }
 
   @override

@@ -1,44 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-
-import '../../../../../common/widget/logo/app_logo.dart';
 
 class DashboardHeader extends StatelessWidget {
   const DashboardHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<StudentDashboardController>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Greeting with Name - Fixed alignment
-        Row(
-          children: [
-            Text(
-              'Good Morning, ',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: SColors.textPrimary,
-                fontSize: SSize.fontSizeLg,
+        Obx(() {
+          final name = controller.user.value.name.isNotEmpty
+              ? controller.user.value.name
+              : 'Student';
+
+          return Row(
+            children: [
+              Text(
+                controller.greeting,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: SColors.textSecondary,
+                ),
               ),
-            ),
-            Text(
-              'Zubayer',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: SColors.textPrimary,
+              const SizedBox(width: SSize.xs),
+              Expanded(
+                child: Text(
+                  name,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: SColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        }),
 
         const SizedBox(height: SSize.xs),
 
-        // Subtitle
         Text(
           "Here's your academic overview for today.",
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: SColors.textPrimary,
+            color: SColors.textSecondary,
           ),
         ),
       ],

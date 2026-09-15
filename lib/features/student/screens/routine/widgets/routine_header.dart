@@ -20,13 +20,7 @@ class RoutineHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: SSize.xs),
-          Text(
-            'Today is a busy day, stay focused.',
-            style: TextStyle(
-              color: SColors.textSecondary,
-              fontSize: SSize.fontSizeMd,
-            ),
-          ),
+
         ],
       ),
     );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:edutrack/features/teacher/controllers/dashboard/teacher_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -7,28 +9,37 @@ class TeacherDashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<TeacherDashboardController>();
+
     return Row(
       children: [
-        // Left: Greeting
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Good Morning,',
+                controller.greeting,
                 style: TextStyle(
                   color: SColors.textSecondary,
                   fontSize: SSize.fontSizeMd,
                 ),
               ),
               const SizedBox(height: SSize.xs),
-              Text(
-                'Dr. Smith',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: SColors.textPrimary,
-                ),
-              ),
+              Obx(() {
+                final name = controller.user.value.name.isNotEmpty
+                    ? controller.user.value.name
+                    : 'Teacher';
+
+                return Text(
+                  name,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: SColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                );
+              }),
               const SizedBox(height: SSize.xs),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -50,8 +61,15 @@ class TeacherDashboardHeader extends StatelessWidget {
             ],
           ),
         ),
-        // Right: Profile Avatar
-
+        CircleAvatar(
+          radius: 28,
+          backgroundColor: SColors.primary.withOpacity(0.1),
+          child: Icon(
+            Icons.person_outline,
+            color: SColors.primary,
+            size: SSize.iconLg,
+          ),
+        ),
       ],
     );
   }

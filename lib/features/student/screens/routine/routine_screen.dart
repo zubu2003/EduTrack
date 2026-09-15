@@ -15,18 +15,35 @@ import 'widgets/routine_header.dart';
 
 class RoutineScreen extends StatelessWidget {
   final String userRole;
+  final String? initialDay;
 
   const RoutineScreen({
     super.key,
     this.userRole = 'student',
+    this.initialDay,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Resolve initialDay — allow null (don't default to 'Sun')
+    final args = Get.arguments;
+    String? resolvedDay = initialDay;
+    if (resolvedDay == null && args is Map && args['initialDay'] != null) {
+      resolvedDay = args['initialDay'] as String;
+    }
+
     final controller = Get.put(
       RoutineController(userRole: userRole),
       tag: 'routine_$userRole',
     );
+
+    //  Only override if resolvedDay is explicitly set
+    if (resolvedDay != null &&
+        RoutineController.days.contains(resolvedDay)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.selectDay(resolvedDay!);
+      });
+    }
 
     final bottomNav = userRole == 'teacher'
         ? const TeacherBottomNav(currentIndex: 2)
@@ -49,12 +66,10 @@ class RoutineScreen extends StatelessWidget {
 
         return Column(
           children: [
-            // Header
             const RoutineHeader(),
 
             const SizedBox(height: SSize.spaceBtwItems),
 
-            // Day Tabs
             RoutineDayTabs(
               days: RoutineController.days,
               selectedDay: controller.selectedDay.value,
@@ -63,7 +78,6 @@ class RoutineScreen extends StatelessWidget {
 
             const SizedBox(height: SSize.spaceBtwItems),
 
-            // Routine List
             Expanded(
               child: currentRoutines.isEmpty
                   ? const RoutineEmptyState()

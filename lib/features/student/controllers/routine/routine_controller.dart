@@ -9,11 +9,11 @@ import 'package:edutrack/common/widget/loader/full_screen_loader.dart';
 import 'package:edutrack/utils/popups/snackbar_helpers.dart';
 
 class RoutineController extends GetxController {
-  final String userRole; // 'student' | 'teacher'
+  final String userRole;
 
   RoutineController({required this.userRole});
 
-  // User's courses (fetched based on role)
+  // User's courses
   RxList<CourseModel> myCourses = <CourseModel>[].obs;
 
   // Routines grouped by day
@@ -28,7 +28,7 @@ class RoutineController extends GetxController {
   // Form
   final addRoutineFormKey = GlobalKey<FormState>();
   RxString selectedCourseCode = 'Others'.obs;
-  RxString selectedCourseId = ''.obs;
+  RxString selectedCourseId = 'Others'.obs;
   RxString selectedCourseName = ''.obs;
   final customCourseNameController = TextEditingController();
   final roomController = TextEditingController();
@@ -41,11 +41,50 @@ class RoutineController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // Default to today's day (or Sunday if weekend)
+    selectedDay.value = _routineDayOrDefault();
+
     fetchMyCourses();
     fetchRoutines();
   }
 
-  /// Fetch the current user's courses based on role
+  // ─── DAY HELPERS ───
+
+  /// Today's day short name (Mon, Tue, ...)
+  String _todayDayName() {
+    final now = DateTime.now();
+    switch (now.weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return 'Sun';
+    }
+  }
+
+  /// Today's day if it's a routine day, else fallback to Sunday
+  String _routineDayOrDefault() {
+    final today = _todayDayName();
+    if (days.contains(today)) {
+      return today;
+    }
+    return 'Sun';
+  }
+
+  // ─── FETCH ───
+
   Future<void> fetchMyCourses() async {
     try {
       final user = await UserRepository.instance.getCurrentUserData();
@@ -59,11 +98,15 @@ class RoutineController extends GetxController {
         await CourseRepository.instance.getStudentCourses(user.uid);
       }
     } catch (e) {
-      SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
+      final errStr = e.toString().toLowerCase();
+      if (!errStr.contains('unable to resolve') &&
+          !errStr.contains('unavailable') &&
+          !errStr.contains('network')) {
+        SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
+      }
     }
   }
 
-  /// Fetch all routines for the current user
   Future<void> fetchRoutines() async {
     try {
       isLoading.value = true;
@@ -86,14 +129,24 @@ class RoutineController extends GetxController {
 
       routineByDay.value = grouped;
     } catch (e) {
-      SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
+      final errStr = e.toString().toLowerCase();
+      if (!errStr.contains('unable to resolve') &&
+          !errStr.contains('unavailable') &&
+          !errStr.contains('network')) {
+        SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
+  // ─── DAY SELECTION ───
+
   void selectDay(String day) => selectedDay.value = day;
+
   void selectFormDay(String day) => selectedDayForm.value = day;
+
+  // ─── FORM ───
 
   void selectCourse(String courseCode, String courseId, String courseName) {
     selectedCourseCode.value = courseCode;
@@ -137,7 +190,9 @@ class RoutineController extends GetxController {
         routineId: '',
         ownerId: user.uid,
         ownerRole: userRole,
-        courseId: selectedCourseId.value,
+        courseId: selectedCourseId.value == 'Others'
+            ? ''
+            : selectedCourseId.value,
         courseCode: selectedCourseCode.value,
         courseName: finalCourseName,
         day: selectedDayForm.value,
@@ -191,7 +246,9 @@ class RoutineController extends GetxController {
       SFullScreenLoader.openLoadingDialog('Updating routine...');
 
       final updated = routine.copyWith(
-        courseId: selectedCourseId.value,
+        courseId: selectedCourseId.value == 'Others'
+            ? ''
+            : selectedCourseId.value,
         courseCode: selectedCourseCode.value,
         courseName: finalCourseName,
         day: selectedDayForm.value,
@@ -259,23 +316,32 @@ class RoutineController extends GetxController {
     );
   }
 
+  // ─── FORM HELPERS ───
+
   void loadRoutineForEdit(RoutineModel routine) {
-    selectedCourseCode.value = routine.courseCode;
-    selectedCourseId.value = routine.courseId;
-    selectedCourseName.value = routine.courseName;
+    if (routine.courseCode == 'Others' ||
+        routine.courseId.isEmpty ||
+        routine.courseId == 'Others') {
+      selectedCourseCode.value = 'Others';
+      selectedCourseId.value = 'Others';
+      selectedCourseName.value = '';
+      customCourseNameController.text = routine.courseName;
+    } else {
+      selectedCourseCode.value = routine.courseCode;
+      selectedCourseId.value = routine.courseId;
+      selectedCourseName.value = routine.courseName;
+      customCourseNameController.clear();
+    }
+
     selectedDayForm.value = routine.day;
     startTime.value = routine.startTime;
     endTime.value = routine.endTime;
     roomController.text = routine.room;
-
-    if (routine.courseCode == 'Others') {
-      customCourseNameController.text = routine.courseName;
-    }
   }
 
   void clearForm() {
     selectedCourseCode.value = 'Others';
-    selectedCourseId.value = '';
+    selectedCourseId.value = 'Others';
     selectedCourseName.value = '';
     selectedDayForm.value = 'Sun';
     startTime.value = '10:00 AM';

@@ -106,7 +106,12 @@ class AppRoutes {
     ),
     GetPage(
       name: studentRoutine,
-      page: () => const RoutineScreen(userRole: 'student'),
+      page: () {
+        final args = Get.arguments;
+        final initialDay =
+        args is Map ? args['initialDay'] as String? : null;
+        return RoutineScreen(userRole: 'student', initialDay: initialDay);
+      },
     ),
     GetPage(
       name: studentProfile,
@@ -133,7 +138,12 @@ class AppRoutes {
     ),
     GetPage(
       name: teacherRoutine,
-      page: () => const RoutineScreen(userRole: 'teacher'),
+      page: () {
+        final args = Get.arguments;
+        final initialDay =
+        args is Map ? args['initialDay'] as String? : null;
+        return RoutineScreen(userRole: 'teacher', initialDay: initialDay);
+      },
     ),
     GetPage(
       name: teacherProfile,

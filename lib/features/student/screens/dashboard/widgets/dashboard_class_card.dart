@@ -1,41 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:edutrack/features/course/models/routine_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-
 import '../../../../../common/widget/teacher/teacher_info.dart';
 
 class DashboardClassCard extends StatelessWidget {
-  final String courseName;
-  final String time;
-  final String room;
-  final String teacher;
-  final bool isLive;
-  final bool isUpcoming;
-  final String? upcomingInfo;
+  final RoutineModel routine;
+  final VoidCallback? onTap;
 
   const DashboardClassCard({
     super.key,
-    required this.courseName,
-    required this.time,
-    required this.room,
-    required this.teacher,
-    this.isLive = false,
-    this.isUpcoming = false,
-    this.upcomingInfo,
+    required this.routine,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isOther = routine.courseCode == 'Others';
+    final now = DateTime.now();
+    final isLive = _isRunning(routine, now);
+
     return InkWell(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Navigate to Course Details'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-        // TODO: Navigate to Course Details Screen
-      },
+      onTap: isOther ? null : onTap,
       borderRadius: BorderRadius.circular(SSize.cardRadius),
       child: Container(
         width: double.infinity,
@@ -54,8 +40,8 @@ class DashboardClassCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Upcoming Badge (Top - Only for Upcoming)
-            if (isUpcoming && upcomingInfo != null) ...[
+            // Upcoming badge
+            if (!isLive) ...[
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: SSize.sm,
@@ -66,7 +52,7 @@ class DashboardClassCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                 ),
                 child: Text(
-                  upcomingInfo!,
+                  'UPCOMING',
                   style: TextStyle(
                     color: SColors.warning,
                     fontWeight: FontWeight.w600,
@@ -77,12 +63,12 @@ class DashboardClassCard extends StatelessWidget {
               const SizedBox(height: SSize.sm),
             ],
 
-            // Course Name and Live Badge
+            // Course name + Live badge
             Row(
               children: [
                 Expanded(
                   child: Text(
-                    courseName,
+                    routine.courseName,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -137,7 +123,7 @@ class DashboardClassCard extends StatelessWidget {
                 ),
                 const SizedBox(width: SSize.xs),
                 Text(
-                  time,
+                  '${routine.startTime} - ${routine.endTime}',
                   style: TextStyle(
                     color: SColors.textSecondary,
                     fontSize: SSize.fontSizeMd,
@@ -146,7 +132,7 @@ class DashboardClassCard extends StatelessWidget {
               ],
             ),
 
-            if (room.isNotEmpty) ...[
+            if (routine.room.isNotEmpty) ...[
               const SizedBox(height: SSize.xs),
               Row(
                 children: [
@@ -157,7 +143,7 @@ class DashboardClassCard extends StatelessWidget {
                   ),
                   const SizedBox(width: SSize.xs),
                   Text(
-                    room,
+                    routine.room,
                     style: TextStyle(
                       color: SColors.textSecondary,
                       fontSize: SSize.fontSizeMd,
@@ -167,18 +153,39 @@ class DashboardClassCard extends StatelessWidget {
               ),
             ],
 
-            const SizedBox(height: SSize.sm),
-
-            // Teacher Info (Using Common Widget)
-            if (teacher.isNotEmpty)
+            if (!isOther && routine.courseCode.isNotEmpty) ...[
+              const SizedBox(height: SSize.sm),
               STeacherInfoWidget(
-                teacherName: teacher,
+                teacherName: routine.courseCode,
                 avatarRadius: 14,
                 fontSize: SSize.fontSizeMd,
               ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  bool _isRunning(RoutineModel routine, DateTime now) {
+    final nowMin = now.hour * 60 + now.minute;
+    final start = _toMinutes(routine.startTime);
+    final end = _toMinutes(routine.endTime);
+    return nowMin >= start && nowMin <= end;
+  }
+
+  int _toMinutes(String time) {
+    try {
+      final parts = time.trim().split(' ');
+      if (parts.length != 2) return 0;
+      final hm = parts[0].split(':');
+      int hour = int.parse(hm[0]);
+      final min = int.parse(hm[1]);
+      if (parts[1].toUpperCase() == 'PM' && hour != 12) hour += 12;
+      if (parts[1].toUpperCase() == 'AM' && hour == 12) hour = 0;
+      return hour * 60 + min;
+    } catch (_) {
+      return 0;
+    }
   }
 }

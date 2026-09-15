@@ -20,7 +20,10 @@ class StudentCoursesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(StudentCoursesController());
+    final controller = Get.put(
+      StudentCoursesController(showTodayOnly: showTodayOnly),
+      tag: showTodayOnly ? 'student_courses_today' : 'student_courses_all',
+    );
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
@@ -99,7 +102,7 @@ class StudentCoursesScreen extends StatelessWidget {
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(
-              'No Enrolled Courses',
+              'No Classes Today',
               style: TextStyle(
                 color: SColors.textPrimary,
                 fontSize: SSize.fontSizeLg,
@@ -108,7 +111,7 @@ class StudentCoursesScreen extends StatelessWidget {
             ),
             const SizedBox(height: SSize.xs),
             Text(
-              'Your teacher will assign you to courses',
+              'You have no classes scheduled for today.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: SColors.textSecondary,

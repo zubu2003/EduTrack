@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'dashboard_calendar_row.dart';
@@ -9,6 +11,8 @@ class DashboardClassSchedule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<StudentDashboardController>();
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(SSize.md),
@@ -26,7 +30,7 @@ class DashboardClassSchedule extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title Row with Month on Right
+          // Title row (not interactive)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -37,7 +41,7 @@ class DashboardClassSchedule extends StatelessWidget {
                 ),
               ),
               Text(
-                'Jan 2026',
+                _monthYear(),
                 style: TextStyle(
                   color: SColors.primary,
                   fontSize: SSize.fontSizeMd,
@@ -49,12 +53,14 @@ class DashboardClassSchedule extends StatelessWidget {
 
           const SizedBox(height: SSize.spaceBtwItems),
 
-          // Calendar Row
-          const DashboardCalendarRow(),
+          // Calendar Row (interactive — day selector)
+          Obx(() => DashboardCalendarRow(
+            selectedDay: controller.selectedScheduleDay.value,
+            onDaySelected: controller.selectScheduleDay,
+          )),
 
           const SizedBox(height: SSize.spaceBtwItems),
 
-          // Divider
           Divider(
             color: SColors.grey.withOpacity(0.2),
             height: 1,
@@ -62,30 +68,55 @@ class DashboardClassSchedule extends StatelessWidget {
 
           const SizedBox(height: SSize.spaceBtwItems),
 
-          // Schedule Items List
-          Column(
-            children: const [
-              DashboardScheduleItem(
-                time: '8:00 AM',
-                subject: 'Writing',
-                timeRange: '8:00 - 8:30',
-              ),
-              SizedBox(height: SSize.sm),
-              DashboardScheduleItem(
-                time: '10:00 AM',
-                subject: 'Math',
-                timeRange: '10:00 - 10:30',
-              ),
-              SizedBox(height: SSize.sm),
-              DashboardScheduleItem(
-                time: '12:00 PM',
-                subject: 'No Class',
-                timeRange: '',
-              ),
-            ],
-          ),
+          // Schedule items for selected day
+          Obx(() {
+            final routines = controller.getRoutineForDay(
+              controller.selectedScheduleDay.value,
+            );
+
+            if (routines.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: SSize.md),
+                child: Center(
+                  child: Text(
+                    'No schedule',
+                    style: TextStyle(
+                      color: SColors.textSecondary,
+                      fontSize: SSize.fontSizeMd,
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              children: routines.map((routine) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: SSize.sm),
+                  child: DashboardScheduleItem(
+                    time: routine.startTime,
+                    subject: routine.courseName,
+                    timeRange:
+                    '${routine.startTime} - ${routine.endTime}',
+                    onTap: () => controller.openRoutine(
+                      day: controller.selectedScheduleDay.value,
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          }),
         ],
       ),
     );
+  }
+
+  String _monthYear() {
+    final now = DateTime.now();
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${months[now.month - 1]} ${now.year}';
   }
 }

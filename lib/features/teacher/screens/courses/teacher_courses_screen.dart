@@ -22,7 +22,18 @@ class TeacherCoursesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(TeacherCoursesController());
+    final controller = Get.put(
+      TeacherCoursesController(),
+      tag: showTodayOnly ? 'teacher_courses_today' : 'teacher_courses_all',
+    );
+
+    // ✅ Set flag on the controller
+    controller.showTodayOnly = showTodayOnly;
+
+    // Trigger fetch after setting flag
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchTeacherCourses();
+    });
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
@@ -67,13 +78,11 @@ class TeacherCoursesScreen extends StatelessWidget {
                         ),
                         child: TeacherCourseCard(
                           course: course,
-                          // ✅ FIXED: Pass full course object
                           onTap: () => Get.to(
                                 () => TeacherCourseDetailsScreen(
                               course: course,
                             ),
                           ),
-                          // Manage Students button
                           onAssign: () => Get.to(
                                 () => AssignStudentsScreen(course: course),
                           ),
@@ -92,7 +101,9 @@ class TeacherCoursesScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: showTodayOnly
+          ? null
+          : FloatingActionButton(
         onPressed: () => Get.to(() => const CreateCourseScreen()),
         backgroundColor: SColors.primary,
         child: const Icon(Iconsax.add, color: SColors.white, size: 28),
@@ -115,7 +126,7 @@ class TeacherCoursesScreen extends StatelessWidget {
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(
-              'No Courses Yet',
+              'No Classes Today',
               style: TextStyle(
                 color: SColors.textPrimary,
                 fontSize: SSize.fontSizeLg,
@@ -124,7 +135,7 @@ class TeacherCoursesScreen extends StatelessWidget {
             ),
             const SizedBox(height: SSize.xs),
             Text(
-              'Tap the + button to create your first course',
+              'You have no classes scheduled for today.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: SColors.textSecondary,

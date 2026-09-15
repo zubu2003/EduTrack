@@ -75,11 +75,11 @@ class AddRoutineScreen extends StatelessWidget {
                 )),
                 const SizedBox(height: SSize.spaceBtwItems),
 
-                // Course Dropdown
+                // Course Dropdown (uses courseId as value)
                 Obx(() => _buildCourseDropdown(
                   context,
                   controller.myCourses,
-                  controller.selectedCourseCode.value,
+                  controller.selectedCourseId.value,
                   controller.selectCourse,
                 )),
                 const SizedBox(height: SSize.spaceBtwItems),
@@ -87,7 +87,8 @@ class AddRoutineScreen extends StatelessWidget {
                 // Course Name (auto or custom)
                 Obx(() {
                   final isOther =
-                      controller.selectedCourseCode.value == 'Others';
+                      controller.selectedCourseId.value == 'Others' ||
+                          controller.selectedCourseCode.value == 'Others';
                   if (isOther) {
                     return _buildTextField(
                       controller: controller.customCourseNameController,
@@ -215,6 +216,32 @@ class AddRoutineScreen extends StatelessWidget {
       String selected,
       Function(String, String, String) onSelect,
       ) {
+    // Build dropdown items using courseId as unique value
+    final dropdownItems = <DropdownMenuItem<String>>[
+      ...courses.map((c) {
+        return DropdownMenuItem<String>(
+          value: c.courseId as String,
+          child: Text(
+            '${c.courseCode} - ${c.courseName}',
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      }),
+      const DropdownMenuItem<String>(
+        value: 'Others',
+        child: Text('Others'),
+      ),
+    ];
+
+    // Determine current value safely
+    String? currentValue;
+    if (selected.isEmpty) {
+      currentValue = 'Others';
+    } else {
+      final exists = dropdownItems.any((item) => item.value == selected);
+      currentValue = exists ? selected : 'Others';
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -234,34 +261,19 @@ class AddRoutineScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
           ),
           child: DropdownButtonFormField<String>(
-            value: selected,
+            value: currentValue,
             isExpanded: true,
             decoration: const InputDecoration(
               prefixIcon: Icon(Iconsax.book, color: SColors.grey),
               border: InputBorder.none,
             ),
-            items: [
-              ...courses.map((c) {
-                return DropdownMenuItem<String>(
-                  value: c.courseCode as String,
-                  child: Text(
-                    '${c.courseCode} - ${c.courseName}',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                );
-              }),
-              const DropdownMenuItem<String>(
-                value: 'Others',
-                child: Text('Others'),
-              ),
-            ],
+            items: dropdownItems,
             onChanged: (v) {
               if (v == null) return;
               if (v == 'Others') {
-                onSelect('Others', '', '');
+                onSelect('Others', 'Others', '');
               } else {
-                final matched =
-                courses.firstWhere((c) => c.courseCode == v);
+                final matched = courses.firstWhere((c) => c.courseId == v);
                 onSelect(
                   matched.courseCode as String,
                   matched.courseId as String,
