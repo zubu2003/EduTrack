@@ -238,16 +238,20 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                           ),
                         ),
                         child: TextFormField(
-                          initialValue: currentMark != null
-                              ? currentMark.toStringAsFixed(0)
-                              : '',
-                          keyboardType: TextInputType.number,
+                          initialValue: CtMark.isAbsent(currentMark)
+                              ? 'abs'
+                              : currentMark != null
+                                  ? currentMark.toStringAsFixed(0)
+                                  : '',
+                          keyboardType: TextInputType.text,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,
                           style: TextStyle(
                             fontSize: SSize.fontSizeLg,
                             fontWeight: FontWeight.bold,
-                            color: SColors.primary,
+                            color: CtMark.isAbsent(currentMark)
+                                ? SColors.error
+                                : SColors.primary,
                           ),
                           decoration: const InputDecoration(
                             isDense: true,
@@ -263,9 +267,9 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                             focusedBorder: InputBorder.none,
                           ),
                           onChanged: (v) {
-                            final mark = double.tryParse(v);
-                            if (mark != null) {
-                              editableMarks[student.studentId] = mark;
+                            final parsed = CtMark.parse(v);
+                            if (parsed != null) {
+                              editableMarks[student.studentId] = parsed;
                             } else {
                               editableMarks.remove(student.studentId);
                             }

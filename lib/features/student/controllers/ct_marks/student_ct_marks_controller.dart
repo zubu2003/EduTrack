@@ -47,75 +47,48 @@ class StudentCtMarksController extends GetxController {
   double? getMarkForCt(String ctTitle) {
     final data = ctData.value;
     if (data == null) return null;
-
-    final ct = data.cts[ctTitle];
-    if (ct == null) return null;
-
-    return ct.marks[user.value.uid];
+    return data.cts[ctTitle]?.marks[user.value.uid];
   }
 
-  /// How many CTs the student has marks for (excluding unpublished if desired)
+  bool isAbsentForCt(String ctTitle) {
+    return CtMark.isAbsent(getMarkForCt(ctTitle));
+  }
+
+  int get bestOfCount {
+    return course.credit > 0 ? course.credit : (ctData.value?.bestOfCount ?? 3);
+  }
+
+  /// Numeric marks only (abs skipped)
   int getAvailableCtCount() {
     final data = ctData.value;
     if (data == null) return 0;
-
-    int count = 0;
-    for (final ct in data.cts.values) {
-      if (ct.marks.containsKey(user.value.uid)) {
-        count++;
-      }
-    }
-    return count;
+    return data.numericMarksFor(user.value.uid).length;
   }
 
-  /// How many CTs should be counted for best-of-N
-  /// = min(bestOfCount, availableCts)
-  int getEffectiveBestCount() {
-    final data = ctData.value;
-    if (data == null) return 0;
-    final available = getAvailableCtCount();
-    if (available == 0) return 0;
-    return available < data.bestOfCount ? available : data.bestOfCount;
-  }
+  int getEffectiveBestCount() => bestOfCount;
 
-  /// Best N total for current student
-  /// Uses min(bestOfCount, availableCts) instead of always bestOfCount
+  /// Best n of n+1 CTs for current student (abs ignored)
   double getBest3Total() {
     final data = ctData.value;
     if (data == null) return 0;
-
-    // Collect all available marks for this student
-    final marks = <double>[];
-    for (final ct in data.cts.values) {
-      final mark = ct.marks[user.value.uid];
-      if (mark != null) marks.add(mark);
-    }
-
-    if (marks.isEmpty) return 0;
-
-    // Sort descending, take top N
-    marks.sort((a, b) => b.compareTo(a));
-    final effectiveCount = getEffectiveBestCount();
-    return marks.take(effectiveCount).fold<double>(0, (sum, m) => sum + m);
+    return data.computeCourseTotal(user.value.uid, bestOfCount);
   }
 
-  /// Average = best total / effective count
+  /// Average across the counted best-n CTs
   double getAverage() {
-    final effective = getEffectiveBestCount();
-    if (effective == 0) return 0;
-    return getBest3Total() / effective;
+    final n = bestOfCount;
+    if (n == 0) return 0;
+    return getBest3Total() / n;
   }
 
-  /// Percentage = best total / (effective * fullMarks) * 100
+  /// Percentage vs fullMarks * credit
   double getPercentage() {
     final data = ctData.value;
     if (data == null) return 0;
-    final effective = getEffectiveBestCount();
-    if (effective == 0) return 0;
-
-    final maxTotal = data.fullMarks * effective;
+    final n = bestOfCount;
+    if (n == 0) return 0;
+    final maxTotal = data.fullMarks * n;
     if (maxTotal == 0) return 0;
-
     return (getBest3Total() / maxTotal) * 100;
   }
 }

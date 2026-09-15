@@ -174,7 +174,8 @@ class TeacherCtMarksController extends GetxController {
         marksByCt: marksByCt,
         totals: totals,
         fullMarks: editableFullMarks.value,
-        bestOfCount: 3,
+        bestOfCount: course.credit > 0 ? course.credit : 3,
+        totalCTs: course.credit > 0 ? course.credit + 1 : 4,
       );
 
       print('✅ [CT] mergeExcelData succeeded');
@@ -275,6 +276,8 @@ class TeacherCtMarksController extends GetxController {
       await CtMarksRepository.instance.initializeCtData(
         courseId: course.courseId,
         fullMarks: fullMarks,
+        bestOfCount: course.credit > 0 ? course.credit : 3,
+        totalCTs: course.credit > 0 ? course.credit + 1 : 4,
       );
 
       await CtMarksRepository.instance.createManualCt(

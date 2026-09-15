@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/teacher_bottom_nav.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/teacher/controllers/courses/teacher_course_details_controller.dart';
 import 'package:edutrack/features/teacher/screens/attendance/attendance_history_screen.dart';
 import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
 import 'package:edutrack/features/teacher/screens/ct_marks/teacher_ct_marks_screen.dart';
@@ -22,6 +23,16 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tag = 'course_details_${course.courseId}';
+    final already =
+        Get.isRegistered<TeacherCourseDetailsController>(tag: tag);
+    final statsController = already
+        ? Get.find<TeacherCourseDetailsController>(tag: tag)
+        : Get.put(TeacherCourseDetailsController(course: course), tag: tag);
+    if (already) {
+      statsController.fetchStats();
+    }
+
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
       appBar: SAppbar(
@@ -44,7 +55,13 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
 
               const SizedBox(height: SSize.spaceBtwSections),
 
-              const CourseDetailsStats(),
+              Obx(() => CourseDetailsStats(
+                    totalClasses: statsController.totalClasses.value,
+                    avgAttendance: statsController.avgAttendance.value,
+                    ctAverage: statsController.ctAverage.value,
+                    ctFullMarks: statsController.ctFullMarks.value,
+                    isLoading: statsController.isLoading.value,
+                  )),
 
               const SizedBox(height: SSize.spaceBtwSections),
 

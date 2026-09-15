@@ -1,11 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Sentinel stored as double in memory; written to Firestore as "abs".
+class CtMark {
+  static const double absent = -1;
+
+  static bool isAbsent(double? value) => value != null && value < 0;
+
+  static bool isAbsentText(String raw) {
+    final s = raw.trim().toLowerCase();
+    return s == 'abs' || s == 'absent';
+  }
+
+  static String display(double? value) {
+    if (value == null) return '—';
+    if (isAbsent(value)) return 'abs';
+    return value.toStringAsFixed(0);
+  }
+
+  static double? parse(dynamic value) {
+    if (value == null) return null;
+    if (value is num) {
+      return value.toDouble();
+    }
+    final s = value.toString().trim();
+    if (s.isEmpty) return null;
+    if (isAbsentText(s)) return absent;
+    return double.tryParse(s);
+  }
+}
+
 /// Represents ONE class test (CT-1, CT-2, etc.)
 class CtModel {
   final String ctTitle;
   final String date; // ISO format "2026-09-15"
   final String status; // "draft" | "published"
-  final Map<String, double> marks; // { studentUid: mark }
+  final Map<String, double> marks; // { studentUid: mark }  // -1 => abs
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -31,7 +60,8 @@ class CtModel {
     final rawMarks = json['marks'] as Map<String, dynamic>? ?? {};
     final marks = <String, double>{};
     rawMarks.forEach((key, value) {
-      marks[key] = (value as num).toDouble();
+      final parsed = CtMark.parse(value);
+      if (parsed != null) marks[key] = parsed;
     });
 
     return CtModel(
@@ -51,7 +81,9 @@ class CtModel {
       'ctTitle': ctTitle,
       'date': date,
       'status': status,
-      'marks': marks,
+      'marks': marks.map(
+        (key, value) => MapEntry(key, CtMark.isAbsent(value) ? 'abs' : value),
+      ),
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -81,11 +113,12 @@ class CtModel {
   /// Students who have a mark (not empty)
   int get studentCount => marks.length;
 
-  /// Compute average marks for this CT
+  /// Compute average marks for this CT (skips abs)
   double get average {
-    if (marks.isEmpty) return 0;
-    final total = marks.values.fold<double>(0, (sum, m) => sum + m);
-    return total / marks.length;
+    final numeric = marks.values.where((m) => !CtMark.isAbsent(m)).toList();
+    if (numeric.isEmpty) return 0;
+    final total = numeric.fold<double>(0, (sum, m) => sum + m);
+    return total / numeric.length;
   }
 }
 
@@ -188,21 +221,37 @@ class CtDataModel {
     return match != null ? int.tryParse(match.group(1)!) ?? 0 : 0;
   }
 
-  /// Compute best-of-3 total for a student
-  double computeBestOf3(String studentUid) {
-    // First, check if Excel provided a Total
-    if (totals.containsKey(studentUid)) {
-      return totals[studentUid]!;
-    }
-
-    // Otherwise, compute from CT marks
+  /// Numeric CT marks only (abs is skipped).
+  List<double> numericMarksFor(String studentUid) {
     final marks = <double>[];
     for (final ct in cts.values) {
-      if (ct.marks.containsKey(studentUid)) {
-        marks.add(ct.marks[studentUid]!);
+      final m = ct.marks[studentUid];
+      if (m != null && !CtMark.isAbsent(m)) {
+        marks.add(m);
       }
     }
-    marks.sort((a, b) => b.compareTo(a)); // descending
-    return marks.take(bestOfCount).fold<double>(0, (sum, m) => sum + m);
+    return marks;
+  }
+
+  /// Credit n → expected n+1 CTs, total = top n numeric marks.
+  double computeCourseTotal(String studentUid, int credit) {
+    final n = credit > 0 ? credit : bestOfCount;
+    return computeBestOf(studentUid, n);
+  }
+
+  /// Best [n] numeric CT marks. Abs entries are ignored.
+  double computeBestOf(String studentUid, int n) {
+    if (n <= 0) return 0;
+    final marks = numericMarksFor(studentUid);
+    marks.sort((a, b) => b.compareTo(a));
+    return marks.take(n).fold<double>(0, (sum, m) => sum + m);
+  }
+
+  double computeTotal(String studentUid, {int? credit}) {
+    return computeCourseTotal(studentUid, credit ?? bestOfCount);
+  }
+
+  double computeBestOf3(String studentUid) {
+    return computeBestOf(studentUid, bestOfCount);
   }
 }

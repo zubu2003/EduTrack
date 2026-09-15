@@ -3,24 +3,39 @@ import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
 class CourseDetailsStats extends StatelessWidget {
-  const CourseDetailsStats({super.key});
+  final int totalClasses;
+  final double avgAttendance;
+  final double ctAverage;
+  final double ctFullMarks;
+  final bool isLoading;
+
+  const CourseDetailsStats({
+    super.key,
+    this.totalClasses = 0,
+    this.avgAttendance = 0,
+    this.ctAverage = 0,
+    this.ctFullMarks = 20,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final stats = [
       {
         'label': 'TOTAL CLASSES',
-        'value': '28',
+        'value': isLoading ? '--' : '$totalClasses',
         'icon': Icons.menu_book_rounded,
       },
       {
         'label': 'AVG ATTENDANCE',
-        'value': '82%',
+        'value': isLoading ? '--' : '${avgAttendance.toStringAsFixed(0)}%',
         'icon': Icons.people_alt_rounded,
       },
       {
         'label': 'CT AVERAGE',
-        'value': '16.4/20',
+        'value': isLoading
+            ? '--'
+            : '${ctAverage.toStringAsFixed(1)}/${ctFullMarks.toInt()}',
         'icon': Icons.assignment_rounded,
       },
     ];
@@ -74,9 +89,7 @@ class CourseDetailsStats extends StatelessWidget {
                     size: 20,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
                   stat['value'] as String,
                   maxLines: 1,
@@ -87,10 +100,7 @@ class CourseDetailsStats extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-
                 const SizedBox(height: 3),
-
-                // Label - allows wrapping to a second line
                 Text(
                   stat['label'] as String,
                   textAlign: TextAlign.center,

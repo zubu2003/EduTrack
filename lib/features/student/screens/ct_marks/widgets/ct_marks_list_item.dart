@@ -8,6 +8,7 @@ class CtMarksListItem extends StatelessWidget {
   final double? mark;
   final double fullMarks;
   final bool isPublished;
+  final bool isAbsent;
 
   const CtMarksListItem({
     super.key,
@@ -15,13 +16,15 @@ class CtMarksListItem extends StatelessWidget {
     required this.mark,
     required this.fullMarks,
     required this.isPublished,
+    this.isAbsent = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Performance color
     Color statusColor;
-    if (mark == null) {
+    if (isAbsent) {
+      statusColor = SColors.error;
+    } else if (mark == null) {
       statusColor = SColors.grey;
     } else {
       final pct = (mark! / fullMarks) * 100;
@@ -101,15 +104,21 @@ class CtMarksListItem extends StatelessWidget {
               vertical: SSize.sm,
             ),
             decoration: BoxDecoration(
-              color: mark != null ? statusColor : SColors.grey.withOpacity(0.15),
+              color: isAbsent
+                  ? SColors.error
+                  : mark != null
+                      ? statusColor
+                      : SColors.grey.withOpacity(0.15),
               borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
             ),
             child: Text(
-              mark != null
-                  ? '${mark!.toStringAsFixed(0)}/${fullMarks.toInt()}'
-                  : '--',
+              isAbsent
+                  ? 'abs'
+                  : mark != null
+                      ? '${mark!.toStringAsFixed(0)}/${fullMarks.toInt()}'
+                      : '--',
               style: TextStyle(
-                color: mark != null ? SColors.white : SColors.grey,
+                color: isAbsent || mark != null ? SColors.white : SColors.grey,
                 fontSize: SSize.fontSizeMd,
                 fontWeight: FontWeight.bold,
               ),

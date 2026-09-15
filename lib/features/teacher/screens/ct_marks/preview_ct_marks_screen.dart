@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/course/models/ct_data_model.dart';
 import 'package:edutrack/features/teacher/controllers/ct_marks/teacher_ct_marks_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
@@ -196,9 +197,12 @@ class PreviewCtMarksScreen extends StatelessWidget {
                             SizedBox(
                               width: 60,
                               child: TextFormField(
-                                initialValue:
-                                val != null ? val.toStringAsFixed(0) : '',
-                                keyboardType: TextInputType.number,
+                                initialValue: CtMark.isAbsent(val)
+                                    ? 'abs'
+                                    : val != null
+                                        ? val.toStringAsFixed(0)
+                                        : '',
+                                keyboardType: TextInputType.text,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: SSize.fontSizeSm,
@@ -213,12 +217,12 @@ class PreviewCtMarksScreen extends StatelessWidget {
                                   border: OutlineInputBorder(),
                                 ),
                                 onChanged: (v) {
-                                  final mark = double.tryParse(v);
-                                  if (mark != null) {
+                                  final parsed = CtMark.parse(v);
+                                  if (parsed != null) {
                                     controller.updateEditableMark(
                                       ct,
                                       studentId,
-                                      mark,
+                                      parsed,
                                     );
                                   }
                                 },

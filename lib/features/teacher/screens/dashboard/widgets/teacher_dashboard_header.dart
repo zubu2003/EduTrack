@@ -61,15 +61,7 @@ class TeacherDashboardHeader extends StatelessWidget {
             ],
           ),
         ),
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: SColors.primary.withOpacity(0.1),
-          child: Icon(
-            Icons.person_outline,
-            color: SColors.primary,
-            size: SSize.iconLg,
-          ),
-        ),
+
       ],
     );
   }

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:excel/excel.dart';
+import 'package:edutrack/features/course/models/ct_data_model.dart';
 
 /// Result of parsing an Excel file
 class ParsedExcelData {
@@ -140,12 +141,16 @@ class ExcelService {
           final valueStr = cell.value.toString().trim();
 
           if (valueStr.isNotEmpty) {
-            final mark = double.tryParse(valueStr);
-            if (mark != null) {
-              marksByCt[ctName]![studentId] = mark;
+            if (CtMark.isAbsentText(valueStr)) {
+              marksByCt[ctName]![studentId] = CtMark.absent;
             } else {
-              errors.add(
-                  'Row ${rowIdx + 1}, $ctName: Invalid mark "$valueStr"');
+              final mark = double.tryParse(valueStr);
+              if (mark != null) {
+                marksByCt[ctName]![studentId] = mark;
+              } else {
+                errors.add(
+                    'Row ${rowIdx + 1}, $ctName: Invalid mark "$valueStr"');
+              }
             }
           }
 

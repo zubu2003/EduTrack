@@ -70,7 +70,7 @@ class StudentCtMarksScreen extends StatelessWidget {
                   best3Total: controller.getBest3Total(),
                   average: controller.getAverage(),
                   percentage: controller.getPercentage(),
-                  bestOfCount: ctData.bestOfCount,
+                  bestOfCount: controller.bestOfCount,
                   fullMarks: ctData.fullMarks,
                 ),
 
@@ -100,6 +100,7 @@ class StudentCtMarksScreen extends StatelessWidget {
                       mark: mark,
                       fullMarks: ctData.fullMarks,
                       isPublished: isPublished,
+                      isAbsent: controller.isAbsentForCt(ctTitle),
                     ),
                   );
                 }).toList(),

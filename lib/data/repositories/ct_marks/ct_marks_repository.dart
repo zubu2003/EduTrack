@@ -39,6 +39,7 @@ class CtMarksRepository extends GetxController {
     required Map<String, double> totals,
     required double fullMarks,
     int bestOfCount = 3,
+    int totalCTs = 4,
   }) async {
     try {
       final enrollmentsSnapshot = await _firestore
@@ -108,6 +109,7 @@ class CtMarksRepository extends GetxController {
         courseId: courseId,
         fullMarks: fullMarks,
         bestOfCount: bestOfCount,
+        totalCTs: totalCTs,
         cts: mergedCts,
         totals: mergedTotals,
         updatedAt: DateTime.now(),

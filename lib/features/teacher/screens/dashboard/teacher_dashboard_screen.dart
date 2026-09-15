@@ -43,8 +43,6 @@ class TeacherDashboardScreen extends StatelessWidget {
                 SizedBox(height: SSize.spaceBtwSections),
                 TeacherQuickActions(),
                 SizedBox(height: SSize.spaceBtwSections),
-                TeacherCourseProgress(),
-                SizedBox(height: SSize.spaceBtwSections),
               ],
             ),
           ),

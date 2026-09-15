@@ -196,7 +196,7 @@ class CtMarksSummary extends StatelessWidget {
 
         // Subtitle
         Text(
-          'Based on best $bestOfCount of all Class Tests',
+                    'Based on best $bestOfCount of ${bestOfCount + 1} Class Tests',
           style: TextStyle(
             color: SColors.textSecondary,
             fontSize: SSize.fontSizeSm,
