@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/data/repositories/attendance/attendance_repository.dart';
+import 'package:edutrack/data/services/tts/tts_service.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
 import 'package:edutrack/features/course/models/enrollment_model.dart';
@@ -50,8 +51,9 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
         editableMarks.addAll(ct!.marks);
       }
 
-      final s = await AttendanceRepository.instance
-          .getEnrolledStudents(widget.course.courseId);
+      final s = await AttendanceRepository.instance.getEnrolledStudents(
+        widget.course.courseId,
+      );
 
       setState(() {
         students = s;
@@ -65,9 +67,7 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (ct == null) {
@@ -83,10 +83,7 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
-      appBar: SAppbar(
-        showBackButton: true,
-        onBackPressed: () => Get.back(),
-      ),
+      appBar: SAppbar(showBackButton: true, onBackPressed: () => Get.back()),
       body: Column(
         children: [
           // ─── Header ───
@@ -98,35 +95,42 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: SSize.sm,
-                        vertical: SSize.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: SColors.primary.withOpacity(0.1),
-                        borderRadius:
-                        BorderRadius.circular(SSize.borderRadiusSm),
-                      ),
-                      child: Text(
-                        widget.course.courseCode,
-                        style: TextStyle(
-                          color: SColors.primary,
-                          fontSize: SSize.fontSizeSm,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: SSize.sm,
+                              vertical: SSize.xs,
+                            ),
+                            decoration: BoxDecoration(
+                              color: SColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(
+                                SSize.borderRadiusSm,
+                              ),
+                            ),
+                            child: Text(
+                              widget.course.courseCode,
+                              style: TextStyle(
+                                color: SColors.primary,
+                                fontSize: SSize.fontSizeSm,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: SSize.sm),
+                          Text(
+                            'Full Marks: ${controller.ctData.value?.fullMarks.toInt() ?? 20}',
+                            style: TextStyle(
+                              color: SColors.textSecondary,
+                              fontSize: SSize.fontSizeSm,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: SSize.sm),
-                    Text(
-                      'Full Marks: ${controller.ctData.value?.fullMarks.toInt() ?? 20}',
-                      style: TextStyle(
-                        color: SColors.textSecondary,
-                        fontSize: SSize.fontSizeSm,
-                      ),
-                    ),
-                    const Spacer(),
                     GestureDetector(
                       onTap: () => _toggleStatus(controller),
                       child: Container(
@@ -138,8 +142,9 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                           color: ct!.isPublished
                               ? SColors.success.withOpacity(0.1)
                               : SColors.warning.withOpacity(0.1),
-                          borderRadius:
-                          BorderRadius.circular(SSize.borderRadiusSm),
+                          borderRadius: BorderRadius.circular(
+                            SSize.borderRadiusSm,
+                          ),
                         ),
                         child: Text(
                           ct!.isPublished ? '● Published' : '● Draft',
@@ -156,13 +161,27 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                   ],
                 ),
                 const SizedBox(height: SSize.sm),
-                Text(
-                  widget.ctTitle,
-                  style: TextStyle(
-                    color: SColors.textPrimary,
-                    fontSize: SSize.fontSizeXxl,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.ctTitle,
+                        style: TextStyle(
+                          color: SColors.textPrimary,
+                          fontSize: SSize.fontSizeXxl,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _speakCurrentMarks,
+                      icon: const Icon(Icons.volume_up, color: SColors.primary),
+                      tooltip: 'Read CT marks aloud',
+                      splashRadius: 20,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -231,7 +250,9 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: SColors.backgroundColor,
-                          borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
+                          borderRadius: BorderRadius.circular(
+                            SSize.borderRadiusSm,
+                          ),
                           border: Border.all(
                             color: SColors.primary.withOpacity(0.15),
                             width: 1,
@@ -241,8 +262,8 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                           initialValue: CtMark.isAbsent(currentMark)
                               ? 'abs'
                               : currentMark != null
-                                  ? currentMark.toStringAsFixed(0)
-                                  : '',
+                              ? currentMark.toStringAsFixed(0)
+                              : '',
                           keyboardType: TextInputType.text,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,
@@ -308,8 +329,7 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: SColors.primary,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(SSize.borderRadiusMd),
+                      borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                     ),
                   ),
                   child: const Text(
@@ -329,14 +349,33 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
     );
   }
 
-  void _toggleStatus(TeacherCtMarksController controller) {
+  Future<void> _speakCurrentMarks() async {
+    final marksInOrder = students
+        .map(
+          (student) =>
+              editableMarks[student.studentId] ?? ct?.marks[student.studentId],
+        )
+        .whereType<double>()
+        .toList();
+
+    if (marksInOrder.isEmpty) return;
+
+    final tts = Get.find<TextToSpeechService>();
+    await tts.speakMarks(marksInOrder);
+  }
+
+  Future<void> _toggleStatus(TeacherCtMarksController controller) async {
+    if (ct == null) return;
+
     final newStatus = ct!.isPublished ? 'draft' : 'published';
-    controller.changeCtStatus(
-      ctTitle: widget.ctTitle,
-      status: newStatus,
-    );
+    await controller.changeCtStatus(ctTitle: widget.ctTitle, status: newStatus);
+
+    if (!mounted) return;
+
     setState(() {
-      ct = ct!.copyWith(status: newStatus);
+      ct =
+          controller.ctData.value?.cts[widget.ctTitle] ??
+          ct!.copyWith(status: newStatus);
     });
   }
 }

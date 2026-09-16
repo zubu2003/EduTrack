@@ -224,10 +224,16 @@ class TeacherCtMarksController extends GetxController {
         marks: marks,
       );
 
+      await CtMarksRepository.instance.updateCtStatus(
+        courseId: course.courseId,
+        ctTitle: ctTitle,
+        status: 'published',
+      );
+
       SFullScreenLoader.stopLoading();
       SSnackBarHelpers.successSnackBar(
         title: 'Success',
-        message: 'CT marks updated',
+        message: 'CT marks updated and published',
       );
 
       await fetchCtData();
@@ -305,16 +311,11 @@ class TeacherCtMarksController extends GetxController {
   Future<void> deleteCt(String ctTitle) async {
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete CT'),
         content: Text('Delete "$ctTitle" and all its marks?'),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
@@ -331,11 +332,12 @@ class TeacherCtMarksController extends GetxController {
                 await fetchCtData();
               } catch (e) {
                 SSnackBarHelpers.errorSnackBar(
-                    title: 'Error', message: e.toString());
+                  title: 'Error',
+                  message: e.toString(),
+                );
               }
             },
-            child:
-            const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

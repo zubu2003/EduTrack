@@ -43,10 +43,7 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
         Get.toNamed(AppRoutes.studentProfile);
       }
     } catch (e) {
-      SSnackBarHelpers.errorSnackBar(
-        title: 'Error',
-        message: e.toString(),
-      );
+      SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
     }
   }
 
@@ -130,17 +127,13 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
       elevation: elevation ?? 0,
       leading: showBackButton
           ? IconButton(
-        icon: const Icon(Iconsax.arrow_left, color: SColors.textPrimary),
-        onPressed: onBackPressed ?? () => Navigator.pop(context),
-      )
+              icon: const Icon(Iconsax.arrow_left, color: SColors.textPrimary),
+              onPressed: onBackPressed ?? () => Navigator.pop(context),
+            )
           : null,
       title: Row(
         children: [
-          const SAppLogo(
-            size: 40,
-            showText: false,
-            isCircular: true,
-          ),
+          const SAppLogo(size: 40, showText: false, isCircular: true),
           const SizedBox(width: SSize.xs),
           Text(
             STextStrings.appName,
@@ -191,10 +184,7 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   Icon(Iconsax.logout, color: SColors.error),
                   const SizedBox(width: SSize.sm),
-                  Text(
-                    'Logout',
-                    style: TextStyle(color: SColors.error),
-                  ),
+                  Text('Logout', style: TextStyle(color: SColors.error)),
                 ],
               ),
             ),
