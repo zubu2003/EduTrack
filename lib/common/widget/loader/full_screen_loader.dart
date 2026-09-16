@@ -7,10 +7,8 @@ import 'package:edutrack/utils/constant/size.dart';
 
 class SFullScreenLoader {
   static void openLoadingDialog(String text) {
-    showDialog(
-      context: Get.overlayContext!,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
+    Get.dialog(
+      PopScope(
         canPop: false,
         child: Container(
           color: SColors.textPrimary.withOpacity(0.6),
@@ -38,7 +36,6 @@ class SFullScreenLoader {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Lottie Loading Animation
                   Lottie.asset(
                     SImages.loadingAnimation,
                     height: 120,
@@ -51,7 +48,6 @@ class SFullScreenLoader {
                     height: SSize.spaceBtwItems,
                   ),
 
-                  // Loading Message
                   SizedBox(
                     width: 220,
                     child: Text(
@@ -71,12 +67,13 @@ class SFullScreenLoader {
           ),
         ),
       ),
+      barrierDismissible: false,
     );
   }
 
   static void stopLoading() {
     if (Get.isDialogOpen ?? false) {
-      Navigator.of(Get.overlayContext!).pop();
+      Get.back();
     }
   }
 }
