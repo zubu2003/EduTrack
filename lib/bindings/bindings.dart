@@ -5,6 +5,7 @@ import 'package:edutrack/data/repositories/course/course_repository.dart';
 import 'package:edutrack/data/repositories/ct_marks/ct_marks_repository.dart';
 import 'package:edutrack/data/repositories/routine/routine_repository.dart';
 import 'package:edutrack/data/repositories/user/user_repository.dart';
+import 'package:edutrack/data/services/ai/ai_service.dart';
 import 'package:edutrack/data/services/cloudinary/cloudinary_services.dart';
 import 'package:edutrack/data/services/tts/tts_service.dart';
 import 'package:edutrack/features/personalization/controllers/user_controller.dart';
@@ -24,6 +25,7 @@ class AppBindings extends Bindings {
     // Services
     Get.put(CloudinaryServices());
     Get.put(TextToSpeechService());
+    Get.put(AIService());
 
     // Controllers
     Get.put(UserController());

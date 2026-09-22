@@ -7,6 +7,7 @@ import 'package:edutrack/features/teacher/controllers/courses/teacher_course_det
 import 'package:edutrack/features/teacher/screens/attendance/attendance_history_screen.dart';
 import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
 import 'package:edutrack/features/teacher/screens/ct_marks/teacher_ct_marks_screen.dart';
+import 'package:edutrack/features/teacher/screens/course_details/attendance_risk_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'widgets/course_details_header.dart';
@@ -16,16 +17,12 @@ import 'widgets/course_details_action_card.dart';
 class TeacherCourseDetailsScreen extends StatelessWidget {
   final CourseModel course;
 
-  const TeacherCourseDetailsScreen({
-    super.key,
-    required this.course,
-  });
+  const TeacherCourseDetailsScreen({super.key, required this.course});
 
   @override
   Widget build(BuildContext context) {
     final tag = 'course_details_${course.courseId}';
-    final already =
-        Get.isRegistered<TeacherCourseDetailsController>(tag: tag);
+    final already = Get.isRegistered<TeacherCourseDetailsController>(tag: tag);
     final statsController = already
         ? Get.find<TeacherCourseDetailsController>(tag: tag)
         : Get.put(TeacherCourseDetailsController(course: course), tag: tag);
@@ -35,10 +32,7 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
-      appBar: SAppbar(
-        showBackButton: true,
-        onBackPressed: () => Get.back(),
-      ),
+      appBar: SAppbar(showBackButton: true, onBackPressed: () => Get.back()),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
@@ -55,13 +49,15 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
 
               const SizedBox(height: SSize.spaceBtwSections),
 
-              Obx(() => CourseDetailsStats(
-                    totalClasses: statsController.totalClasses.value,
-                    avgAttendance: statsController.avgAttendance.value,
-                    ctAverage: statsController.ctAverage.value,
-                    ctFullMarks: statsController.ctFullMarks.value,
-                    isLoading: statsController.isLoading.value,
-                  )),
+              Obx(
+                () => CourseDetailsStats(
+                  totalClasses: statsController.totalClasses.value,
+                  avgAttendance: statsController.avgAttendance.value,
+                  ctAverage: statsController.ctAverage.value,
+                  ctFullMarks: statsController.ctFullMarks.value,
+                  isLoading: statsController.isLoading.value,
+                ),
+              ),
 
               const SizedBox(height: SSize.spaceBtwSections),
 
@@ -72,9 +68,7 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
                 subtitle: 'Mark present, absent, or late for today\'s session.',
                 buttonText: 'START SESSION',
                 buttonColor: SColors.primary,
-                onTap: () => Get.to(
-                      () => TakeAttendanceScreen(course: course),
-                ),
+                onTap: () => Get.to(() => TakeAttendanceScreen(course: course)),
               ),
 
               const SizedBox(height: SSize.spaceBtwItems),
@@ -83,12 +77,11 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
               CourseDetailsActionCard(
                 icon: Icons.edit_note,
                 title: 'CT Marks',
-                subtitle: 'Enter and review Class Test scores and distributions.',
+                subtitle:
+                    'Enter and review Class Test scores and distributions.',
                 buttonText: 'MANAGE MARKS',
                 buttonColor: const Color(0xFF6C63FF),
-                onTap: () => Get.to(
-                      () => TeacherCtMarksScreen(course: course),
-                ),
+                onTap: () => Get.to(() => TeacherCtMarksScreen(course: course)),
               ),
 
               const SizedBox(height: SSize.spaceBtwItems),
@@ -98,12 +91,23 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
                 icon: Icons.history,
                 title: 'Attendance History',
                 subtitle:
-                'View past records, modify entries, and generate exportable reports.',
+                    'View past records, modify entries, and generate exportable reports.',
                 buttonText: 'VIEW HISTORY',
                 buttonColor: const Color(0xFF4A90D9),
-                onTap: () => Get.to(
-                      () => AttendanceHistoryScreen(course: course),
-                ),
+                onTap: () =>
+                    Get.to(() => AttendanceHistoryScreen(course: course)),
+              ),
+
+              const SizedBox(height: SSize.spaceBtwItems),
+
+              // Attendance Risk
+              CourseDetailsActionCard(
+                icon: Icons.analytics_outlined,
+                title: 'Attendance Risk',
+                subtitle: 'Identify students who may need early intervention.',
+                buttonText: 'VIEW ATTENDANCE RISK',
+                buttonColor: SColors.error,
+                onTap: () => Get.to(() => AttendanceRiskScreen(course: course)),
               ),
 
               const SizedBox(height: SSize.spaceBtwSections),

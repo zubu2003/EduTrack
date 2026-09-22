@@ -16,6 +16,9 @@ import 'package:edutrack/features/teacher/screens/courses/create_course_screen.d
 import 'package:edutrack/features/personalization/screens/profile/profile_screen.dart';
 import 'package:edutrack/features/personalization/screens/profile/edit_profile_screen.dart';
 
+//dummy page
+import 'package:edutrack/dummypage.dart';
+
 class AppRoutes {
   // Splash Route
   static const String splash = '/splash';
@@ -46,6 +49,11 @@ class AppRoutes {
   // Common Routes
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
+
+  static const String aiTest = '/ai-test';
+
+
+
 
   static final List<GetPage> pages = [
     // Splash
@@ -157,6 +165,11 @@ class AppRoutes {
     GetPage(
       name: editProfile,
       page: () => const EditProfileScreen(),
+    ),
+    //dummy page for ai test
+    GetPage(
+      name: aiTest,
+      page: () => const Dummypage(),
     ),
   ];
 }
