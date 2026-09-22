@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
+import 'package:edutrack/features/student/controllers/ct_alert_controller.dart';
 import 'package:edutrack/features/course/controllers/academic_performance_insight_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
@@ -18,6 +19,7 @@ class StudentDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(StudentDashboardController());
+    Get.put(StudentCtAlertController());
     Get.put(
       AcademicPerformanceInsightController(teacherMode: false),
       tag: 'student_academic_insight',
@@ -29,6 +31,7 @@ class StudentDashboardScreen extends StatelessWidget {
       body: RefreshIndicator(
         onRefresh: () async {
           await Get.find<StudentDashboardController>().fetchDashboardData();
+          await Get.find<StudentCtAlertController>().loadAlerts();
           await Get.find<AcademicPerformanceInsightController>(
             tag: 'student_academic_insight',
           ).loadInsight();

@@ -7,6 +7,7 @@ import 'package:edutrack/features/teacher/controllers/courses/teacher_course_det
 import 'package:edutrack/features/teacher/screens/attendance/attendance_history_screen.dart';
 import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
 import 'package:edutrack/features/teacher/screens/ct_marks/teacher_ct_marks_screen.dart';
+import 'package:edutrack/features/teacher/screens/ct_alert/create_ct_alert_screen.dart';
 import 'package:edutrack/features/teacher/screens/course_details/attendance_risk_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
@@ -82,6 +83,17 @@ class TeacherCourseDetailsScreen extends StatelessWidget {
                 buttonText: 'MANAGE MARKS',
                 buttonColor: const Color(0xFF6C63FF),
                 onTap: () => Get.to(() => TeacherCtMarksScreen(course: course)),
+              ),
+
+              const SizedBox(height: SSize.spaceBtwItems),
+
+              CourseDetailsActionCard(
+                icon: Icons.notifications_active_outlined,
+                title: 'CT Alert',
+                subtitle: 'Notify enrolled students about an upcoming CT.',
+                buttonText: 'CREATE CT ALERT',
+                buttonColor: SColors.warning,
+                onTap: () => Get.to(() => CreateCtAlertScreen(course: course)),
               ),
 
               const SizedBox(height: SSize.spaceBtwItems),

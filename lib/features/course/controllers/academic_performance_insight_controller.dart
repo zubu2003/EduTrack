@@ -34,6 +34,7 @@ class AcademicPerformanceInsightController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = null;
+      insight.value = null;
 
       final user = await UserRepository.instance.getCurrentUserData();
       if (user == null) {
@@ -51,19 +52,40 @@ class AcademicPerformanceInsightController extends GetxController {
         return;
       }
 
-      final response = await AIService.instance.ask(
-        SPromptTemplates.performanceInsight(
-          studentName: teacherMode ? 'Course cohort' : user.name,
-          courseName: teacherMode ? 'Your courses' : 'Your enrolled courses',
-          ctAverage: metrics.studentCtAverage,
-          courseMean: metrics.courseMean,
-          attendancePercent: metrics.attendancePercent,
-        ),
+      final prompt = SPromptTemplates.performanceInsight(
+        studentName: teacherMode ? 'Course cohort' : user.name,
+        courseName: teacherMode ? 'Your courses' : 'Your enrolled courses',
+        ctAverage: metrics.studentCtAverage,
+        courseMean: metrics.courseMean,
+        attendancePercent: metrics.attendancePercent,
       );
 
-      insight.value = AcademicPerformanceInsightModel.fromAiResponse(
-        _decodeResponse(response),
-      );
+      Map<String, dynamic>? responseJson;
+      for (var attempt = 0; attempt < 2 && responseJson == null; attempt++) {
+        try {
+          responseJson = _decodeResponse(await AIService.instance.ask(prompt));
+        } catch (_) {
+          if (attempt == 1) {
+            errorMessage.value =
+                'AI insight is temporarily unavailable. Please retry.';
+            return;
+          }
+        }
+      }
+
+      if (responseJson == null) {
+        errorMessage.value =
+            'AI insight is temporarily unavailable. Please retry.';
+        return;
+      }
+
+      try {
+        insight.value = AcademicPerformanceInsightModel.fromAiResponse(
+          responseJson,
+        );
+      } on FormatException {
+        errorMessage.value = 'AI returned an incomplete insight. Please retry.';
+      }
     } catch (e) {
       insight.value = null;
       errorMessage.value = e.toString();
@@ -178,12 +200,22 @@ class AcademicPerformanceInsightController extends GetxController {
 
   Map<String, dynamic> _decodeResponse(String response) {
     var clean = response.trim();
+    if (clean.isEmpty || clean.toLowerCase() == 'no response generated') {
+      throw const FormatException('AI did not generate an insight response');
+    }
+
     if (clean.startsWith('```')) {
       clean = clean.replaceFirst(RegExp(r'^```(?:json)?\s*'), '');
       clean = clean.replaceFirst(RegExp(r'\s*```$'), '');
     }
 
-    final decoded = jsonDecode(clean);
+    final objectStart = clean.indexOf('{');
+    final objectEnd = clean.lastIndexOf('}');
+    if (objectStart < 0 || objectEnd <= objectStart) {
+      throw const FormatException('AI insight response did not contain JSON');
+    }
+
+    final decoded = jsonDecode(clean.substring(objectStart, objectEnd + 1));
     if (decoded is! Map) {
       throw const FormatException('AI response was not a JSON object');
     }

@@ -4,6 +4,7 @@ import 'package:edutrack/common/widget/dialog/course_selector_dialog.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
 import 'package:edutrack/features/teacher/screens/ct_marks/teacher_ct_marks_screen.dart';
+import 'package:edutrack/features/teacher/screens/course_report/course_report_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -12,18 +13,16 @@ class TeacherQuickActions extends StatelessWidget {
   const TeacherQuickActions({super.key});
 
   Future<void> _showCourseSelector(
-      BuildContext context, {
-        required String title,
-        required String subtitle,
-        required void Function(CourseModel) onCourseSelected,
-      }) async {
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required void Function(CourseModel) onCourseSelected,
+  }) async {
     final result = await showDialog<CourseModel>(
       context: context,
       barrierDismissible: true,
-      builder: (context) => CourseSelectorDialog(
-        title: title,
-        subtitle: subtitle,
-      ),
+      builder: (context) =>
+          CourseSelectorDialog(title: title, subtitle: subtitle),
     );
 
     if (result != null) {
@@ -59,12 +58,12 @@ class TeacherQuickActions extends StatelessWidget {
         'type': null,
       },
       {
-        'label': 'View Reports',
+        'label': 'Reports',
         'icon': Iconsax.chart,
         'color': const Color(0xFF1A1A2E),
-        'title': 'View Reports',
-        'subtitle': 'Choose a course to view reports',
-        'type': null,
+        'title': 'Course Report',
+        'subtitle': 'Choose a course to generate a report',
+        'type': 'report',
       },
     ];
 
@@ -107,14 +106,14 @@ class TeacherQuickActions extends StatelessWidget {
   }
 
   Widget _buildActionCard(
-      BuildContext context, {
-        required String label,
-        required IconData icon,
-        required Color color,
-        required String title,
-        required String subtitle,
-        required String? type,
-      }) {
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    required String? type,
+  }) {
     return InkWell(
       onTap: () {
         if (type == null) {
@@ -145,6 +144,15 @@ class TeacherQuickActions extends StatelessWidget {
               Get.to(() => TeacherCtMarksScreen(course: course));
             },
           );
+        } else if (type == 'report') {
+          _showCourseSelector(
+            context,
+            title: title,
+            subtitle: subtitle,
+            onCourseSelected: (course) {
+              Get.to(() => CourseReportScreen(course: course));
+            },
+          );
         }
       },
       borderRadius: BorderRadius.circular(SSize.cardRadius),
@@ -160,10 +168,7 @@ class TeacherQuickActions extends StatelessWidget {
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(
-            color: color.withOpacity(0.15),
-            width: 1,
-          ),
+          border: Border.all(color: color.withOpacity(0.15), width: 1),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -175,11 +180,7 @@ class TeacherQuickActions extends StatelessWidget {
                 color: color.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: SSize.iconMd,
-              ),
+              child: Icon(icon, color: color, size: SSize.iconMd),
             ),
             const SizedBox(height: SSize.sm),
             Text(

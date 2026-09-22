@@ -9,6 +9,7 @@ import 'package:edutrack/features/student/screens/courses/student_courses_screen
 import 'package:edutrack/features/student/screens/course_details/student_course_details_screen.dart';
 import 'package:edutrack/features/student/screens/attendance_history/student_attendance_history_screen.dart';
 import 'package:edutrack/features/student/screens/ct_marks/student_ct_marks_screen.dart';
+import 'package:edutrack/features/student/screens/ct_alerts/student_ct_alerts_screen.dart';
 import 'package:edutrack/features/student/screens/routine/routine_screen.dart';
 import 'package:edutrack/features/teacher/screens/dashboard/teacher_dashboard_screen.dart';
 import 'package:edutrack/features/teacher/screens/courses/teacher_courses_screen.dart';
@@ -35,6 +36,7 @@ class AppRoutes {
   static const String studentCourseDetails = '/student-course-details';
   static const String studentAttendanceHistory = '/student-attendance-history';
   static const String studentCtMarks = '/student-ct-marks';
+  static const String studentCtAlerts = '/student-ct-alerts';
   static const String studentRoutine = '/student-routine';
   static const String studentProfile = '/student-profile';
 
@@ -52,35 +54,17 @@ class AppRoutes {
 
   static const String aiTest = '/ai-test';
 
-
-
-
   static final List<GetPage> pages = [
     // Splash
-    GetPage(
-      name: splash,
-      page: () => const SplashScreen(),
-    ),
+    GetPage(name: splash, page: () => const SplashScreen()),
 
     // Auth Routes
-    GetPage(
-      name: login,
-      page: () => const LoginScreen(),
-    ),
-    GetPage(
-      name: signUp,
-      page: () => const SignUpScreen(),
-    ),
-    GetPage(
-      name: forgotPassword,
-      page: () => const ForgotPasswordScreen(),
-    ),
+    GetPage(name: login, page: () => const LoginScreen()),
+    GetPage(name: signUp, page: () => const SignUpScreen()),
+    GetPage(name: forgotPassword, page: () => const ForgotPasswordScreen()),
 
     // Student Routes
-    GetPage(
-      name: studentDashboard,
-      page: () => const StudentDashboardScreen(),
-    ),
+    GetPage(name: studentDashboard, page: () => const StudentDashboardScreen()),
     GetPage(
       name: studentCourses,
       page: () => const StudentCoursesScreen(showTodayOnly: false),
@@ -113,6 +97,7 @@ class AppRoutes {
         return StudentCtMarksScreen(course: course);
       },
     ),
+    GetPage(name: studentCtAlerts, page: () => const StudentCtAlertsScreen()),
     GetPage(
       name: studentRoutine,
       page: () {
@@ -127,10 +112,7 @@ class AppRoutes {
     ),
 
     // Teacher Routes
-    GetPage(
-      name: teacherDashboard,
-      page: () => const TeacherDashboardScreen(),
-    ),
+    GetPage(name: teacherDashboard, page: () => const TeacherDashboardScreen()),
     GetPage(
       name: teacherCourses,
       page: () => const TeacherCoursesScreen(showTodayOnly: false),
@@ -162,14 +144,8 @@ class AppRoutes {
       name: profile,
       page: () => const ProfileScreen(userRole: 'student'),
     ),
-    GetPage(
-      name: editProfile,
-      page: () => const EditProfileScreen(),
-    ),
+    GetPage(name: editProfile, page: () => const EditProfileScreen()),
     //dummy page for ai test
-    GetPage(
-      name: aiTest,
-      page: () => const Dummypage(),
-    ),
+    GetPage(name: aiTest, page: () => const Dummypage()),
   ];
 }
