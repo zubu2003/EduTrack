@@ -16,6 +16,7 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPressed;
   final Color? backgroundColor;
   final double? elevation;
+  final VoidCallback? onSearchPressed;
 
   const SAppbar({
     super.key,
@@ -23,6 +24,7 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
     this.onBackPressed,
     this.backgroundColor,
     this.elevation,
+    this.onSearchPressed,
   });
 
   /// Navigate to Profile based on user role
@@ -147,6 +149,12 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
+        if (onSearchPressed != null)
+          IconButton(
+            onPressed: onSearchPressed,
+            tooltip: 'Search',
+            icon: const Icon(Iconsax.search_normal, color: SColors.textPrimary),
+          ),
         PopupMenuButton<String>(
           onSelected: (value) => _handleMenuSelection(context, value),
           offset: const Offset(0, 45),
@@ -159,7 +167,7 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
             margin: const EdgeInsets.only(right: SSize.md),
             child: CircleAvatar(
               radius: 18,
-              backgroundColor: SColors.primary.withOpacity(0.1),
+              backgroundColor: SColors.primary.withValues(alpha: 0.1),
               child: Icon(
                 Iconsax.user,
                 color: SColors.primary,

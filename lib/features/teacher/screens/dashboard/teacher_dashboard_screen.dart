@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/features/teacher/controllers/dashboard/teacher_dashboard_controller.dart';
 import 'package:edutrack/features/course/controllers/academic_performance_insight_controller.dart';
+import 'package:edutrack/features/search/screens/search_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import '../../../../common/widget/bottom_nav/teacher_bottom_nav.dart';
@@ -25,7 +26,11 @@ class TeacherDashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
-      appBar: const SAppbar(showBackButton: false),
+      appBar: SAppbar(
+        showBackButton: false,
+        onSearchPressed: () =>
+            Get.to(() => const SearchScreen(role: 'teacher')),
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           await Get.find<TeacherDashboardController>().fetchDashboardData();

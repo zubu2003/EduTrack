@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
 import 'package:edutrack/features/student/controllers/ct_alert_controller.dart';
 import 'package:edutrack/features/course/controllers/academic_performance_insight_controller.dart';
+import 'package:edutrack/features/search/screens/search_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import '../../../../common/widget/appbar/common_appbar.dart';
@@ -26,7 +27,11 @@ class StudentDashboardScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: const SAppbar(showBackButton: false),
+      appBar: SAppbar(
+        showBackButton: false,
+        onSearchPressed: () =>
+            Get.to(() => const SearchScreen(role: 'student')),
+      ),
       backgroundColor: SColors.backgroundColor,
       body: RefreshIndicator(
         onRefresh: () async {
