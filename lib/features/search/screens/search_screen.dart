@@ -88,7 +88,7 @@ class SearchScreen extends StatelessWidget {
                 }
                 if (controller.errorMessage.value != null) {
                   return _StateMessage(
-                    message: 'Search could not be completed.',
+                    message: controller.errorMessage.value!,
                     onRetry: controller.query.value.isEmpty
                         ? null
                         : () => controller.runNaturalLanguageSearch(

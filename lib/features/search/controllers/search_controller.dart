@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:edutrack/data/repositories/attendance/attendance_repository.dart';
 import 'package:edutrack/data/repositories/course/course_repository.dart';
 import 'package:edutrack/data/repositories/ct_marks/ct_marks_repository.dart';
+import 'package:edutrack/data/repositories/ct_alert_repository.dart';
 import 'package:edutrack/data/repositories/routine/routine_repository.dart';
 import 'package:edutrack/data/repositories/user/user_repository.dart';
 import 'package:edutrack/data/services/ai/ai_service.dart';
@@ -150,6 +151,12 @@ class AppSearchController extends GetxController {
     if (query.value.isEmpty) return;
 
     await _run(() async {
+      final directCtResults = await _searchUpcomingCtDate(query.value);
+      if (directCtResults != null) {
+        explanation.value = 'Upcoming CT dates matching your query';
+        return directCtResults;
+      }
+
       final response = await AIService.instance.ask(
         SPromptTemplates.nlSearch(role: role, query: query.value),
       );
@@ -158,6 +165,56 @@ class AppSearchController extends GetxController {
       explanation.value = request.humanReadable;
       return _executeValidatedQuery(request);
     });
+  }
+
+  Future<List<SearchResultModel>?> _searchUpcomingCtDate(String text) async {
+    final normalized = text.toLowerCase();
+    if (!normalized.contains('ct') ||
+        (!normalized.contains('date') && !normalized.contains('next'))) {
+      return null;
+    }
+
+    final courseCodeMatch = RegExp(
+      r'\b[a-z]{2,5}[- ]?\d{3}\b',
+      caseSensitive: false,
+    ).firstMatch(text);
+    final requestedCode = courseCodeMatch
+        ?.group(0)
+        ?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
+        .toLowerCase();
+
+    final user = await _currentUser();
+    if (user == null) return <SearchResultModel>[];
+    final courses = role == 'student'
+        ? await CourseRepository.instance.getStudentCourses(user.uid)
+        : await CourseRepository.instance.getTeacherCourses(user.uid);
+    final matchingCourses = requestedCode == null
+        ? courses
+        : courses.where((course) {
+            final code = course.courseCode
+                .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
+                .toLowerCase();
+            return code == requestedCode;
+          }).toList();
+
+    final output = <SearchResultModel>[];
+    for (final course in matchingCourses) {
+      final alerts = await CtAlertRepository.instance.getCourseAlerts(
+        course.courseId,
+      );
+      for (final alert in alerts.take(1)) {
+        output.add(
+          SearchResultModel(
+            title: '${alert.ctTitle} • ${course.courseName}',
+            subtitle: alert.formattedDate,
+            detail: alert.daysRemaining == 0
+                ? 'Today'
+                : '${alert.daysRemaining} days remaining',
+          ),
+        );
+      }
+    }
+    return output;
   }
 
   Future<void> _run(Future<List<SearchResultModel>> Function() action) async {
@@ -350,6 +407,11 @@ class AppSearchController extends GetxController {
 
   Map<String, dynamic> _decodeResponse(String response) {
     final clean = response.trim();
+    if (clean.isEmpty || clean.toLowerCase() == 'no response generated') {
+      throw const FormatException(
+        'No response was generated. Try a quick search or rephrase your query.',
+      );
+    }
     final start = clean.indexOf('{');
     final end = clean.lastIndexOf('}');
     if (start < 0 || end <= start) {
