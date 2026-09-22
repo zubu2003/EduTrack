@@ -19,6 +19,7 @@ extension AttendanceRiskLevelX on AttendanceRiskLevel {
 
 class AttendanceRiskModel {
   final String studentId;
+  final String studentCode;
   final String studentName;
   final double attendancePercent;
   final AttendanceRiskLevel riskLevel;
@@ -27,6 +28,7 @@ class AttendanceRiskModel {
 
   const AttendanceRiskModel({
     required this.studentId,
+    required this.studentCode,
     required this.studentName,
     required this.attendancePercent,
     required this.riskLevel,
@@ -36,6 +38,7 @@ class AttendanceRiskModel {
 
   factory AttendanceRiskModel.fromAiResponse({
     required String studentId,
+    required String studentCode,
     required String studentName,
     required double attendancePercent,
     required Map<String, dynamic> json,
@@ -62,6 +65,7 @@ class AttendanceRiskModel {
 
     return AttendanceRiskModel(
       studentId: studentId,
+      studentCode: studentCode,
       studentName: studentName,
       attendancePercent: attendancePercent,
       riskLevel: AttendanceRiskLevelX.parse(riskValue),

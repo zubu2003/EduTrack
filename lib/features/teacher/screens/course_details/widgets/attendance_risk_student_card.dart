@@ -53,6 +53,16 @@ class AttendanceRiskStudentCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    if (risk.studentCode.isNotEmpty) ...[
+                      const SizedBox(height: SSize.xs),
+                      Text(
+                        risk.studentCode,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: SColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: SSize.xs),
                     Text(
                       '${risk.attendancePercent.toStringAsFixed(1)}% attendance',

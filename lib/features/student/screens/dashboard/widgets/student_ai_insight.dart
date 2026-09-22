@@ -3,27 +3,28 @@ import 'package:get/get.dart';
 import 'package:edutrack/common/widget/shimmer/academic_performance_insight_loading_card.dart';
 import 'package:edutrack/features/course/controllers/academic_performance_insight_controller.dart';
 import 'package:edutrack/features/course/widgets/academic_performance_insight_card.dart';
+import 'package:edutrack/features/course/widgets/academic_performance_insight_sheet.dart';
 import 'package:edutrack/features/course/widgets/academic_performance_insight_status.dart';
 
-class TeacherAIInsight extends StatelessWidget {
-  const TeacherAIInsight({super.key});
+class StudentAIInsight extends StatelessWidget {
+  const StudentAIInsight({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AcademicPerformanceInsightController>(
-      tag: 'teacher_academic_insight',
+      tag: 'student_academic_insight',
     );
 
     return Obx(() {
       if (controller.isLoading.value) {
-        return const AcademicPerformanceInsightLoadingCard();
+        return const AcademicPerformanceInsightLoadingCard(showAction: true);
       }
 
       final insight = controller.insight.value;
       if (insight == null) {
         return AcademicPerformanceInsightStatus(
           message: controller.errorMessage.value == null
-              ? 'AI insight will appear after course performance data is available.'
+              ? 'AI insight will appear after your performance data is available.'
               : 'AI insight could not be loaded.',
           onRetry: controller.errorMessage.value == null
               ? null
@@ -33,7 +34,8 @@ class TeacherAIInsight extends StatelessWidget {
 
       return AcademicPerformanceInsightCard(
         insight: insight,
-        subtitle: 'AI Insight',
+        subtitle: 'AI Academic Insight',
+        onTap: () => AcademicPerformanceInsightSheet.show(context, insight),
       );
     });
   }

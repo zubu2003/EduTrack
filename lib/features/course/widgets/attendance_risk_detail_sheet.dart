@@ -63,6 +63,15 @@ class AttendanceRiskDetailSheet extends StatelessWidget {
               ],
             ),
             const SizedBox(height: SSize.xs),
+            if (risk.studentCode.isNotEmpty)
+              Text(
+                'Student ID: ${risk.studentCode}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: SColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            if (risk.studentCode.isNotEmpty) const SizedBox(height: SSize.xs),
             Text(
               '${risk.attendancePercent.toStringAsFixed(1)}% attendance',
               style: Theme.of(

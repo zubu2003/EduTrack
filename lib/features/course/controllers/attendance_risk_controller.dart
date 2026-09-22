@@ -40,11 +40,19 @@ class AttendanceRiskController extends GetxController {
       final targets = await _targetStudents(enrollments, sessions);
 
       final loaded = <AttendanceRiskModel>[];
+      Object? lastFailure;
       for (final target in targets) {
-        loaded.add(await _buildRisk(target: target, sessions: sessions));
+        try {
+          loaded.add(await _buildRisk(target: target, sessions: sessions));
+        } catch (e) {
+          lastFailure = e;
+        }
       }
 
       risks.assignAll(loaded);
+      if (loaded.isEmpty && lastFailure != null) {
+        throw lastFailure;
+      }
     } catch (e) {
       risks.clear();
       errorMessage.value = e.toString();
@@ -70,9 +78,11 @@ class AttendanceRiskController extends GetxController {
 
     if (enrolled.isNotEmpty) return enrolled;
 
-    final records = sessions.expand((session) => session.records).where((record) {
+    final records = sessions.expand((session) => session.records).where((
+      record,
+    ) {
       return record.studentId == user.uid ||
-        (user.studentId.isNotEmpty && record.studentCode == user.studentId);
+          (user.studentId.isNotEmpty && record.studentCode == user.studentId);
     }).toList();
     if (records.isEmpty) return [];
 
@@ -108,13 +118,85 @@ class AttendanceRiskController extends GetxController {
       sessionsRemaining: sessionsRemaining,
     );
 
-    final response = await AIService.instance.ask(prompt);
-    final json = _decodeResponse(response);
-    return AttendanceRiskModel.fromAiResponse(
+    try {
+      Map<String, dynamic>? json;
+      for (var attempt = 0; attempt < 2 && json == null; attempt++) {
+        try {
+          final response = await AIService.instance.ask(prompt);
+          json = _decodeResponse(response);
+        } catch (_) {
+          if (attempt == 1) {
+            return _fallbackRisk(
+              target: target,
+              attendancePercent: attendancePercent,
+              recentTrend: recentTrend,
+            );
+          }
+        }
+      }
+
+      if (json == null) {
+        return _fallbackRisk(
+          target: target,
+          attendancePercent: attendancePercent,
+          recentTrend: recentTrend,
+        );
+      }
+
+      return AttendanceRiskModel.fromAiResponse(
+        studentId: target.studentId,
+        studentCode: target.studentCode,
+        studentName: target.studentName,
+        attendancePercent: attendancePercent,
+        json: json,
+      );
+    } on FormatException {
+      return _fallbackRisk(
+        target: target,
+        attendancePercent: attendancePercent,
+        recentTrend: recentTrend,
+      );
+    }
+  }
+
+  AttendanceRiskModel _fallbackRisk({
+    required EnrollmentModel target,
+    required double attendancePercent,
+    required int recentTrend,
+  }) {
+    final isHighRisk = attendancePercent < 60 || recentTrend <= -20;
+    final isMediumRisk = attendancePercent < 75 || recentTrend < 0;
+    final level = isHighRisk
+        ? AttendanceRiskLevel.high
+        : isMediumRisk
+        ? AttendanceRiskLevel.medium
+        : AttendanceRiskLevel.low;
+
+    final reason = switch (level) {
+      AttendanceRiskLevel.high =>
+        'Attendance is below 60% or the recent attendance trend is declining.',
+      AttendanceRiskLevel.medium =>
+        'Attendance is below 75% or the recent attendance trend needs attention.',
+      AttendanceRiskLevel.low =>
+        'Attendance is currently steady and above the intervention threshold.',
+    };
+    final recommendation = switch (level) {
+      AttendanceRiskLevel.high =>
+        'Meet with the teacher and attend every remaining class where possible.',
+      AttendanceRiskLevel.medium =>
+        'Prioritize upcoming classes and monitor attendance after each session.',
+      AttendanceRiskLevel.low =>
+        'Maintain the current attendance habit and stay consistent.',
+    };
+
+    return AttendanceRiskModel(
       studentId: target.studentId,
+      studentCode: target.studentCode,
       studentName: target.studentName,
       attendancePercent: attendancePercent,
-      json: json,
+      riskLevel: level,
+      reason: reason,
+      recommendation: recommendation,
     );
   }
 
@@ -169,12 +251,24 @@ class AttendanceRiskController extends GetxController {
 
   Map<String, dynamic> _decodeResponse(String response) {
     var clean = response.trim();
+    if (clean.isEmpty || clean.toLowerCase() == 'no response generated') {
+      throw const FormatException(
+        'AI did not generate an attendance-risk response',
+      );
+    }
+
     if (clean.startsWith('```')) {
       clean = clean.replaceFirst(RegExp(r'^```(?:json)?\s*'), '');
       clean = clean.replaceFirst(RegExp(r'\s*```$'), '');
     }
 
-    final decoded = jsonDecode(clean);
+    final objectStart = clean.indexOf('{');
+    final objectEnd = clean.lastIndexOf('}');
+    if (objectStart < 0 || objectEnd <= objectStart) {
+      throw const FormatException('AI response did not contain JSON');
+    }
+
+    final decoded = jsonDecode(clean.substring(objectStart, objectEnd + 1));
     if (decoded is! Map) {
       throw const FormatException('AI response was not a JSON object');
     }
