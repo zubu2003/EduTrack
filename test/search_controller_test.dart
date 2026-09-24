@@ -2,6 +2,8 @@ import 'package:edutrack/features/authentication/models/user_model.dart';
 import 'package:edutrack/features/course/models/ct_alert_model.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/course/models/attendance_session_model.dart';
+import 'package:edutrack/features/course/models/enrollment_model.dart';
 import 'package:edutrack/features/course/models/routine_model.dart';
 import 'package:edutrack/features/search/controllers/search_controller.dart';
 import 'package:edutrack/features/search/services/search_data_source.dart';
@@ -49,6 +51,10 @@ void main() {
     CtDataModel? ctData,
     Object? failure,
     List<CtAlertModel>? alerts,
+    List<EnrollmentModel>? enrolledStudents,
+    List<AttendanceSessionModel>? attendanceSessions,
+    List<RoutineModel>? routines,
+    String role = 'student',
   }) {
     return FakeSearchDataSource(
       user: user,
@@ -57,6 +63,10 @@ void main() {
       ctData: ctData,
       failure: failure,
       alerts: alerts ?? const [],
+      enrolledStudents: enrolledStudents ?? const [],
+      attendanceSessions: attendanceSessions ?? const [],
+      routines: routines ?? const [],
+      role: role,
     );
   }
 
@@ -232,6 +242,169 @@ void main() {
     expect(controller.results.single.detail, contains('days remaining'));
   });
 
+  test('teacher can ask how many CTs happened for a course', () async {
+    final ctData = CtDataModel(
+      courseId: course.courseId,
+      fullMarks: 20,
+      bestOfCount: 3,
+      totalCTs: 4,
+      cts: {
+        'CT-1': CtModel(
+          ctTitle: 'CT-1',
+          date: '2026-09-01',
+          status: 'published',
+          marks: {},
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+        'CT-2': CtModel(
+          ctTitle: 'CT-2',
+          date: '2026-09-10',
+          status: 'published',
+          marks: {},
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+      },
+      totals: {},
+      updatedAt: DateTime(2026),
+    );
+    final controller = AppSearchController(
+      role: 'teacher',
+      dataSource: source(ctData: ctData, role: 'teacher'),
+      askAi: (_) async => fail('Teacher CT count should be deterministic'),
+    );
+
+    await controller.runNaturalLanguageSearch('How many CSE-321 CT happened?');
+
+    expect(controller.errorMessage.value, isNull);
+    expect(controller.results.single.subtitle, '2 CTs happened');
+  });
+
+  test('teacher can ask for the next class', () async {
+    final controller = AppSearchController(
+      role: 'teacher',
+      dataSource: source(
+        role: 'teacher',
+        routines: [
+          RoutineModel(
+            routineId: 'routine-1',
+            ownerId: user.uid,
+            ownerRole: 'teacher',
+            courseId: course.courseId,
+            courseCode: course.courseCode,
+            courseName: course.courseName,
+            day: _todayDay(),
+            startTime: _futureTime(),
+            endTime: _futureTime(),
+            room: 'Room 201',
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+        ],
+      ),
+      askAi: (_) async => fail('Next class should be resolved locally'),
+    );
+
+    await controller.runNaturalLanguageSearch('What is my next class?');
+
+    expect(controller.errorMessage.value, isNull);
+    expect(controller.results.single.title, 'Mathematics');
+    expect(controller.results.single.detail, 'Room 201');
+  });
+
+  test('teacher can find students absent from a specific CT', () async {
+    final ctData = CtDataModel(
+      courseId: course.courseId,
+      fullMarks: 20,
+      bestOfCount: 3,
+      totalCTs: 4,
+      cts: {
+        'CT-1': CtModel(
+          ctTitle: 'CT-1',
+          date: '2026-09-01',
+          status: 'published',
+          marks: {'student-present': 15, 'student-absent': -1},
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+      },
+      totals: {},
+      updatedAt: DateTime(2026),
+    );
+    final controller = AppSearchController(
+      role: 'teacher',
+      dataSource: source(
+        ctData: ctData,
+        role: 'teacher',
+        enrolledStudents: [
+          _enrollment('student-present', 'Present Student'),
+          _enrollment('student-absent', 'Absent Student'),
+        ],
+      ),
+      askAi: (_) async => fail('Teacher CT absence should be deterministic'),
+    );
+
+    await controller.runNaturalLanguageSearch(
+      'Which students did not attend CT 1 for CSE 321?',
+    );
+
+    expect(controller.errorMessage.value, isNull);
+    expect(controller.results.single.title, 'Absent Student');
+    expect(controller.results.single.subtitle, 'Did not attend CT-1');
+    expect(controller.results.single.detail, contains('Student ID: 2204065'));
+    expect(controller.results.single.detail, contains('Course Code: CSE-321'));
+  });
+
+  test(
+    'teacher CT absence search scans all owned courses without a code',
+    () async {
+      final ctData = CtDataModel(
+        courseId: course.courseId,
+        fullMarks: 20,
+        bestOfCount: 3,
+        totalCTs: 4,
+        cts: {
+          'CT-1': CtModel(
+            ctTitle: 'CT-1',
+            date: '2026-09-01',
+            status: 'published',
+            marks: {'student-absent': -1},
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+        },
+        totals: {},
+        updatedAt: DateTime(2026),
+      );
+      final secondCourse = course.copyWith(
+        courseId: 'course-2',
+        courseCode: 'CSE322',
+        courseName: 'Physics',
+      );
+      final controller = AppSearchController(
+        role: 'teacher',
+        dataSource: source(
+          role: 'teacher',
+          courses: [course, secondCourse],
+          ctData: ctData,
+          enrolledStudents: [_enrollment('student-absent', 'Absent Student')],
+        ),
+        askAi: (_) async =>
+            fail('All-course CT absence should be deterministic'),
+      );
+
+      await controller.runNaturalLanguageSearch(
+        'Which students did not attend CT 1?',
+      );
+
+      expect(controller.errorMessage.value, isNull);
+      expect(controller.results, hasLength(2));
+      expect(controller.results[0].detail, contains('CSE-321'));
+      expect(controller.results[1].detail, contains('CSE-322'));
+    },
+  );
+
   test(
     'resolves common attendance wording without requiring an AI response',
     () async {
@@ -365,6 +538,37 @@ String _encode(List<Map<String, dynamic>> values) {
   return '[$encoded]';
 }
 
+EnrollmentModel _enrollment(
+  String studentId,
+  String studentName, {
+  String studentCode = '2204065',
+}) {
+  return EnrollmentModel(
+    studentId: studentId,
+    studentName: studentName,
+    studentCode: studentCode,
+    batch: '2024',
+    department: 'CSE',
+    roll: '1',
+    section: 'A',
+    enrolledAt: DateTime(2026),
+  );
+}
+
+String _todayDay() {
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  return days[DateTime.now().weekday - 1];
+}
+
+String _futureTime() {
+  final now = DateTime.now();
+  if (now.hour == 23 && now.minute < 59) return '11:59 PM';
+  final hour = now.hour + 1;
+  final period = hour >= 12 ? 'PM' : 'AM';
+  final displayHour = hour % 12 == 0 ? 12 : hour % 12;
+  return '$displayHour:00 $period';
+}
+
 class FakeSearchDataSource implements SearchDataSource {
   final UserModel user;
   final List<CourseModel> courses;
@@ -372,6 +576,10 @@ class FakeSearchDataSource implements SearchDataSource {
   final CtDataModel? ctData;
   final Object? failure;
   final List<CtAlertModel> alerts;
+  final List<EnrollmentModel> enrolledStudents;
+  final List<AttendanceSessionModel> attendanceSessions;
+  final List<RoutineModel> routines;
+  final String role;
 
   FakeSearchDataSource({
     required this.user,
@@ -380,6 +588,10 @@ class FakeSearchDataSource implements SearchDataSource {
     required this.ctData,
     required this.failure,
     required this.alerts,
+    required this.enrolledStudents,
+    required this.attendanceSessions,
+    required this.routines,
+    required this.role,
   });
 
   void _throwIfNeeded() {
@@ -399,7 +611,7 @@ class FakeSearchDataSource implements SearchDataSource {
   }) async {
     _throwIfNeeded();
     expect(uid, user.uid);
-    expect(role, 'student');
+    expect(role, this.role);
     return courses;
   }
 
@@ -422,9 +634,23 @@ class FakeSearchDataSource implements SearchDataSource {
   }
 
   @override
+  Future<List<EnrollmentModel>> getEnrolledStudents(String courseId) async {
+    _throwIfNeeded();
+    return enrolledStudents;
+  }
+
+  @override
+  Future<List<AttendanceSessionModel>> getAttendanceSessions(
+    String courseId,
+  ) async {
+    _throwIfNeeded();
+    return attendanceSessions;
+  }
+
+  @override
   Future<List<RoutineModel>> getUserRoutines(String uid) async {
     _throwIfNeeded();
-    return const [];
+    return routines;
   }
 
   @override

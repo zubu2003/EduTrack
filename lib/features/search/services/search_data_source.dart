@@ -8,7 +8,9 @@ import 'package:edutrack/features/authentication/models/user_model.dart';
 import 'package:edutrack/features/course/models/ct_alert_model.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/course/models/enrollment_model.dart';
 import 'package:edutrack/features/course/models/routine_model.dart';
+import 'package:edutrack/features/course/models/attendance_session_model.dart';
 
 abstract class SearchDataSource {
   Future<UserModel?> getCurrentUser();
@@ -25,6 +27,10 @@ abstract class SearchDataSource {
   });
 
   Future<CtDataModel?> getCtData(String courseId);
+
+  Future<List<EnrollmentModel>> getEnrolledStudents(String courseId);
+
+  Future<List<AttendanceSessionModel>> getAttendanceSessions(String courseId);
 
   Future<List<RoutineModel>> getUserRoutines(String uid);
 
@@ -62,6 +68,14 @@ class FirestoreSearchDataSource implements SearchDataSource {
   @override
   Future<CtDataModel?> getCtData(String courseId) =>
       CtMarksRepository.instance.getCtData(courseId);
+
+  @override
+  Future<List<EnrollmentModel>> getEnrolledStudents(String courseId) =>
+      CourseRepository.instance.getEnrolledStudents(courseId);
+
+  @override
+  Future<List<AttendanceSessionModel>> getAttendanceSessions(String courseId) =>
+      AttendanceRepository.instance.getSessions(courseId);
 
   @override
   Future<List<RoutineModel>> getUserRoutines(String uid) =>

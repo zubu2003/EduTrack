@@ -152,6 +152,14 @@ For attendance questions:
 - "attendance percentage" => collection "attendance" with the course filter
   and no student identity filter.
 
+For teacher questions, use the teacher's authorized courses only:
+- "my next class" => collection "routines" with the next class intent.
+- "how many CTs happened for [course]" => collection "ct_marks" with the
+  course filter and an empty or published-status-compatible CT filter.
+- "which students did not attend CT-1 for [course]" => collection "ct_marks"
+  with courseCode and ctTitle filters. The app resolves missing or absent
+  marks against the authorized enrollment list.
+
 Return STRICT JSON only:
 {
   "collection": "one of the allowed collections",

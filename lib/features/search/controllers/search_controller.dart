@@ -135,8 +135,8 @@ class AppSearchController extends GetxController {
           return _teacherLowAttendance(user);
         case 'Recent CT Performance':
           return _teacherCtPerformance(user);
-        case 'Students Who Missed Classes':
-          return _teacherMissedClasses(user);
+        case "Students Who Missed Today's Class":
+          return _teacherMissedTodaysClass(user);
         default:
           throw const FormatException('Unsupported quick search');
       }
@@ -160,6 +160,12 @@ class AppSearchController extends GetxController {
       if (directAttendanceResults != null) {
         explanation.value = 'Attendance results matching your query';
         return directAttendanceResults;
+      }
+
+      final directTeacherResults = await _searchDirectTeacherQuery(query.value);
+      if (directTeacherResults != null) {
+        explanation.value = 'Teacher results matching your query';
+        return directTeacherResults;
       }
 
       final response = await _askAi(
@@ -402,22 +408,27 @@ class AppSearchController extends GetxController {
     return output;
   }
 
-  Future<List<SearchResultModel>> _teacherMissedClasses(UserModel user) async {
-    final courses = await CourseRepository.instance.getTeacherCourses(user.uid);
+  Future<List<SearchResultModel>> _teacherMissedTodaysClass(
+    UserModel user,
+  ) async {
+    final courses = await _dataSource.getAuthorizedCourses(
+      uid: user.uid,
+      role: 'teacher',
+    );
+    final today = _todayIso();
     final output = <SearchResultModel>[];
     for (final course in courses) {
-      final students = await AttendanceRepository.instance.getEnrolledStudents(
-        course.courseId,
-      );
-      final sessions = await AttendanceRepository.instance.getSessions(
-        course.courseId,
-      );
+      final students = await _dataSource.getEnrolledStudents(course.courseId);
+      final sessions = await _dataSource.getAttendanceSessions(course.courseId);
+      final todaySessions = sessions.where((session) => session.date == today);
+      if (todaySessions.isEmpty) continue;
       for (final student in students) {
-        final missed = sessions
+        final missed = todaySessions
             .where(
               (session) => session.records.any(
                 (record) =>
-                    record.studentId == student.studentId &&
+                    (record.studentId == student.studentId ||
+                        record.studentCode == student.studentCode) &&
                     record.status == 'absent',
               ),
             )
@@ -426,7 +437,7 @@ class AppSearchController extends GetxController {
           output.add(
             SearchResultModel(
               title: student.studentName,
-              subtitle: '$missed missed classes • ${course.courseCode}',
+              subtitle: 'Missed today • ${course.courseCode}',
               detail: student.studentCode,
             ),
           );
@@ -434,6 +445,178 @@ class AppSearchController extends GetxController {
       }
     }
     return output;
+  }
+
+  Future<List<SearchResultModel>?> _searchDirectTeacherQuery(
+    String text,
+  ) async {
+    if (role != 'teacher') return null;
+    final normalized = text.toLowerCase();
+    if (normalized.contains('next class')) {
+      return _teacherNextClass();
+    }
+    final codeMatch = RegExp(
+      r'\b[a-z]{2,5}[- ]?\d{3}\b',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    if (normalized.contains('how many') && normalized.contains('ct')) {
+      return _teacherCtCount(codeMatch?.group(0));
+    }
+    if ((normalized.contains('did not attend') ||
+            normalized.contains('didn\'t attend') ||
+            normalized.contains('missed')) &&
+        normalized.contains('ct')) {
+      final titleMatch = RegExp(
+        r'ct\s*[- ]?\s*\d+',
+        caseSensitive: false,
+      ).firstMatch(text);
+      if (titleMatch == null) return null;
+      return _teacherCtAbsentees(
+        courseCode: codeMatch?.group(0),
+        ctTitle: titleMatch.group(0)!,
+      );
+    }
+    return null;
+  }
+
+  Future<List<SearchResultModel>> _teacherNextClass() async {
+    final user = await _dataSource.getCurrentUser();
+    if (user == null) return [];
+    final routines = await _dataSource.getUserRoutines(user.uid);
+    final today = _todayDayName();
+    final now = DateTime.now().hour * 60 + DateTime.now().minute;
+    final todayRoutines =
+        routines
+            .where(
+              (routine) =>
+                  routine.day == today && routine.courseCode != 'Others',
+            )
+            .where((routine) => _timeToMinutes(routine.startTime) >= now)
+            .toList()
+          ..sort(
+            (a, b) => _timeToMinutes(
+              a.startTime,
+            ).compareTo(_timeToMinutes(b.startTime)),
+          );
+    final next = todayRoutines.isEmpty ? null : todayRoutines.first;
+    if (next == null) return [];
+    return [
+      SearchResultModel(
+        title: next.courseName,
+        subtitle: '${next.courseCode} • ${next.startTime} - ${next.endTime}',
+        detail: next.room,
+      ),
+    ];
+  }
+
+  Future<List<SearchResultModel>> _teacherCtCount(String? code) async {
+    final user = await _dataSource.getCurrentUser();
+    if (user == null) return [];
+    final courses = await _dataSource.getAuthorizedCourses(
+      uid: user.uid,
+      role: 'teacher',
+    );
+    final matchingCourses = code == null
+        ? courses
+        : courses.where(
+            (course) =>
+                _normalizeCourseCode(course.courseCode) ==
+                _normalizeCourseCode(code),
+          );
+    final output = <SearchResultModel>[];
+    for (final course in matchingCourses) {
+      final data = await _dataSource.getCtData(course.courseId);
+      if (data == null) continue;
+      final happened = data.cts.values.where((ct) => ct.isPublished).length;
+      output.add(
+        SearchResultModel(
+          title: course.courseName,
+          subtitle: '$happened CTs happened',
+          detail: course.courseCode,
+        ),
+      );
+    }
+    return output;
+  }
+
+  Future<List<SearchResultModel>> _teacherCtAbsentees({
+    required String? courseCode,
+    required String ctTitle,
+  }) async {
+    final user = await _dataSource.getCurrentUser();
+    if (user == null) return [];
+    final courses = await _dataSource.getAuthorizedCourses(
+      uid: user.uid,
+      role: 'teacher',
+    );
+    final matchingCourses = courseCode == null
+        ? courses
+        : courses.where(
+            (course) =>
+                _normalizeCourseCode(course.courseCode) ==
+                _normalizeCourseCode(courseCode),
+          );
+    final output = <SearchResultModel>[];
+    for (final course in matchingCourses) {
+      final data = await _dataSource.getCtData(course.courseId);
+      final ct = data == null ? null : _findCtByTitle(data.cts.values, ctTitle);
+      if (ct == null) continue;
+      final students = await _dataSource.getEnrolledStudents(course.courseId);
+      output.addAll(
+        students
+            .where(
+              (student) =>
+                  !ct.marks.containsKey(student.studentId) ||
+                  CtMark.isAbsent(ct.marks[student.studentId]),
+            )
+            .map(
+              (student) => SearchResultModel(
+                title: student.studentName,
+                subtitle: 'Did not attend ${ct.ctTitle}',
+                detail:
+                    'Student ID: ${student.studentCode} • Course Code: ${_displayCourseCode(course.courseCode)}',
+              ),
+            ),
+      );
+    }
+    return output;
+  }
+
+  String _todayIso() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  CtModel? _findCtByTitle(Iterable<CtModel> cts, String title) {
+    final normalized = _normalizeCtTitle(title);
+    for (final ct in cts) {
+      if (_normalizeCtTitle(ct.ctTitle) == normalized) return ct;
+    }
+    return null;
+  }
+
+  String _displayCourseCode(String value) {
+    final match = RegExp(r'^\s*([a-zA-Z]+)[ -]?(\d+)\s*$').firstMatch(value);
+    if (match == null) return value.toUpperCase();
+    return '${match.group(1)!.toUpperCase()}-${match.group(2)}';
+  }
+
+  String _todayDayName() {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days[DateTime.now().weekday - 1];
+  }
+
+  int _timeToMinutes(String time) {
+    final parts = time.trim().split(' ');
+    if (parts.length != 2) return 0;
+    final clock = parts[0].split(':');
+    if (clock.length != 2) return 0;
+    var hour = int.tryParse(clock[0]) ?? 0;
+    final minute = int.tryParse(clock[1]) ?? 0;
+    if (parts[1].toUpperCase() == 'PM' && hour != 12) hour += 12;
+    if (parts[1].toUpperCase() == 'AM' && hour == 12) hour = 0;
+    return hour * 60 + minute;
   }
 
   Future<List<SearchResultModel>> _executeValidatedQuery(

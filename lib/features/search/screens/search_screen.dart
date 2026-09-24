@@ -21,9 +21,9 @@ class SearchScreen extends StatelessWidget {
       : const [
           "Today's Attendance",
           'Low Attendance Students',
-          'Recent CT Performance',
+          'Recent CT Performance(Avg.)',
           'Upcoming CTs',
-          'Students Who Missed Classes',
+          "Students Who Missed Today's Class",
         ];
 
   @override
@@ -121,28 +121,52 @@ class SearchScreen extends StatelessWidget {
                           final result = controller.results[index];
                           return Card(
                             color: SColors.white,
-                            child: ListTile(
-                              title: Text(result.title),
-                              subtitle: Text(
-                                result.subtitle,
-                                style: result.highlightSubtitle
-                                    ? Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.copyWith(
-                                        color: SColors.primary,
-                                        fontWeight: FontWeight.w800,
-                                      )
-                                    : null,
-                              ),
-                              trailing: result.detail == null
-                                  ? null
-                                  : Text(
+                            child: Padding(
+                              padding: const EdgeInsets.all(SSize.md),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    result.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: SSize.xs),
+                                  Text(
+                                    result.subtitle,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: result.highlightSubtitle
+                                        ? Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium?.copyWith(
+                                            color: SColors.primary,
+                                            fontWeight: FontWeight.w800,
+                                          )
+                                        : Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                  ),
+                                  if (result.detail != null) ...[
+                                    const SizedBox(height: SSize.xs),
+                                    Text(
                                       result.detail!,
-                                      textAlign: TextAlign.end,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: SColors.textSecondary,
+                                          ),
                                     ),
+                                  ],
+                                ],
+                              ),
                             ),
                           );
                         },
