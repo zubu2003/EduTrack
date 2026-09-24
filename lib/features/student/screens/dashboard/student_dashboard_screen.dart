@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
+import 'package:edutrack/features/student/controllers/ct_alert_controller.dart';
+import 'package:edutrack/features/search/screens/search_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import '../../../../common/widget/appbar/common_appbar.dart';
@@ -16,15 +18,19 @@ class StudentDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(StudentDashboardController());
+    Get.put(StudentCtAlertController());
 
     return Scaffold(
-      appBar: const SAppbar(
+      appBar: SAppbar(
         showBackButton: false,
+        onSearchPressed: () =>
+            Get.to(() => const SearchScreen(role: 'student')),
       ),
       backgroundColor: SColors.backgroundColor,
       body: RefreshIndicator(
         onRefresh: () async {
           await Get.find<StudentDashboardController>().fetchDashboardData();
+          await Get.find<StudentCtAlertController>().loadAlerts();
         },
         color: SColors.primary,
         child: SingleChildScrollView(
@@ -58,9 +64,7 @@ class StudentDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const StudentBottomNav(
-        currentIndex: 0,
-      ),
+      bottomNavigationBar: const StudentBottomNav(currentIndex: 0),
     );
   }
 }

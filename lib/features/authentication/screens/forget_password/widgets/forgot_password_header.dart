@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:edutrack/common/widget/logo/app_logo.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/utils/constant/text_strings.dart';
 
 class ForgotPasswordHeader extends StatelessWidget {
   const ForgotPasswordHeader({super.key});

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/course/models/routine_model.dart';
 import 'package:edutrack/utils/exceptions/firebase_exceptions.dart';
-import 'package:edutrack/utils/exceptions/format_exceptions.dart';
 import 'package:edutrack/utils/exceptions/platform_exceptions.dart';
 
 class RoutineRepository extends GetxController {

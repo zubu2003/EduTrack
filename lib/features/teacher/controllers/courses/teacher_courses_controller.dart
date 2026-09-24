@@ -6,7 +6,6 @@ import 'package:edutrack/data/repositories/user/user_repository.dart';
 import 'package:edutrack/features/authentication/models/user_model.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/common/widget/loader/full_screen_loader.dart';
-import 'package:edutrack/utils/constant/departments.dart';
 import 'package:edutrack/utils/helper/student_id_parser.dart';
 import 'package:edutrack/utils/popups/snackbar_helpers.dart';
 

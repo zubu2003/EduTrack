@@ -14,7 +14,7 @@ class TextToSpeechService extends GetxService {
     if (_isInitialized) return;
 
     await _flutterTts.setLanguage('en-US');
-    await _flutterTts.setSpeechRate(0.45);
+    await _flutterTts.setSpeechRate(0.55);
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setPitch(1.0);
 

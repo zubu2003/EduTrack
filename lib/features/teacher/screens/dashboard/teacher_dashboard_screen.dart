@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/features/teacher/controllers/dashboard/teacher_dashboard_controller.dart';
+import 'package:edutrack/features/search/screens/search_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import '../../../../common/widget/bottom_nav/teacher_bottom_nav.dart';
@@ -9,7 +10,6 @@ import 'widgets/teacher_dashboard_header.dart';
 import 'widgets/teacher_stats_row.dart';
 import 'widgets/teacher_quick_actions.dart';
 import 'widgets/teacher_todays_classes.dart';
-import 'widgets/teacher_course_progress.dart';
 
 class TeacherDashboardScreen extends StatelessWidget {
   const TeacherDashboardScreen({super.key});
@@ -20,8 +20,10 @@ class TeacherDashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
-      appBar: const SAppbar(
+      appBar: SAppbar(
         showBackButton: false,
+        onSearchPressed: () =>
+            Get.to(() => const SearchScreen(role: 'teacher')),
       ),
       body: RefreshIndicator(
         onRefresh: () async {

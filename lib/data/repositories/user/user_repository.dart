@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:edutrack/features/authentication/models/user_model.dart';
 import 'package:edutrack/utils/constant/keys.dart';
 import 'package:edutrack/utils/exceptions/firebase_exceptions.dart';
-import 'package:edutrack/utils/exceptions/format_exceptions.dart';
 import 'package:edutrack/utils/exceptions/platform_exceptions.dart';
 
 class UserRepository extends GetxController {

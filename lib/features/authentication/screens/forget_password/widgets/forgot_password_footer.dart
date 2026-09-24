@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
-import 'package:edutrack/utils/constant/size.dart';
 
 class ForgotPasswordFooter extends StatelessWidget {
   const ForgotPasswordFooter({super.key});

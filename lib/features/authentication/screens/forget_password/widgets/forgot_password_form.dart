@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/utils/constant/text_strings.dart';
 import 'package:iconsax/iconsax.dart';
 
 class ForgotPasswordForm extends StatelessWidget {

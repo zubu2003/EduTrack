@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:iconsax/iconsax.dart';
 
 class CourseDetailsHeader extends StatelessWidget {
   final CourseModel course;

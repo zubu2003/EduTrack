@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:edutrack/routes/app_routes.dart';
 
 class CourseDetailsActionCard extends StatelessWidget {
   final IconData icon;

@@ -7,6 +7,7 @@ import 'package:edutrack/features/teacher/controllers/ct_marks/teacher_ct_marks_
 import 'package:edutrack/features/teacher/screens/ct_marks/ct_details_screen.dart';
 import 'package:edutrack/features/teacher/screens/ct_marks/upload_ct_marks_screen.dart';
 import 'package:edutrack/features/teacher/screens/ct_marks/view_all_ct_marks_screen.dart';
+import 'package:edutrack/features/teacher/screens/ct_alert/create_ct_alert_screen.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -16,10 +17,7 @@ import 'widgets/ct_marks_list_item.dart';
 class TeacherCtMarksScreen extends StatelessWidget {
   final CourseModel course;
 
-  const TeacherCtMarksScreen({
-    super.key,
-    required this.course,
-  });
+  const TeacherCtMarksScreen({super.key, required this.course});
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +28,7 @@ class TeacherCtMarksScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: SColors.backgroundColor,
-      appBar: SAppbar(
-        showBackButton: true,
-        onBackPressed: () => Get.back(),
-      ),
+      appBar: SAppbar(showBackButton: true, onBackPressed: () => Get.back()),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
@@ -46,9 +41,7 @@ class TeacherCtMarksScreen extends StatelessWidget {
 
         return SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: SSize.defaultSpace,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: SSize.defaultSpace),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -70,10 +63,19 @@ class TeacherCtMarksScreen extends StatelessWidget {
                       child: _buildActionButton(
                         icon: Iconsax.document_upload,
                         label: 'Upload Excel',
-                        onTap: () => Get.to(
-                              () => UploadCtMarksScreen(course: course),
-                        ),
+                        onTap: () =>
+                            Get.to(() => UploadCtMarksScreen(course: course)),
                         isPrimary: true,
+                      ),
+                    ),
+                    const SizedBox(width: SSize.sm),
+                    Expanded(
+                      child: _buildActionButton(
+                        icon: Iconsax.notification,
+                        label: 'CT Alert',
+                        onTap: () =>
+                            Get.to(() => CreateCtAlertScreen(course: course)),
+                        isPrimary: false,
                       ),
                     ),
                     const SizedBox(width: SSize.sm),
@@ -86,8 +88,8 @@ class TeacherCtMarksScreen extends StatelessWidget {
                         onTap: cts.isEmpty
                             ? null
                             : () => Get.to(
-                              () => ViewAllCtMarksScreen(course: course),
-                        ),
+                                () => ViewAllCtMarksScreen(course: course),
+                              ),
                         isPrimary: false,
                       ),
                     ),
@@ -120,10 +122,8 @@ class TeacherCtMarksScreen extends StatelessWidget {
                         ct: ct,
                         fullMarks: ctData.fullMarks,
                         onTap: () => Get.to(
-                              () => CtDetailsScreen(
-                            course: course,
-                            ctTitle: ctTitle,
-                          ),
+                          () =>
+                              CtDetailsScreen(course: course, ctTitle: ctTitle),
                         ),
                         onDelete: () => controller.deleteCt(ctTitle),
                       ),
@@ -165,10 +165,7 @@ class TeacherCtMarksScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
           border: isPrimary
               ? null
-              : Border.all(
-            color: SColors.primary.withOpacity(0.3),
-            width: 1,
-          ),
+              : Border.all(color: SColors.primary.withOpacity(0.3), width: 1),
         ),
         child: Column(
           children: [
@@ -238,9 +235,9 @@ class TeacherCtMarksScreen extends StatelessWidget {
   }
 
   void _showAddCtDialog(
-      BuildContext context,
-      TeacherCtMarksController controller,
-      ) {
+    BuildContext context,
+    TeacherCtMarksController controller,
+  ) {
     final ctTitleController = TextEditingController();
     final fullMarksController = TextEditingController(text: '20');
 
@@ -264,17 +261,12 @@ class TeacherCtMarksScreen extends StatelessWidget {
             TextField(
               controller: fullMarksController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Full Marks',
-              ),
+              decoration: const InputDecoration(labelText: 'Full Marks'),
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               final title = ctTitleController.text.trim();

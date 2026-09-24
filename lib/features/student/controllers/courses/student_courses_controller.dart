@@ -3,7 +3,6 @@ import 'package:edutrack/data/repositories/course/course_repository.dart';
 import 'package:edutrack/data/repositories/routine/routine_repository.dart';
 import 'package:edutrack/data/repositories/user/user_repository.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
-import 'package:edutrack/features/course/models/routine_model.dart';
 import 'package:edutrack/utils/popups/snackbar_helpers.dart';
 
 class StudentCoursesController extends GetxController {
