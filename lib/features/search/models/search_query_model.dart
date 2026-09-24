@@ -58,6 +58,14 @@ class SearchQueryModel {
       if (field is! String || !_allowedFields(collection).contains(field)) {
         throw FormatException('Unsupported search field: $field');
       }
+      if (role == 'student' &&
+          (collection == SearchCollection.attendance ||
+              collection == SearchCollection.ctMarks) &&
+          (field == 'studentId' || field == 'studentCode')) {
+        throw const FormatException(
+          'Students cannot search another student\'s academic data',
+        );
+      }
       return SearchFilterModel(
         field: field,
         operator: _parseOperator(raw['op']),
@@ -128,9 +136,23 @@ class SearchQueryModel {
       case SearchCollection.courses:
         return {'courseName', 'courseCode', 'batch', 'department'};
       case SearchCollection.attendance:
-        return {'status', 'date', 'studentId', 'studentCode'};
+        return {
+          'courseName',
+          'courseCode',
+          'status',
+          'date',
+          'studentId',
+          'studentCode',
+        };
       case SearchCollection.ctMarks:
-        return {'studentId', 'studentCode', 'ctTitle', 'mark'};
+        return {
+          'courseName',
+          'courseCode',
+          'studentId',
+          'studentCode',
+          'ctTitle',
+          'mark',
+        };
       case SearchCollection.routines:
         return {'day', 'courseName', 'courseCode', 'room'};
       case SearchCollection.users:
@@ -173,10 +195,12 @@ class SearchResultModel {
   final String title;
   final String subtitle;
   final String? detail;
+  final bool highlightSubtitle;
 
   const SearchResultModel({
     required this.title,
     required this.subtitle,
     this.detail,
+    this.highlightSubtitle = false,
   });
 }

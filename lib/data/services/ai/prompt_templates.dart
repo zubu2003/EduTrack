@@ -6,7 +6,8 @@ class SPromptTemplates {
     required String studentName,
     required String courseName,
     required double attendancePercent,
-    required int recentTrend, // +ve = improving, -ve = worsening (last 3 sessions delta)
+    required int
+    recentTrend, // +ve = improving, -ve = worsening (last 3 sessions delta)
     required int sessionsRemaining,
   }) {
     return '''
@@ -21,7 +22,7 @@ Sessions remaining: $sessionsRemaining
 
 Rules:
 - Risk = HIGH if attendance < 60 or trend is strongly negative.
-- Risk = MEDIUM if attendance < 75 or trend is mildly negative.
+- Risk = MEDIUM if attendance < 80 or trend is mildly negative.
 - Risk = LOW otherwise.
 
 Return STRICT JSON only, no markdown, no explanation:
@@ -128,9 +129,28 @@ Convert the user's natural language query into a structured JSON filter.
 User role: $role
 Query: "$query"
 
-Allowed collections: courses, attendance, ct_marks, routines, users.
-Allowed operators: ==, !=, >, <, >=, <=, array-contains, in.
+Use only these executable collections: courses, attendance, ct_marks, routines.
+Collection fields:
+- courses: courseName, courseCode, batch, department
+- attendance: courseName, courseCode, status, date
+- ct_marks: courseName, courseCode, ctTitle, mark
+- routines: day, courseName, courseCode, room
+Allowed operators: ==, !=, >, <, >=, <=.
 Allowed sorts: asc, desc.
+
+For attendance and ct_marks, courseName/courseCode identify an authorized
+course before its nested records are evaluated. Never request another
+student's studentId or studentCode. If the question is unsupported, return
+collection "courses" with an empty filters list and explain that clearly.
+
+For attendance questions:
+- "did I attend/present on [date]" => collection "attendance" with
+  courseCode/courseName and date filters; use date format "YYYY-MM-DD" when
+  the year is known, otherwise preserve the day and month words.
+- "how many classes happened/are recorded" => collection "attendance" with
+  only the courseCode/courseName filter.
+- "attendance percentage" => collection "attendance" with the course filter
+  and no student identity filter.
 
 Return STRICT JSON only:
 {

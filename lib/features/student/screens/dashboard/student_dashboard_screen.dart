@@ -69,9 +69,6 @@ class StudentDashboardScreen extends StatelessWidget {
 
                 SizedBox(height: SSize.spaceBtwSections),
 
-                StudentAIInsight(),
-
-                SizedBox(height: SSize.spaceBtwSections),
               ],
             ),
           ),

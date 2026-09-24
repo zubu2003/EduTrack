@@ -123,7 +123,17 @@ class SearchScreen extends StatelessWidget {
                             color: SColors.white,
                             child: ListTile(
                               title: Text(result.title),
-                              subtitle: Text(result.subtitle),
+                              subtitle: Text(
+                                result.subtitle,
+                                style: result.highlightSubtitle
+                                    ? Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium?.copyWith(
+                                        color: SColors.primary,
+                                        fontWeight: FontWeight.w800,
+                                      )
+                                    : null,
+                              ),
                               trailing: result.detail == null
                                   ? null
                                   : Text(
