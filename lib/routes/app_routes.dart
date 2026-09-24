@@ -4,6 +4,7 @@ import 'package:edutrack/features/authentication/screens/login/login_screen.dart
 import 'package:edutrack/features/authentication/screens/sign_up/sign_up_screen.dart';
 import 'package:edutrack/features/authentication/screens/forget_password/forgot_password_screen.dart';
 import 'package:edutrack/features/authentication/screens/splash/splash_screen.dart';
+import 'package:edutrack/features/announcement/screens/announcement_screen.dart';
 import 'package:edutrack/features/student/screens/dashboard/student_dashboard_screen.dart';
 import 'package:edutrack/features/student/screens/courses/student_courses_screen.dart';
 import 'package:edutrack/features/student/screens/course_details/student_course_details_screen.dart';
@@ -39,6 +40,7 @@ class AppRoutes {
   static const String studentCtAlerts = '/student-ct-alerts';
   static const String studentRoutine = '/student-routine';
   static const String studentProfile = '/student-profile';
+  static const String studentAnnouncements = '/student-announcements';
 
   // Teacher Routes
   static const String teacherDashboard = '/teacher-dashboard';
@@ -47,6 +49,7 @@ class AppRoutes {
   static const String createCourse = '/create-course';
   static const String teacherRoutine = '/teacher-routine';
   static const String teacherProfile = '/teacher-profile';
+  static const String teacherAnnouncements = '/teacher-announcements';
 
   // Common Routes
   static const String profile = '/profile';
@@ -110,6 +113,10 @@ class AppRoutes {
       name: studentProfile,
       page: () => const ProfileScreen(userRole: 'student'),
     ),
+    GetPage(
+      name: studentAnnouncements,
+      page: () => const AnnouncementScreen(role: 'student'),
+    ),
 
     // Teacher Routes
     GetPage(name: teacherDashboard, page: () => const TeacherDashboardScreen()),
@@ -137,6 +144,10 @@ class AppRoutes {
     GetPage(
       name: teacherProfile,
       page: () => const ProfileScreen(userRole: 'teacher'),
+    ),
+    GetPage(
+      name: teacherAnnouncements,
+      page: () => const AnnouncementScreen(role: 'teacher'),
     ),
 
     // Common Routes

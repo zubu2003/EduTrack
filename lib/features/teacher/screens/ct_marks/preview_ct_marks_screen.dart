@@ -303,7 +303,7 @@ class PreviewCtMarksScreen extends StatelessWidget {
                       ),
                     ),
                     child: const Text(
-                      'Submit to Firestore',
+                      'Submit Marks',
                       style: TextStyle(
                         color: SColors.white,
                         fontWeight: FontWeight.bold,

@@ -22,16 +22,7 @@ class AIService extends GetxController {
     try {
       final api = SApiUrls.aiProxyUrl;
 
-      print('🔵 [AI] POST $api');
-      print('🔵 [AI] prompt length: ${prompt.length}');
-
-      final response = await _dio.post(
-        api,
-        data: {'prompt': prompt},
-      );
-
-      print('🔵 [AI] status: ${response.statusCode}');
-      print('🔵 [AI] body: ${response.data}');
+      final response = await _dio.post(api, data: {'prompt': prompt});
 
       if (response.statusCode != 200) {
         throw _aiError(response.data) ??
@@ -45,12 +36,8 @@ class AIService extends GetxController {
 
       throw 'AI returned an empty response';
     } on dio.DioException catch (e) {
-      print('❌ [AI] Dio status: ${e.response?.statusCode}');
-      print('❌ [AI] Dio body: ${e.response?.data}');
-      print('❌ [AI] Dio message: ${e.message}');
       throw _aiError(e.response?.data) ?? 'AI request failed';
     } catch (e) {
-      print('❌ [AI] $e');
       rethrow;
     }
   }

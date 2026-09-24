@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:edutrack/data/repositories/attendance/attendance_repository.dart';
+import 'package:edutrack/data/repositories/announcement_repository.dart';
 import 'package:edutrack/data/repositories/authentication_repository.dart';
 import 'package:edutrack/data/repositories/course/course_repository.dart';
 import 'package:edutrack/data/repositories/ct_marks/ct_marks_repository.dart';
@@ -22,6 +23,7 @@ class AppBindings extends Bindings {
     Get.put(UserRepository());
     Get.put(CourseRepository());
     Get.put(AttendanceRepository());
+    Get.put(AnnouncementRepository());
     Get.put(RoutineRepository());
     Get.put(CtMarksRepository());
     Get.put(CtAlertRepository());

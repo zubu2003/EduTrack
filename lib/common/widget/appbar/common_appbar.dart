@@ -49,6 +49,29 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
     }
   }
 
+  Future<void> _navigateToAnnouncements() async {
+    try {
+      final userData = await UserRepository.instance.getCurrentUserData();
+      if (userData == null) {
+        SSnackBarHelpers.errorSnackBar(
+          title: 'Error',
+          message: 'Could not load announcements. Please try again.',
+        );
+        return;
+      }
+      Get.toNamed(
+        userData.role == SRoles.teacher
+            ? AppRoutes.teacherAnnouncements
+            : AppRoutes.studentAnnouncements,
+      );
+    } catch (_) {
+      SSnackBarHelpers.errorSnackBar(
+        title: 'Error',
+        message: 'Could not open announcements. Please try again.',
+      );
+    }
+  }
+
   /// Show Logout Confirmation Dialog
   void _showLogoutDialog(BuildContext context) {
     Get.dialog(
@@ -116,6 +139,8 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
   void _handleMenuSelection(BuildContext context, String value) {
     if (value == 'profile') {
       _navigateToProfile();
+    } else if (value == 'announcements') {
+      _navigateToAnnouncements();
     } else if (value == 'logout') {
       _showLogoutDialog(context);
     }
@@ -176,6 +201,16 @@ class SAppbar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           itemBuilder: (context) => [
+            const PopupMenuItem<String>(
+              value: 'announcements',
+              child: Row(
+                children: [
+                  Icon(Iconsax.notification, color: SColors.textPrimary),
+                  SizedBox(width: SSize.sm),
+                  Text('Announcements'),
+                ],
+              ),
+            ),
             const PopupMenuItem<String>(
               value: 'profile',
               child: Row(

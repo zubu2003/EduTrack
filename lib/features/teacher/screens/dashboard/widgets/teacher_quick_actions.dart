@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/dialog/course_selector_dialog.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
+import 'package:edutrack/features/announcement/screens/announcement_screen.dart';
 import 'package:edutrack/features/teacher/screens/attendance/take_attendance_screen.dart';
 import 'package:edutrack/features/teacher/screens/ct_marks/teacher_ct_marks_screen.dart';
 import 'package:edutrack/features/teacher/screens/course_report/course_report_screen.dart';
@@ -55,7 +56,7 @@ class TeacherQuickActions extends StatelessWidget {
         'color': const Color(0xFF4A90D9),
         'title': 'Send Announcement',
         'subtitle': 'Choose a course to send announcement',
-        'type': null,
+        'type': 'announcement',
       },
       {
         'label': 'Reports',
@@ -153,6 +154,8 @@ class TeacherQuickActions extends StatelessWidget {
               Get.to(() => CourseReportScreen(course: course));
             },
           );
+        } else if (type == 'announcement') {
+          Get.to(() => const AnnouncementScreen(role: 'teacher'));
         }
       },
       borderRadius: BorderRadius.circular(SSize.cardRadius),
