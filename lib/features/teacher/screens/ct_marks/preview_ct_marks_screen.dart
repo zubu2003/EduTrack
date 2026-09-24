@@ -6,7 +6,6 @@ import 'package:edutrack/features/course/models/ct_data_model.dart';
 import 'package:edutrack/features/teacher/controllers/ct_marks/teacher_ct_marks_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:iconsax/iconsax.dart';
 
 class PreviewCtMarksScreen extends StatelessWidget {
   final CourseModel course;

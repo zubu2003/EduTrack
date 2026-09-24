@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import 'data/services/ai/ai_service.dart';
 import 'utils/popups/snackbar_helpers.dart';

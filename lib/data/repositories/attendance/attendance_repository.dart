@@ -4,8 +4,6 @@ import 'package:edutrack/features/course/models/attendance_record_model.dart';
 import 'package:edutrack/features/course/models/attendance_session_model.dart';
 import 'package:edutrack/features/course/models/enrollment_model.dart';
 import 'package:edutrack/utils/exceptions/firebase_exceptions.dart';
-import 'package:edutrack/utils/exceptions/format_exceptions.dart';
-import 'package:edutrack/utils/exceptions/platform_exceptions.dart';
 
 class AttendanceRepository extends GetxController {
   static AttendanceRepository get instance => Get.find();

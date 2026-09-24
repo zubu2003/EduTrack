@@ -1,5 +1,4 @@
 import 'package:edutrack/features/authentication/controllers/login/login_controller.dart';
-import 'package:edutrack/features/authentication/screens/sign_up/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';

@@ -138,6 +138,13 @@ Collection fields:
 Allowed operators: ==, !=, >, <, >=, <=.
 Allowed sorts: asc, desc.
 
+Return an optional intent that describes the user's goal. Choose exactly one:
+course_search, attendance_summary, attendance_absentees, ct_count,
+ct_absentees, ct_highest_mark, academic_summary, course_comparison,
+routine_search, upcoming_cts. Use the most specific intent; do not return an
+intent outside this list. Keep filters for courseCode, courseName, and ctTitle
+when the user mentions them. A missing filter means all authorized courses.
+
 For attendance and ct_marks, courseName/courseCode identify an authorized
 course before its nested records are evaluated. Never request another
 student's studentId or studentCode. If the question is unsupported, return
@@ -162,6 +169,7 @@ For teacher questions, use the teacher's authorized courses only:
 
 Return STRICT JSON only:
 {
+  "intent": "one allowed intent",
   "collection": "one of the allowed collections",
   "filters": [
     { "field": "fieldName", "op": "==", "value": "value" }

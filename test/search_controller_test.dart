@@ -3,6 +3,7 @@ import 'package:edutrack/features/course/models/ct_alert_model.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/features/course/models/attendance_session_model.dart';
+import 'package:edutrack/features/course/models/attendance_record_model.dart';
 import 'package:edutrack/features/course/models/enrollment_model.dart';
 import 'package:edutrack/features/course/models/routine_model.dart';
 import 'package:edutrack/features/search/controllers/search_controller.dart';
@@ -72,6 +73,14 @@ void main() {
 
   String response(String collection, List<Map<String, dynamic>> filters) {
     return '{"collection":"$collection","filters":${_encode(filters)},"sort":null,"limit":20,"humanReadable":"Academic search"}';
+  }
+
+  String responseWithIntent(
+    String intent,
+    String collection,
+    List<Map<String, dynamic>> filters,
+  ) {
+    return '{"intent":"$intent","collection":"$collection","filters":${_encode(filters)},"sort":null,"limit":20,"humanReadable":"Academic search"}';
   }
 
   test(
@@ -271,7 +280,14 @@ void main() {
     );
     final controller = AppSearchController(
       role: 'teacher',
-      dataSource: source(ctData: ctData, role: 'teacher'),
+      dataSource: source(
+        ctData: ctData,
+        role: 'teacher',
+        enrolledStudents: [
+          _enrollment('student-present', 'Present Student'),
+          _enrollment('student-absent', 'Absent Student'),
+        ],
+      ),
       askAi: (_) async => fail('Teacher CT count should be deterministic'),
     );
 
@@ -405,6 +421,122 @@ void main() {
     },
   );
 
+  test('teacher absent CT query works without a CT number', () async {
+    final ctData = CtDataModel(
+      courseId: course.courseId,
+      fullMarks: 20,
+      bestOfCount: 3,
+      totalCTs: 4,
+      cts: {
+        'CT-1': CtModel(
+          ctTitle: 'CT-1',
+          date: '2026-09-01',
+          status: 'published',
+          marks: {'student-present': 15, 'student-absent': -1},
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+      },
+      totals: {},
+      updatedAt: DateTime(2026),
+    );
+    final controller = AppSearchController(
+      role: 'teacher',
+      dataSource: source(
+        ctData: ctData,
+        role: 'teacher',
+        enrolledStudents: [
+          _enrollment('student-present', 'Present Student'),
+          _enrollment('student-absent', 'Absent Student'),
+        ],
+      ),
+      askAi: (_) async => fail('Absent CT queries should be resolved locally'),
+    );
+
+    await controller.runNaturalLanguageSearch(
+      'Which student absent on CSE 321 CT?',
+    );
+
+    expect(controller.errorMessage.value, isNull);
+    expect(controller.results.single.title, 'Absent Student');
+    expect(controller.results.single.subtitle, 'Absent from CT-1');
+  });
+
+  test(
+    'teacher class absence query works without today-only wording',
+    () async {
+      final controller = AppSearchController(
+        role: 'teacher',
+        dataSource: source(
+          role: 'teacher',
+          attendance: const [],
+          enrolledStudents: [_enrollment('student-absent', 'Absent Student')],
+          attendanceSessions: [
+            _attendanceSession(
+              courseId: course.courseId,
+              date: '2026-09-20',
+              studentId: 'student-absent',
+              status: 'absent',
+            ),
+          ],
+        ),
+        askAi: (_) async => fail('Teacher class absence should be local'),
+      );
+
+      await controller.runNaturalLanguageSearch(
+        'Which students did not attend class CSE 321?',
+      );
+
+      expect(controller.errorMessage.value, isNull);
+      expect(controller.results.single.title, 'Absent Student');
+      expect(controller.results.single.subtitle, contains('Missed class'));
+    },
+  );
+
+  test('teacher can find the highest mark for CT-1 in a course', () async {
+    final ctData = CtDataModel(
+      courseId: course.courseId,
+      fullMarks: 20,
+      bestOfCount: 3,
+      totalCTs: 4,
+      cts: {
+        'CT-1': CtModel(
+          ctTitle: 'CT-1',
+          date: '2026-09-01',
+          status: 'published',
+          marks: {'student-present': 18, 'student-absent': 15},
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+      },
+      totals: {},
+      updatedAt: DateTime(2026),
+    );
+    final controller = AppSearchController(
+      role: 'teacher',
+      dataSource: source(
+        role: 'teacher',
+        ctData: ctData,
+        enrolledStudents: [
+          _enrollment('student-present', 'Top Student'),
+          _enrollment('student-absent', 'Other Student'),
+        ],
+      ),
+      askAi: (_) async => responseWithIntent('ct_highest_mark', 'ct_marks', [
+        {'field': 'courseCode', 'op': '==', 'value': 'CSE-321'},
+        {'field': 'ctTitle', 'op': '==', 'value': 'CT 1'},
+      ]),
+    );
+
+    await controller.runNaturalLanguageSearch(
+      'Which student got highest mark in CT 1 in CSE 321?',
+    );
+
+    expect(controller.errorMessage.value, isNull);
+    expect(controller.results.single.title, 'Top Student');
+    expect(controller.results.single.subtitle, 'Highest mark: 18.0 / 20.0');
+  });
+
   test(
     'resolves common attendance wording without requiring an AI response',
     () async {
@@ -536,6 +668,33 @@ String _encode(List<Map<String, dynamic>> values) {
       )
       .join(',');
   return '[$encoded]';
+}
+
+AttendanceSessionModel _attendanceSession({
+  required String courseId,
+  required String date,
+  required String studentId,
+  required String status,
+}) {
+  return AttendanceSessionModel(
+    sessionId: date,
+    courseId: courseId,
+    date: date,
+    lecture: 'Lecture',
+    totalStudents: 1,
+    presentCount: status == 'present' ? 1 : 0,
+    absentCount: status == 'absent' ? 1 : 0,
+    records: [
+      AttendanceRecordModel(
+        studentId: studentId,
+        studentName: 'Student',
+        studentCode: '2204065',
+        status: status,
+      ),
+    ],
+    createdAt: DateTime(2026, 9, 20),
+    updatedAt: DateTime(2026, 9, 20),
+  );
 }
 
 EnrollmentModel _enrollment(

@@ -24,6 +24,7 @@ class SearchFilterModel {
 }
 
 class SearchQueryModel {
+  final String? intent;
   final SearchCollection collection;
   final List<SearchFilterModel> filters;
   final String? sortField;
@@ -32,6 +33,7 @@ class SearchQueryModel {
   final String humanReadable;
 
   const SearchQueryModel({
+    this.intent,
     required this.collection,
     required this.filters,
     required this.sortField,
@@ -44,6 +46,11 @@ class SearchQueryModel {
     Map<String, dynamic> json, {
     required String role,
   }) {
+    final intent = json['intent'];
+    if (intent != null &&
+        (intent is! String || !_allowedIntents.contains(intent))) {
+      throw FormatException('Unsupported search intent: $intent');
+    }
     final collection = _parseCollection(json['collection']);
     _authorizeCollection(collection, role);
 
@@ -99,6 +106,7 @@ class SearchQueryModel {
     }
 
     return SearchQueryModel(
+      intent: intent as String?,
       collection: collection,
       filters: filters,
       sortField: sortField,
@@ -107,6 +115,19 @@ class SearchQueryModel {
       humanReadable: humanReadable.trim(),
     );
   }
+
+  static const Set<String> _allowedIntents = {
+    'course_search',
+    'attendance_summary',
+    'attendance_absentees',
+    'ct_count',
+    'ct_absentees',
+    'ct_highest_mark',
+    'academic_summary',
+    'course_comparison',
+    'routine_search',
+    'upcoming_cts',
+  };
 
   static SearchCollection _parseCollection(dynamic value) {
     switch (value) {

@@ -5,7 +5,6 @@ import 'package:edutrack/features/authentication/models/user_model.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
 import 'package:edutrack/features/course/models/enrollment_model.dart';
 import 'package:edutrack/utils/exceptions/firebase_exceptions.dart';
-import 'package:edutrack/utils/exceptions/format_exceptions.dart';
 import 'package:edutrack/utils/exceptions/platform_exceptions.dart';
 import 'package:edutrack/utils/helper/student_id_parser.dart';
 

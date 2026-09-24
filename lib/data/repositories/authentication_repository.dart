@@ -10,7 +10,6 @@ import 'package:edutrack/routes/app_routes.dart';
 import 'package:edutrack/utils/constant/keys.dart';
 import 'package:edutrack/utils/exceptions/firebase_auth_exceptions.dart';
 import 'package:edutrack/utils/exceptions/firebase_exceptions.dart';
-import 'package:edutrack/utils/exceptions/format_exceptions.dart';
 import 'package:edutrack/utils/exceptions/platform_exceptions.dart';
 
 class AuthenticationRepository extends GetxController {

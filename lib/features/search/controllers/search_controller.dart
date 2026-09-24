@@ -463,18 +463,44 @@ class AppSearchController extends GetxController {
     if (normalized.contains('how many') && normalized.contains('ct')) {
       return _teacherCtCount(codeMatch?.group(0));
     }
+    final asksMissedClass =
+        normalized.contains('did not attend') ||
+        normalized.contains("didn't attend") ||
+        normalized.contains('missed') ||
+        normalized.contains('absent');
+    if (asksMissedClass && !normalized.contains('ct')) {
+      final user = await _dataSource.getCurrentUser();
+      if (user == null) return <SearchResultModel>[];
+      final courses = await _dataSource.getAuthorizedCourses(
+        uid: user.uid,
+        role: 'teacher',
+      );
+      final filtered = codeMatch == null
+          ? courses
+          : courses
+                .where(
+                  (course) =>
+                      _normalizeCourseCode(course.courseCode) ==
+                      _normalizeCourseCode(codeMatch.group(0)!),
+                )
+                .toList();
+      return _searchTeacherAbsentees(
+        courses: filtered,
+        todayOnly: normalized.contains('today'),
+      );
+    }
     if ((normalized.contains('did not attend') ||
             normalized.contains('didn\'t attend') ||
-            normalized.contains('missed')) &&
+            normalized.contains('missed') ||
+            normalized.contains('absent')) &&
         normalized.contains('ct')) {
       final titleMatch = RegExp(
         r'ct\s*[- ]?\s*\d+',
         caseSensitive: false,
       ).firstMatch(text);
-      if (titleMatch == null) return null;
       return _teacherCtAbsentees(
         courseCode: codeMatch?.group(0),
-        ctTitle: titleMatch.group(0)!,
+        ctTitle: titleMatch?.group(0),
       );
     }
     return null;
@@ -542,7 +568,7 @@ class AppSearchController extends GetxController {
 
   Future<List<SearchResultModel>> _teacherCtAbsentees({
     required String? courseCode,
-    required String ctTitle,
+    required String? ctTitle,
   }) async {
     final user = await _dataSource.getCurrentUser();
     if (user == null) return [];
@@ -560,25 +586,35 @@ class AppSearchController extends GetxController {
     final output = <SearchResultModel>[];
     for (final course in matchingCourses) {
       final data = await _dataSource.getCtData(course.courseId);
-      final ct = data == null ? null : _findCtByTitle(data.cts.values, ctTitle);
-      if (ct == null) continue;
+      if (data == null) continue;
+      final selectedCt = ctTitle == null
+          ? null
+          : _findCtByTitle(data.cts.values, ctTitle);
+      final matchingCts = ctTitle == null
+          ? data.cts.values.where((ct) => ct.isPublished).toList()
+          : selectedCt == null
+          ? <CtModel>[]
+          : [selectedCt];
+      if (matchingCts.isEmpty) continue;
       final students = await _dataSource.getEnrolledStudents(course.courseId);
-      output.addAll(
-        students
-            .where(
-              (student) =>
-                  !ct.marks.containsKey(student.studentId) ||
-                  CtMark.isAbsent(ct.marks[student.studentId]),
-            )
-            .map(
-              (student) => SearchResultModel(
-                title: student.studentName,
-                subtitle: 'Did not attend ${ct.ctTitle}',
-                detail:
-                    'Student ID: ${student.studentCode} • Course Code: ${_displayCourseCode(course.courseCode)}',
-              ),
-            ),
-      );
+      for (final student in students) {
+        final absentCts = matchingCts.where(
+          (ct) =>
+              !ct.marks.containsKey(student.studentId) ||
+              CtMark.isAbsent(ct.marks[student.studentId]),
+        );
+        if (absentCts.isEmpty) continue;
+        output.add(
+          SearchResultModel(
+            title: student.studentName,
+            subtitle: ctTitle == null
+                ? 'Absent from ${absentCts.map((ct) => ct.ctTitle).join(', ')}'
+                : 'Did not attend ${absentCts.first.ctTitle}',
+            detail:
+                'Student ID: ${student.studentCode} • Course Code: ${_displayCourseCode(course.courseCode)}',
+          ),
+        );
+      }
     }
     return output;
   }
@@ -630,6 +666,13 @@ class AppSearchController extends GetxController {
       role: role,
     );
 
+    final intentResults = await _executeIntent(
+      request: request,
+      user: user,
+      courses: courses,
+    );
+    if (intentResults != null) return intentResults;
+
     switch (request.collection) {
       case SearchCollection.courses:
         return courses
@@ -658,6 +701,281 @@ class AppSearchController extends GetxController {
           'Searching users is not supported for this account',
         );
     }
+  }
+
+  Future<List<SearchResultModel>?> _executeIntent({
+    required SearchQueryModel request,
+    required UserModel user,
+    required List<CourseModel> courses,
+  }) async {
+    switch (request.intent) {
+      case 'ct_highest_mark':
+        return _searchHighestCtMarks(
+          user: user,
+          courses: _filterCourses(courses, request.filters),
+          request: request,
+        );
+      case 'attendance_absentees':
+        if (role != 'teacher') return [];
+        return _searchTeacherAbsentees(
+          courses: _filterCourses(courses, request.filters),
+          todayOnly: _hasTodayFilter(request.filters),
+        );
+      case 'ct_count':
+        return _teacherCtCountFromCourses(
+          courses: _filterCourses(courses, request.filters),
+        );
+      case 'ct_absentees':
+        if (role != 'teacher') return [];
+        return _teacherCtAbsenteesFromCourses(
+          courses: _filterCourses(courses, request.filters),
+          ctTitle: _filterValue(request.filters, 'ctTitle'),
+        );
+      case 'academic_summary':
+      case 'course_comparison':
+        return _academicCourseSummary(
+          user: user,
+          courses: _filterCourses(courses, request.filters),
+          descending: request.sortDirection != SearchSortDirection.asc,
+        );
+      case 'upcoming_cts':
+        return _upcomingCtResults(_filterCourses(courses, request.filters));
+      default:
+        return null;
+    }
+  }
+
+  Future<List<SearchResultModel>> _academicCourseSummary({
+    required UserModel user,
+    required List<CourseModel> courses,
+    required bool descending,
+  }) async {
+    if (role != 'student') return [];
+    final summaries = <({CourseModel course, double score, String detail})>[];
+    for (final course in courses) {
+      final attendance = await _dataSource.getStudentAttendance(
+        courseId: course.courseId,
+        studentUid: user.uid,
+        studentCode: user.studentId,
+      );
+      final attended = attendance
+          .where(
+            (record) =>
+                record['status'] == 'present' || record['status'] == 'late',
+          )
+          .length;
+      final attendancePercent = attendance.isEmpty
+          ? 0.0
+          : attended / attendance.length * 100;
+      final data = await _dataSource.getCtData(course.courseId);
+      final marks = data?.numericMarksFor(user.uid) ?? const <double>[];
+      final markAverage = marks.isEmpty
+          ? 0.0
+          : marks.reduce((a, b) => a + b) / marks.length;
+      final score = attendancePercent + markAverage * 5;
+      summaries.add((
+        course: course,
+        score: score,
+        detail:
+            '${attendancePercent.toStringAsFixed(1)}% attendance • ${markAverage.toStringAsFixed(1)} CT average',
+      ));
+    }
+    summaries.sort(
+      (a, b) =>
+          descending ? b.score.compareTo(a.score) : a.score.compareTo(b.score),
+    );
+    return summaries
+        .map(
+          (summary) => SearchResultModel(
+            title: summary.course.courseName,
+            subtitle: _displayCourseCode(summary.course.courseCode),
+            detail: summary.detail,
+          ),
+        )
+        .toList();
+  }
+
+  List<CourseModel> _filterCourses(
+    List<CourseModel> courses,
+    List<SearchFilterModel> filters,
+  ) => courses.where((course) => _courseMatches(course, filters)).toList();
+
+  String? _filterValue(List<SearchFilterModel> filters, String field) {
+    for (final filter in filters) {
+      if (filter.field == field && filter.operator == SearchOperator.equals) {
+        return filter.value?.toString();
+      }
+    }
+    return null;
+  }
+
+  bool _hasTodayFilter(List<SearchFilterModel> filters) {
+    final value = _filterValue(filters, 'date');
+    return value != null &&
+        _parseSearchDate(value)?.difference(DateTime.now()).inDays == 0;
+  }
+
+  Future<List<SearchResultModel>> _teacherCtCountFromCourses({
+    required List<CourseModel> courses,
+  }) async {
+    final output = <SearchResultModel>[];
+    for (final course in courses) {
+      final data = await _dataSource.getCtData(course.courseId);
+      if (data == null) continue;
+      final count = data.cts.values.where((ct) => ct.isPublished).length;
+      output.add(
+        SearchResultModel(
+          title: course.courseName,
+          subtitle: '$count CTs happened',
+          detail: _displayCourseCode(course.courseCode),
+        ),
+      );
+    }
+    return output;
+  }
+
+  Future<List<SearchResultModel>> _searchTeacherAbsentees({
+    required List<CourseModel> courses,
+    required bool todayOnly,
+  }) async {
+    final output = <SearchResultModel>[];
+    for (final course in courses) {
+      final students = await _dataSource.getEnrolledStudents(course.courseId);
+      final sessions = await _dataSource.getAttendanceSessions(course.courseId);
+      final selected = todayOnly
+          ? sessions.where((session) => session.date == _todayIso())
+          : sessions;
+      for (final student in students) {
+        final missed = selected.any(
+          (session) => session.records.any(
+            (record) =>
+                (record.studentId == student.studentId ||
+                    record.studentCode == student.studentCode) &&
+                record.status == 'absent',
+          ),
+        );
+        if (!missed) continue;
+        output.add(
+          SearchResultModel(
+            title: student.studentName,
+            subtitle: todayOnly
+                ? 'Missed today'
+                : 'Missed class • ${_displayCourseCode(course.courseCode)}',
+            detail:
+                'Student ID: ${student.studentCode} • Course Code: ${_displayCourseCode(course.courseCode)}',
+          ),
+        );
+      }
+    }
+    return output;
+  }
+
+  Future<List<SearchResultModel>> _teacherCtAbsenteesFromCourses({
+    required List<CourseModel> courses,
+    required String? ctTitle,
+  }) async {
+    final output = <SearchResultModel>[];
+    for (final course in courses) {
+      final data = await _dataSource.getCtData(course.courseId);
+      if (data == null) continue;
+      final cts = ctTitle == null
+          ? data.cts.values.where((ct) => ct.isPublished).toList()
+          : data.cts.values
+                .where(
+                  (ct) =>
+                      _normalizeCtTitle(ct.ctTitle) ==
+                      _normalizeCtTitle(ctTitle),
+                )
+                .toList();
+      if (cts.isEmpty) continue;
+      final students = await _dataSource.getEnrolledStudents(course.courseId);
+      for (final student in students) {
+        final absent = cts
+            .where(
+              (ct) =>
+                  !ct.marks.containsKey(student.studentId) ||
+                  CtMark.isAbsent(ct.marks[student.studentId]),
+            )
+            .toList();
+        if (absent.isEmpty) continue;
+        output.add(
+          SearchResultModel(
+            title: student.studentName,
+            subtitle:
+                'Absent from ${absent.map((ct) => ct.ctTitle).join(', ')}',
+            detail:
+                'Student ID: ${student.studentCode} • Course Code: ${_displayCourseCode(course.courseCode)}',
+          ),
+        );
+      }
+    }
+    return output;
+  }
+
+  Future<List<SearchResultModel>> _searchHighestCtMarks({
+    required UserModel user,
+    required List<CourseModel> courses,
+    required SearchQueryModel request,
+  }) async {
+    final output = <SearchResultModel>[];
+    for (final course in courses) {
+      final data = await _dataSource.getCtData(course.courseId);
+      if (data == null) continue;
+      final title = _filterValue(request.filters, 'ctTitle');
+      final cts = title == null
+          ? data.cts.values.where((ct) => ct.isPublished).toList()
+          : data.cts.values
+                .where(
+                  (ct) =>
+                      _normalizeCtTitle(ct.ctTitle) == _normalizeCtTitle(title),
+                )
+                .toList();
+      final marks = <String, double>{};
+      for (final ct in cts) {
+        for (final entry in ct.marks.entries) {
+          if (!CtMark.isAbsent(entry.value) &&
+              (!marks.containsKey(entry.key) ||
+                  entry.value > marks[entry.key]!)) {
+            marks[entry.key] = entry.value;
+          }
+        }
+      }
+      if (marks.isEmpty) continue;
+      if (role == 'student') {
+        final mark = marks[user.uid];
+        if (mark != null) {
+          output.add(
+            SearchResultModel(
+              title: course.courseName,
+              subtitle:
+                  'Your highest mark: ${mark.toStringAsFixed(1)} / ${data.fullMarks}',
+              detail: _displayCourseCode(course.courseCode),
+              highlightSubtitle: true,
+            ),
+          );
+        }
+        continue;
+      }
+      final students = await _dataSource.getEnrolledStudents(course.courseId);
+      final highest = marks.entries.reduce(
+        (a, b) => a.value >= b.value ? a : b,
+      );
+      final student = students.firstWhere(
+        (item) => item.studentId == highest.key,
+        orElse: () => students.first,
+      );
+      output.add(
+        SearchResultModel(
+          title: student.studentName,
+          subtitle:
+              'Highest mark: ${highest.value.toStringAsFixed(1)} / ${data.fullMarks}',
+          detail:
+              'Student ID: ${student.studentCode} • Course Code: ${_displayCourseCode(course.courseCode)}',
+          highlightSubtitle: true,
+        ),
+      );
+    }
+    return output;
   }
 
   Future<List<SearchResultModel>> _searchAttendance({

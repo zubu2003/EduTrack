@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
-import 'package:iconsax/iconsax.dart';
 
 class CtMarksSummary extends StatelessWidget {
   final double best3Total;
