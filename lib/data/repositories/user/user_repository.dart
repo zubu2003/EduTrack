@@ -181,4 +181,35 @@ class UserRepository extends GetxController {
       throw 'Error checking user: $e';
     }
   }
+
+  /// Check whether a student or teacher ID is already assigned to an account.
+  Future<bool> isIdNumberRegistered({
+    required String role,
+    required String idNumber,
+  }) async {
+    final normalizedId = idNumber.trim();
+    if (normalizedId.isEmpty) return false;
+
+    final field =
+        role == SRoles.student ? SUserFields.studentId : SUserFields.teacherId;
+
+    try {
+      final result = await _firestore
+          .collection(SCollections.users)
+          .where(field, isEqualTo: normalizedId)
+          .limit(1)
+          .get();
+      return result.docs.isNotEmpty;
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw 'This ID may already be registered, but Firestore permissions '
+            'prevented checking it. Contact the administrator to verify the ID.';
+      }
+      throw SFirebaseException(e.code).message;
+    } on PlatformException catch (e) {
+      throw SPlatformException(e.code).message;
+    } catch (e) {
+      throw 'Error checking ID: $e';
+    }
+  }
 }
