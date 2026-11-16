@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/authentication/controllers/login/login_controller.dart';
+import 'package:edutrack/routes/app_routes.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:edutrack/utils/constant/text_strings.dart';
@@ -95,7 +96,7 @@ class LoginFormSection extends StatelessWidget {
               ),
               // Forgot Password
               TextButton(
-                onPressed: controller.forgotPassword,
+                onPressed: () => Get.toNamed(AppRoutes.forgotPassword),
                 child: Text(
                   STextStrings.forgotPassword,
                   style: const TextStyle(
