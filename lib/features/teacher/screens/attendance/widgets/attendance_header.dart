@@ -8,14 +8,16 @@ class AttendanceHeader extends StatelessWidget {
   final String courseName;
   final String date;
   final bool isEditing;
-  final VoidCallback onMarkAllPresent;
+  final bool areAllStudentsPresent;
+  final VoidCallback onToggleMarkAll;
 
   const AttendanceHeader({
     super.key,
     required this.courseCode,
     required this.courseName,
     required this.date,
-    required this.onMarkAllPresent,
+    required this.areAllStudentsPresent,
+    required this.onToggleMarkAll,
     this.isEditing = false,
   });
 
@@ -115,12 +117,11 @@ class AttendanceHeader extends StatelessWidget {
 
           const SizedBox(height: SSize.sm),
 
-          // Mark All Present Button
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: onMarkAllPresent,
+                onPressed: onToggleMarkAll,
                 style: TextButton.styleFrom(
                   backgroundColor: SColors.white.withOpacity(0.1),
                   padding: const EdgeInsets.symmetric(
@@ -135,13 +136,17 @@ class AttendanceHeader extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Iconsax.tick_circle,
+                      areAllStudentsPresent
+                          ? Iconsax.close_circle
+                          : Iconsax.tick_circle,
                       color: SColors.white,
                       size: SSize.iconSm,
                     ),
                     const SizedBox(width: SSize.xs),
                     Text(
-                      'Mark All Present',
+                      areAllStudentsPresent
+                          ? 'Mark All Absent'
+                          : 'Mark All Present',
                       style: TextStyle(
                         color: SColors.white,
                         fontSize: SSize.fontSizeSm,

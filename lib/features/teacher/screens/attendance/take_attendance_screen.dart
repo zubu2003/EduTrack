@@ -41,13 +41,16 @@ class TakeAttendanceScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Obx(() => AttendanceHeader(
-                courseCode: course.courseCode,
-                courseName: course.courseName,
-                date: controller.displayDate,
-                isEditing: controller.isEditing,
-                onMarkAllPresent: controller.markAllPresent,
-              )),
+          Obx(() {
+            return AttendanceHeader(
+              courseCode: course.courseCode,
+              courseName: course.courseName,
+              date: controller.displayDate,
+              isEditing: controller.isEditing,
+              areAllStudentsPresent: controller.areAllStudentsPresent,
+              onToggleMarkAll: controller.toggleMarkAllAttendance,
+            );
+          }),
           const SizedBox(height: SSize.spaceBtwItems),
           Expanded(
             child: Obx(() {

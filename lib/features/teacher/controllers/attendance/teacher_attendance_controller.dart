@@ -30,6 +30,12 @@ class TeacherAttendanceController extends GetxController {
 
   bool get isEditing => currentSession.value != null;
 
+  bool get areAllStudentsPresent =>
+      enrolledStudents.isNotEmpty &&
+      enrolledStudents.every(
+        (student) => attendanceMap[student.studentId] == 'present',
+      );
+
   String get sessionDateIso =>
       currentSession.value?.date ?? session?.date ?? _todayISO();
 
@@ -132,6 +138,14 @@ class TeacherAttendanceController extends GetxController {
       attendanceMap[s.studentId] = 'absent';
     }
     attendanceMap.refresh();
+  }
+
+  void toggleMarkAllAttendance() {
+    if (areAllStudentsPresent) {
+      markAllAbsent();
+    } else {
+      markAllPresent();
+    }
   }
 
   int get presentCount =>
