@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-import 'package:excel/excel.dart';
+import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
 
 /// Result of parsing an Excel file
@@ -25,11 +25,6 @@ class ExcelService {
   static final ExcelService instance = ExcelService._();
   ExcelService._();
 
-  /// Parse Excel bytes → structured data
-  ///
-  /// Expected columns:
-  ///   Column A (index 0): Student ID or Roll
-  ///   Columns B+ : CT-1, CT-2, ... , Total (optional)
   ParsedExcelData parseCtMarks(Uint8List fileBytes) {
     final errors = <String>[];
     final ctColumns = <String>[];
@@ -38,8 +33,8 @@ class ExcelService {
     int totalRows = 0;
 
     try {
-      final excel = Excel.decodeBytes(fileBytes);
-      if (excel.tables.isEmpty) {
+      final decoder = SpreadsheetDecoder.decodeBytes(fileBytes, update: false);
+      if (decoder.tables.isEmpty) {
         return ParsedExcelData(
           ctColumns: [],
           marksByCt: {},
@@ -50,8 +45,8 @@ class ExcelService {
       }
 
       // Get first sheet
-      final sheetName = excel.tables.keys.first;
-      final sheet = excel.tables[sheetName]!;
+      final sheetName = decoder.tables.keys.first;
+      final sheet = decoder.tables[sheetName]!;
 
       if (sheet.maxRows < 2) {
         return ParsedExcelData(
@@ -75,28 +70,41 @@ class ExcelService {
         );
       }
 
-      // Detect CT columns and Total column
       int idColumnIndex = 0;
       int? totalColumnIndex;
+      final Map<int, String> ctColMap = {};
 
-      for (int col = 1; col < headerRow.length; col++) {
-        final cell = headerRow[col];
-        if (cell == null) continue;
-
-        final headerText = cell.value.toString().trim();
+      for (int col = 0; col < headerRow.length; col++) {
+        final headerText = _extractValueString(headerRow[col]);
         if (headerText.isEmpty) continue;
 
         final lowerHeader = headerText.toLowerCase();
+
+        // Detect ID/Roll column dynamically (defaults to 0)
+        if (lowerHeader == 'id' ||
+            lowerHeader.contains('student id') ||
+            lowerHeader.contains('roll')) {
+          idColumnIndex = col;
+          continue;
+        }
+
+        // Safely ignore Name or Serial columns
+        if (lowerHeader == 'name' ||
+            lowerHeader.contains('student name') ||
+            lowerHeader == 'sl' ||
+            lowerHeader == 's/n') {
+          continue;
+        }
 
         if (lowerHeader.contains('total') || lowerHeader.contains('best')) {
           totalColumnIndex = col;
         } else if (lowerHeader.contains('ct') ||
             RegExp(r'\d+').hasMatch(lowerHeader)) {
-          // Normalize CT name: "ct 1" → "CT-1"
           final normalized = _normalizeCtName(headerText);
-          ctColumns.add(normalized);
-
-          // Initialize marks map for this CT
+          if (!ctColumns.contains(normalized)) {
+            ctColumns.add(normalized);
+          }
+          ctColMap[col] = normalized;
           marksByCt[normalized] = {};
         }
       }
@@ -116,29 +124,20 @@ class ExcelService {
         final row = sheet.rows[rowIdx];
         if (row.isEmpty) continue;
 
-        // Read student ID from column A
-        final idCell = row.isNotEmpty ? row[idColumnIndex] : null;
-        if (idCell == null || idCell.value == null) continue;
-
-        final studentId = idCell.value.toString().trim();
+        final studentId = row.length > idColumnIndex
+            ? _extractValueString(row[idColumnIndex])
+            : '';
         if (studentId.isEmpty) continue;
 
         totalRows++;
 
-        // Read CT marks
-        int ctColCounter = 0;
-        for (int col = 1; col < headerRow.length; col++) {
-          final cell = row.length > col ? row[col] : null;
-          if (cell == null || cell.value == null) continue;
+        // Iterate strictly over mapped CT column indices
+        for (final entry in ctColMap.entries) {
+          final colIdx = entry.key;
+          final ctName = entry.value;
 
-          // Skip Total column here
-          if (col == totalColumnIndex) continue;
-
-          // Only process columns we identified as CTs
-          if (ctColCounter >= ctColumns.length) break;
-
-          final ctName = ctColumns[ctColCounter];
-          final valueStr = cell.value.toString().trim();
+          if (row.length <= colIdx) continue;
+          final valueStr = _extractValueString(row[colIdx]);
 
           if (valueStr.isNotEmpty) {
             if (CtMark.isAbsentText(valueStr)) {
@@ -153,17 +152,11 @@ class ExcelService {
               }
             }
           }
-
-          ctColCounter++;
         }
 
         // Read Total column (if present)
-        if (totalColumnIndex != null &&
-            row.length > totalColumnIndex &&
-            row[totalColumnIndex] != null &&
-            row[totalColumnIndex]!.value != null) {
-          final totalStr =
-          row[totalColumnIndex]!.value.toString().trim();
+        if (totalColumnIndex != null && row.length > totalColumnIndex) {
+          final totalStr = _extractValueString(row[totalColumnIndex]);
           if (totalStr.isNotEmpty) {
             final total = double.tryParse(totalStr);
             if (total != null) {
@@ -172,7 +165,9 @@ class ExcelService {
           }
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('EXCEL ERROR: $e');
+      print('STACK TRACE: $stackTrace');
       errors.add('Failed to parse Excel: $e');
     }
 
@@ -185,13 +180,21 @@ class ExcelService {
     );
   }
 
-  /// Normalize CT header → canonical form
-  /// "CT 1" → "CT-1"
-  /// "ct-2" → "CT-2"
-  /// "CT-3" → "CT-3"
+  /// Safely extracts clean text from raw cell values
+  String _extractValueString(dynamic val) {
+    if (val == null) return '';
+    if (val is num) {
+      // Remove trailing .0 for whole numbers (e.g. 2204001.0 -> 2204001)
+      return val == val.toInt() ? val.toInt().toString() : val.toString();
+    }
+    final str = val.toString().trim();
+    if (str.endsWith('.0')) return str.substring(0, str.length - 2);
+    return str;
+  }
+
+  /// Normalize CT header -> canonical form
   String _normalizeCtName(String raw) {
     final cleaned = raw.toUpperCase().replaceAll(' ', '-').trim();
-    // Ensure format CT-X
     final match = RegExp(r'CT-?(\d+)').firstMatch(cleaned);
     if (match != null) {
       return 'CT-${match.group(1)}';
