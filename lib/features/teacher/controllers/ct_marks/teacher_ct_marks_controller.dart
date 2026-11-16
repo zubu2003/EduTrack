@@ -84,6 +84,9 @@ class TeacherCtMarksController extends GetxController {
 
       // Parse
       final parsed = ExcelService.instance.parseCtMarks(file.bytes!);
+      debugPrint('PARSE ERRORS: ${parsed.errors}');
+debugPrint('CT COLUMNS: ${parsed.ctColumns}');
+debugPrint('TOTAL ROWS: ${parsed.totalRows}');
       parsedData.value = parsed;
 
       // Prepare editable maps

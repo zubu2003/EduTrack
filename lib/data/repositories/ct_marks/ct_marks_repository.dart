@@ -31,7 +31,7 @@ class CtMarksRepository extends GetxController {
   }
 
   /// Merge parsed Excel data into Firestore.
-  /// Converts studentCode → Firebase UID before saving.
+  /// Converts studentCode -> Firebase UID before saving.
   Future<void> mergeExcelData({
     required String courseId,
     required Map<String, Map<String, double>> marksByCt,
@@ -39,6 +39,7 @@ class CtMarksRepository extends GetxController {
     required double fullMarks,
     int bestOfCount = 3,
     int totalCTs = 4,
+    String status = 'published',
   }) async {
     try {
       final enrollmentsSnapshot = await _firestore
@@ -48,33 +49,100 @@ class CtMarksRepository extends GetxController {
           .get();
 
       final codeToUid = <String, String>{};
+      final validUids = <String>{};
+      final uidsMissingCode = <String>[];
+
       for (final doc in enrollmentsSnapshot.docs) {
         final data = doc.data();
-        final studentCode = (data['studentCode'] ?? '').toString();
-        final studentId = (data['studentId'] ?? '').toString();
-        if (studentCode.isNotEmpty && studentId.isNotEmpty) {
-          codeToUid[studentCode] = studentId;
+        final studentId =
+            (data['studentId'] ?? data['uid'] ?? doc.id).toString().trim();
+
+        if (studentId.isNotEmpty) {
+          validUids.add(studentId);
+          final studentCode =
+              (data['studentCode'] ?? '').toString().trim();
+          final roll = (data['roll'] ?? '').toString().trim();
+          final studentRoll = (data['studentRoll'] ?? '').toString().trim();
+          final codes = [studentCode, roll, studentRoll];
+
+          for (final code in codes) {
+            if (code.isEmpty) continue;
+
+            codeToUid[code.toLowerCase()] = studentId;
+          }
+
+          if (roll.isNotEmpty) {
+            final numericRoll = int.tryParse(roll);
+            if (numericRoll != null) {
+              codeToUid[numericRoll.toString()] = studentId;
+            }
+          }
+          if (codes.every((code) => code.isEmpty)) {
+            uidsMissingCode.add(studentId);
+          }
         }
       }
 
+      // Fallback: if enrollment docs didn't store studentCode/roll, fetch from users collection
+      if (uidsMissingCode.isNotEmpty) {
+        for (final uid in uidsMissingCode) {
+          final userDoc = await _firestore.collection('users').doc(uid).get();
+          final uData = userDoc.data();
+          if (uData != null) {
+            for (final value in [
+              uData['studentCode'],
+              uData['roll'],
+              uData['studentId'],
+            ]) {
+              final code = (value ?? '').toString().trim();
+              if (code.isNotEmpty) {
+                codeToUid[code.toLowerCase()] = uid;
+              }
+            }
+          }
+        }
+      }
+
+      print(
+          '🔵 [CT] Loaded ${enrollmentsSnapshot.docs.length} enrollments, ${codeToUid.length} code->uid mappings');
+
+      String? resolveUid(String rawCode) {
+        final clean = rawCode.trim();
+        if (validUids.contains(clean)) return clean; // Already a UID
+        return codeToUid[clean.toLowerCase()];
+      }
+
       final uidMarksByCt = <String, Map<String, double>>{};
+      final unmatchedCodes = <String>{};
+
       for (final entry in marksByCt.entries) {
         final uidMarks = <String, double>{};
         entry.value.forEach((code, mark) {
-          final uid = codeToUid[code];
-          if (uid != null) uidMarks[uid] = mark;
+          final uid = resolveUid(code);
+          if (uid != null) {
+            uidMarks[uid] = mark;
+          } else {
+            unmatchedCodes.add(code);
+          }
         });
         uidMarksByCt[entry.key] = uidMarks;
       }
 
+      if (unmatchedCodes.isNotEmpty) {
+        final examples = unmatchedCodes.take(5).join(', ');
+        throw StateError(
+          'Could not match ${unmatchedCodes.length} Excel student ID(s) '
+          'to this course. Check the enrollment IDs. Unmatched: $examples',
+        );
+      }
+
       final uidTotals = <String, double>{};
       totals.forEach((code, total) {
-        final uid = codeToUid[code];
+        final uid = resolveUid(code);
         if (uid != null) uidTotals[uid] = total;
       });
 
       final existing = await getCtData(courseId) ?? CtDataModel.empty();
-
       final mergedCts = Map<String, CtModel>.from(existing.cts);
 
       for (final entry in uidMarksByCt.entries) {
@@ -87,13 +155,14 @@ class CtMarksRepository extends GetxController {
           newMarks.forEach((uid, mark) => mergedMarks[uid] = mark);
           mergedCts[ctTitle] = oldCt.copyWith(
             marks: mergedMarks,
+            status: status,
             updatedAt: DateTime.now(),
           );
         } else {
           mergedCts[ctTitle] = CtModel(
             ctTitle: ctTitle,
             date: _todayISO(),
-            status: 'draft',
+            status: status,
             marks: newMarks,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
