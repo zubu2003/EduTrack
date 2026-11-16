@@ -89,6 +89,22 @@ class SignUpController extends GetxController {
         return;
       }
 
+      final accountId = idNumber.text.trim();
+      if (accountId.isNotEmpty &&
+          await UserRepository.instance.isIdNumberRegistered(
+            role: selectedRole.value,
+            idNumber: accountId,
+          )) {
+        SFullScreenLoader.stopLoading();
+        final accountType =
+            selectedRole.value == SRoles.student ? 'Student' : 'Teacher';
+        SSnackBarHelpers.errorSnackBar(
+          title: 'Duplicate ID',
+          message: '$accountType ID already exists. Please use a different ID.',
+        );
+        return;
+      }
+
       // Step 1: Firebase Auth
       final userCredential = await AuthenticationRepository.instance
           .registerUser(email.text.trim(), password.text.trim());
