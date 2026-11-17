@@ -10,15 +10,25 @@ class SKeys {
   static const String studentEmailPattern = '@student.';
 
   // Google Sign-In
-  static const String googleWebClientId =
-      '460723661177-b831lnoh4kgmc2rm8s8tltihhasdu63s.apps.googleusercontent.com';
+  static const String googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+    defaultValue:
+        '460723661177-b831lnoh4kgmc2rm8s8tltihhasdu63s.apps.googleusercontent.com',
+  );
 
-
-  //Cloudinary Keys
-  static const String cloudname = 'dvhlep9ov';
-  static const String apiKey = '723351754777293';
-  static const String apiSecret = 'O4G_X5_SyVmMQm7vbz4liXrlkeY';
-  static const String uploadPreset = 'edutrack';
+  // Cloudinary Keys
+  static const String cloudname = String.fromEnvironment(
+    'CLOUDINARY_CLOUD_NAME',
+  );
+  static const String apiKey = String.fromEnvironment(
+    'CLOUDINARY_API_KEY',
+  );
+  static const String apiSecret = String.fromEnvironment(
+    'CLOUDINARY_API_SECRET',
+  );
+  static const String uploadPreset = String.fromEnvironment(
+    'CLOUDINARY_UPLOAD_PRESET',
+  );
 
   //Cloudinary Folders
   static const String studentProfileFolder = 'edutrack/student_profiles';
