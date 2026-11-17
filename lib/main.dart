@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:edutrack/data/repositories/authentication_repository.dart';
-import 'App.dart';
+import 'app.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   // Widgets Flutter Binding
-  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   // Get Storage Initialization
   await GetStorage.init();

@@ -103,7 +103,7 @@ class StudentCtMarksScreen extends StatelessWidget {
                       isAbsent: controller.isAbsentForCt(ctTitle),
                     ),
                   );
-                }).toList(),
+                }),
 
                 const SizedBox(height: SSize.spaceBtwSections),
               ],
@@ -125,7 +125,7 @@ class StudentCtMarksScreen extends StatelessWidget {
             Icon(
               Iconsax.document_text,
               size: 80,
-              color: SColors.primary.withOpacity(0.3),
+              color: SColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(

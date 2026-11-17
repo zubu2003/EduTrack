@@ -138,7 +138,7 @@ class LoginFormSection extends StatelessWidget {
           // OR Divider
           Row(
             children: [
-              Expanded(child: Divider(color: SColors.grey.withOpacity(0.3))),
+              Expanded(child: Divider(color: SColors.grey.withValues(alpha: 0.3))),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: SSize.sm),
                 child: Text(
@@ -149,7 +149,7 @@ class LoginFormSection extends StatelessWidget {
                   ),
                 ),
               ),
-              Expanded(child: Divider(color: SColors.grey.withOpacity(0.3))),
+              Expanded(child: Divider(color: SColors.grey.withValues(alpha: 0.3))),
             ],
           ),
 
@@ -162,7 +162,7 @@ class LoginFormSection extends StatelessWidget {
             child: OutlinedButton(
               onPressed: controller.googleSignIn,
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: SColors.grey.withOpacity(0.3)),
+                side: BorderSide(color: SColors.grey.withValues(alpha: 0.3)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                 ),
@@ -174,7 +174,7 @@ class LoginFormSection extends StatelessWidget {
                     'assets/logos/google_logo.png',
                     height: 24,
                     width: 24,
-                    errorBuilder: (_, __, ___) =>
+                    errorBuilder: (_, _, _) =>
                     const Icon(Icons.g_mobiledata, size: 28),
                   ),
                   const SizedBox(width: SSize.sm),

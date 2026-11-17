@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'widgets/forgot_password_header.dart';
@@ -36,7 +36,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(SSize.cardRadius),
                   boxShadow: [
                     BoxShadow(
-                      color: SColors.black.withOpacity(0.05),
+                      color: SColors.black.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),

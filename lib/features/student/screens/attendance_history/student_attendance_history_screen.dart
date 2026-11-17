@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
@@ -119,7 +119,7 @@ class StudentAttendanceHistoryScreen extends StatelessWidget {
             Icon(
               Iconsax.calendar_remove,
               size: 80,
-              color: SColors.primary.withOpacity(0.3),
+              color: SColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(

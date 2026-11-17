@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/teacher/controllers/dashboard/teacher_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -44,10 +44,10 @@ class TeacherStatsRow extends StatelessWidget {
                 margin: const EdgeInsets.only(right: SSize.sm),
                 padding: const EdgeInsets.all(SSize.sm),
                 decoration: BoxDecoration(
-                  color: (stat['color'] as Color).withOpacity(0.08),
+                  color: (stat['color'] as Color).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(SSize.cardRadius),
                   border: Border.all(
-                    color: (stat['color'] as Color).withOpacity(0.15),
+                    color: (stat['color'] as Color).withValues(alpha: 0.15),
                     width: 1,
                   ),
                 ),

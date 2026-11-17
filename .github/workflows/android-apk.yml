@@ -1,75 +1,70 @@
-name: Android APK
+
+name: Flutter CI/CD
 
 on:
-  push:
   pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+  push:
+    branches:
+      - main
+
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  analyze:
+  flutter-ci:
+    name: Flutter CI
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      # 1. Get source code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      # 2. Setup Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # 3. Setup Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.41.1'
           channel: stable
           cache: true
 
+      # 4. Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Analyze
+      # 5. Analyze code
+      - name: Flutter Analyze
         run: flutter analyze
 
-  build-apk:
-    runs-on: ubuntu-latest
+      # 6. Run tests
+      - name: Flutter Tests
+        run: flutter test
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build debug APK
+      # 7. Build APK
+      - name: Build Android APK
         run: flutter build apk --debug
 
-      - name: Upload APK
+      # 8. Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: edutrack-android-apk
+          name: flutter-apk-${{ github.run_number }}
           path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
           if-no-files-found: error
-          retention-days: 14
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run tests
-        run: flutter test

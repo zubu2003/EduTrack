@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -38,14 +38,14 @@ class RoutineDayTabs extends StatelessWidget {
                     boxShadow: isSelected
                         ? [
                       BoxShadow(
-                        color: SColors.primary.withOpacity(0.3),
+                        color: SColors.primary.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
                     ]
                         : [
                       BoxShadow(
-                        color: SColors.black.withOpacity(0.04),
+                        color: SColors.black.withValues(alpha: 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

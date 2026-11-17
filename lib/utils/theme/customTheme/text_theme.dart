@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../constant/colors.dart';
 
@@ -16,11 +16,11 @@ class STextTheme {
 
     bodyLarge: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: SColors.dark),
     bodyMedium: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: SColors.dark),
-    bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: SColors.dark.withOpacity(0.6)),
+    bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: SColors.dark.withValues(alpha: 0.6)),
 
     labelLarge: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: SColors.dark),
     labelMedium: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: SColors.dark),
-    labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: SColors.dark.withOpacity(0.5)),
+    labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: SColors.dark.withValues(alpha: 0.5)),
   );
 
   static TextTheme darkTextTheme = TextTheme(
@@ -34,10 +34,10 @@ class STextTheme {
 
     bodyLarge: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: SColors.light),
     bodyMedium: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: SColors.light),
-    bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: SColors.light.withOpacity(0.6)),
+    bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: SColors.light.withValues(alpha: 0.6)),
 
     labelLarge: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: SColors.light),
     labelMedium: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: SColors.light),
-    labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: SColors.light.withOpacity(0.5)),
+    labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w400, color: SColors.light.withValues(alpha: 0.5)),
   );
 }

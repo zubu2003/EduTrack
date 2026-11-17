@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
@@ -103,7 +104,7 @@ class CtMarksRepository extends GetxController {
         }
       }
 
-      print(
+      debugPrint(
           '🔵 [CT] Loaded ${enrollmentsSnapshot.docs.length} enrollments, ${codeToUid.length} code->uid mappings');
 
       String? resolveUid(String rawCode) {

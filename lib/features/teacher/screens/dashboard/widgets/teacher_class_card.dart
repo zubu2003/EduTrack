@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -42,20 +42,20 @@ class TeacherClassCard extends StatelessWidget {
             width: 1.5,
           )
               : Border.all(
-            color: SColors.grey.withOpacity(0.15),
+            color: SColors.grey.withValues(alpha: 0.15),
             width: 1,
           ),
           boxShadow: isOngoing
               ? [
             BoxShadow(
-              color: statusColor.withOpacity(0.15),
+              color: statusColor.withValues(alpha: 0.15),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ]
               : [
             BoxShadow(
-              color: SColors.black.withOpacity(0.04),
+              color: SColors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -180,12 +180,12 @@ class TeacherClassCard extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color:
-                isOngoing ? statusColor : statusColor.withOpacity(0.08),
+                isOngoing ? statusColor : statusColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                 border: isOngoing
                     ? null
                     : Border.all(
-                  color: statusColor.withOpacity(0.2),
+                  color: statusColor.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),

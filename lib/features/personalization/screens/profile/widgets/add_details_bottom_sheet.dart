@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/personalization/controllers/profile_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -56,7 +56,7 @@ class AddDetailsBottomSheet extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: SColors.grey.withOpacity(0.3),
+                        color: SColors.grey.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -81,7 +81,7 @@ class AddDetailsBottomSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: SSize.spaceBtwItems),
 
-                  Divider(color: SColors.grey.withOpacity(0.2), height: 1),
+                  Divider(color: SColors.grey.withValues(alpha: 0.2), height: 1),
                   const SizedBox(height: SSize.spaceBtwItems),
 
                   // ✅ Show only EMPTY fields
@@ -253,7 +253,7 @@ class AddDetailsBottomSheet extends StatelessWidget {
           controller: controller,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: SColors.grey.withOpacity(0.5)),
+            hintStyle: TextStyle(color: SColors.grey.withValues(alpha: 0.5)),
             prefixIcon: Icon(icon, color: SColors.grey),
             filled: true,
             fillColor: SColors.inputFieldBackground,

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/teacher/controllers/dashboard/teacher_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -47,7 +47,7 @@ class TeacherDashboardHeader extends StatelessWidget {
                   vertical: SSize.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: SColors.primary.withOpacity(0.08),
+                  color: SColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                 ),
                 child: Text(

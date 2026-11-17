@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -11,7 +11,7 @@ class SFullScreenLoader {
       PopScope(
         canPop: false,
         child: Container(
-          color: SColors.textPrimary.withOpacity(0.6),
+          color: SColors.textPrimary.withValues(alpha: 0.6),
           width: double.infinity,
           height: double.infinity,
           child: Center(
@@ -27,7 +27,7 @@ class SFullScreenLoader {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: SColors.black.withOpacity(0.1),
+                    color: SColors.black.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),

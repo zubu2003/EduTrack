@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -34,7 +34,7 @@ class CourseDetailsHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.1),
+            color: SColors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -49,7 +49,7 @@ class CourseDetailsHeader extends StatelessWidget {
               Text(
                 courseCode,
                 style: TextStyle(
-                  color: SColors.white.withOpacity(0.7),
+                  color: SColors.white.withValues(alpha: 0.7),
                   fontSize: SSize.fontSizeMd,
                   fontWeight: FontWeight.w500,
                 ),
@@ -61,7 +61,7 @@ class CourseDetailsHeader extends StatelessWidget {
                   vertical: SSize.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: SColors.white.withOpacity(0.15),
+                  color: SColors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                 ),
                 child: Text(
@@ -93,14 +93,14 @@ class CourseDetailsHeader extends StatelessWidget {
             children: [
               Icon(
                 Iconsax.people,
-                color: SColors.white.withOpacity(0.7),
+                color: SColors.white.withValues(alpha: 0.7),
                 size: SSize.iconSm,
               ),
               const SizedBox(width: SSize.xs),
               Text(
                 '$students Students Enrolled',
                 style: TextStyle(
-                  color: SColors.white.withOpacity(0.7),
+                  color: SColors.white.withValues(alpha: 0.7),
                   fontSize: SSize.fontSizeMd,
                 ),
               ),

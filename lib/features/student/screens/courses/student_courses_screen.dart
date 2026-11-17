@@ -1,4 +1,4 @@
-import 'package:edutrack/features/student/screens/courses/widgets/course_card.dart';
+﻿import 'package:edutrack/features/student/screens/courses/widgets/course_card.dart';
 import 'package:edutrack/features/student/screens/courses/widgets/courses_header.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -98,7 +98,7 @@ class StudentCoursesScreen extends StatelessWidget {
             Icon(
               Iconsax.book,
               size: 80,
-              color: SColors.primary.withOpacity(0.3),
+              color: SColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(

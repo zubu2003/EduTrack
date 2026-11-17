@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/data/repositories/attendance/attendance_repository.dart';
@@ -106,7 +106,7 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                               vertical: SSize.xs,
                             ),
                             decoration: BoxDecoration(
-                              color: SColors.primary.withOpacity(0.1),
+                              color: SColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(
                                 SSize.borderRadiusSm,
                               ),
@@ -140,8 +140,8 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: ct!.isPublished
-                              ? SColors.success.withOpacity(0.1)
-                              : SColors.warning.withOpacity(0.1),
+                              ? SColors.success.withValues(alpha: 0.1)
+                              : SColors.warning.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             SSize.borderRadiusSm,
                           ),
@@ -207,7 +207,7 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                     borderRadius: BorderRadius.circular(SSize.borderRadiusLg),
                     boxShadow: [
                       BoxShadow(
-                        color: SColors.black.withOpacity(0.04),
+                        color: SColors.black.withValues(alpha: 0.04),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -254,7 +254,7 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
                             SSize.borderRadiusSm,
                           ),
                           border: Border.all(
-                            color: SColors.primary.withOpacity(0.15),
+                            color: SColors.primary.withValues(alpha: 0.15),
                             width: 1,
                           ),
                         ),
@@ -311,7 +311,7 @@ class _CtDetailsScreenState extends State<CtDetailsScreen> {
               color: SColors.white,
               boxShadow: [
                 BoxShadow(
-                  color: SColors.black.withOpacity(0.05),
+                  color: SColors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -4),
                 ),

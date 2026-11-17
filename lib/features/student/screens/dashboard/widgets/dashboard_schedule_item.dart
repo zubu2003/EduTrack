@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -31,8 +31,8 @@ class DashboardScheduleItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: SSize.sm),
             decoration: BoxDecoration(
               color: isNoClass
-                  ? SColors.grey.withOpacity(0.1)
-                  : SColors.primary.withOpacity(0.1),
+                  ? SColors.grey.withValues(alpha: 0.1)
+                  : SColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
             ),
             child: Text(
@@ -54,20 +54,20 @@ class DashboardScheduleItem extends StatelessWidget {
               padding: const EdgeInsets.all(SSize.sm),
               decoration: BoxDecoration(
                 color: isNoClass
-                    ? SColors.grey.withOpacity(0.05)
+                    ? SColors.grey.withValues(alpha: 0.05)
                     : SColors.white,
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                 border: Border.all(
                   color: isNoClass
-                      ? SColors.grey.withOpacity(0.2)
-                      : SColors.primary.withOpacity(0.15),
+                      ? SColors.grey.withValues(alpha: 0.2)
+                      : SColors.primary.withValues(alpha: 0.15),
                   width: 1,
                 ),
                 boxShadow: isNoClass
                     ? null
                     : [
                   BoxShadow(
-                    color: SColors.black.withOpacity(0.04),
+                    color: SColors.black.withValues(alpha: 0.04),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),

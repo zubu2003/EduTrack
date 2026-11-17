@@ -1,4 +1,4 @@
-import 'package:edutrack/features/authentication/screens/sign_up/widget/sign_up_footer.dart';
+﻿import 'package:edutrack/features/authentication/screens/sign_up/widget/sign_up_footer.dart';
 import 'package:edutrack/features/authentication/screens/sign_up/widget/sign_up_form_section.dart';
 import 'package:edutrack/features/authentication/screens/sign_up/widget/sign_up_header.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,7 @@ class SignUpScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(SSize.cardRadius),
                   boxShadow: [
                     BoxShadow(
-                      color: SColors.black.withOpacity(0.05),
+                      color: SColors.black.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -38,7 +38,7 @@ class AttendanceHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.1),
+            color: SColors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -52,7 +52,7 @@ class AttendanceHeader extends StatelessWidget {
           Text(
             courseCode,
             style: TextStyle(
-              color: SColors.white.withOpacity(0.7),
+              color: SColors.white.withValues(alpha: 0.7),
               fontSize: SSize.fontSizeMd,
               fontWeight: FontWeight.w500,
             ),
@@ -78,14 +78,14 @@ class AttendanceHeader extends StatelessWidget {
                 children: [
                   Icon(
                     Iconsax.calendar,
-                    color: SColors.white.withOpacity(0.7),
+                    color: SColors.white.withValues(alpha: 0.7),
                     size: SSize.iconSm,
                   ),
                   const SizedBox(width: SSize.xs),
                   Text(
                     date,
                     style: TextStyle(
-                      color: SColors.white.withOpacity(0.7),
+                      color: SColors.white.withValues(alpha: 0.7),
                       fontSize: SSize.fontSizeMd,
                     ),
                   ),
@@ -98,9 +98,9 @@ class AttendanceHeader extends StatelessWidget {
                     vertical: SSize.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
+                    color: Colors.amber.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
-                    border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                    border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
                   ),
                   child: const Text(
                     'EDITING',
@@ -123,7 +123,7 @@ class AttendanceHeader extends StatelessWidget {
               TextButton(
                 onPressed: onToggleMarkAll,
                 style: TextButton.styleFrom(
-                  backgroundColor: SColors.white.withOpacity(0.1),
+                  backgroundColor: SColors.white.withValues(alpha: 0.1),
                   padding: const EdgeInsets.symmetric(
                     horizontal: SSize.md,
                     vertical: SSize.xs,

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -32,13 +32,13 @@ class AttendanceSessionItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.04),
+            color: SColors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
         border: Border.all(
-          color: badgeColor.withOpacity(0.1),
+          color: badgeColor.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -51,7 +51,7 @@ class AttendanceSessionItem extends StatelessWidget {
               vertical: SSize.xs,
             ),
             decoration: BoxDecoration(
-              color: SColors.grey.withOpacity(0.1),
+              color: SColors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
             ),
             child: Text(
@@ -84,7 +84,7 @@ class AttendanceSessionItem extends StatelessWidget {
               vertical: SSize.xs,
             ),
             decoration: BoxDecoration(
-              color: badgeColor.withOpacity(0.1),
+              color: badgeColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
             ),
             child: Text(

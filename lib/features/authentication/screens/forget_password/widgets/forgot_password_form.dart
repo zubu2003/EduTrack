@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/authentication/controllers/forgot_password/forgot_password_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -24,7 +24,7 @@ class ForgotPasswordForm extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'name@university.edu',
               hintStyle: TextStyle(
-                color: SColors.textSecondary.withOpacity(0.7),
+                color: SColors.textSecondary.withValues(alpha: 0.7),
               ),
               prefixIcon: const Icon(Iconsax.sms, color: SColors.grey),
               filled: true,
