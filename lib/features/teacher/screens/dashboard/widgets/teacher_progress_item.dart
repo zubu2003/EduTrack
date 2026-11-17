@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -24,7 +24,7 @@ class TeacherProgressItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.04),
+            color: SColors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -37,7 +37,7 @@ class TeacherProgressItem extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: SColors.primary.withOpacity(0.08),
+              color: SColors.primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
             ),
             child: Icon(
@@ -69,7 +69,7 @@ class TeacherProgressItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                         child: LinearProgressIndicator(
                           value: value,
-                          backgroundColor: SColors.grey.withOpacity(0.15),
+                          backgroundColor: SColors.grey.withValues(alpha: 0.15),
                           color: SColors.primary,
                           minHeight: 6,
                         ),

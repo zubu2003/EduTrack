@@ -42,17 +42,6 @@ class AttendanceHistoryScreen extends StatelessWidget {
           return _buildEmptyState();
         }
 
-        // Compute average
-        int totalPresent = 0;
-        int totalStudents = 0;
-        for (var s in controller.sessions) {
-          totalPresent += s.presentCount;
-          totalStudents += s.totalStudents;
-        }
-        final avg = totalStudents > 0
-            ? ((totalPresent / totalStudents) * 100).toStringAsFixed(1)
-            : '0';
-
         return SingleChildScrollView(
           child: Padding(
             padding:
@@ -115,7 +104,7 @@ class AttendanceHistoryScreen extends StatelessWidget {
             Icon(
               Iconsax.calendar_remove,
               size: 80,
-              color: SColors.primary.withOpacity(0.3),
+              color: SColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(

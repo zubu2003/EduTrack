@@ -192,7 +192,7 @@ class AddRoutineScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
           ),
           child: DropdownButtonFormField<String>(
-            value: selected,
+            initialValue: selected,
             decoration: const InputDecoration(
               prefixIcon: Icon(Iconsax.calendar, color: SColors.grey),
               border: InputBorder.none,
@@ -261,7 +261,7 @@ class AddRoutineScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
           ),
           child: DropdownButtonFormField<String>(
-            value: currentValue,
+            initialValue: currentValue,
             isExpanded: true,
             decoration: const InputDecoration(
               prefixIcon: Icon(Iconsax.book, color: SColors.grey),
@@ -361,7 +361,7 @@ class AddRoutineScreen extends StatelessWidget {
             horizontal: 20,
           ),
           decoration: BoxDecoration(
-            color: SColors.grey.withOpacity(0.05),
+            color: SColors.grey.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
           ),
           child: Row(

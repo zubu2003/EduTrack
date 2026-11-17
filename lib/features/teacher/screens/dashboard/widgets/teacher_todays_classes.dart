@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/teacher/controllers/dashboard/teacher_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -57,7 +57,7 @@ class TeacherTodaysClasses extends StatelessWidget {
                 borderRadius: BorderRadius.circular(SSize.cardRadius),
                 boxShadow: [
                   BoxShadow(
-                    color: SColors.black.withOpacity(0.04),
+                    color: SColors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),

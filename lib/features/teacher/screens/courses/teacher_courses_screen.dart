@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/common/widget/bottom_nav/teacher_bottom_nav.dart';
@@ -122,7 +122,7 @@ class TeacherCoursesScreen extends StatelessWidget {
             Icon(
               Iconsax.book,
               size: 80,
-              color: SColors.primary.withOpacity(0.3),
+              color: SColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(

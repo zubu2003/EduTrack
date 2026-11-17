@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/features/personalization/controllers/profile_controller.dart';
@@ -80,7 +80,7 @@ class EditProfileScreen extends StatelessWidget {
                             ),
                             child: ClipOval(
                               child: Container(
-                                color: SColors.primary.withOpacity(0.1),
+                                color: SColors.primary.withValues(alpha: 0.1),
                                 child: Icon(
                                   Icons.person,
                                   color: SColors.primary,
@@ -221,7 +221,7 @@ class EditProfileScreen extends StatelessWidget {
                           children: [
                             Icon(
                               Iconsax.info_circle,
-                              color: SColors.textSecondary.withOpacity(0.5),
+                              color: SColors.textSecondary.withValues(alpha: 0.5),
                               size: 48,
                             ),
                             const SizedBox(height: SSize.sm),
@@ -303,12 +303,12 @@ class EditProfileScreen extends StatelessWidget {
             hintText: hint,
             prefixIcon: Icon(
               icon,
-              color: enabled ? SColors.grey : SColors.grey.withOpacity(0.5),
+              color: enabled ? SColors.grey : SColors.grey.withValues(alpha: 0.5),
             ),
             filled: true,
             fillColor: enabled
                 ? SColors.inputFieldBackground
-                : SColors.grey.withOpacity(0.05),
+                : SColors.grey.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
               borderSide: BorderSide.none,

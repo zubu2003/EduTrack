@@ -110,8 +110,8 @@ class PreviewCtMarksScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     columnSpacing: 12,
-                    headingRowColor: MaterialStateProperty.all(
-                      SColors.primary.withOpacity(0.08),
+                    headingRowColor: WidgetStateProperty.all(
+                      SColors.primary.withValues(alpha: 0.08),
                     ),
                     columns: [
                       DataColumn(
@@ -145,8 +145,8 @@ class PreviewCtMarksScreen extends StatelessWidget {
                                 ),
                                 decoration: BoxDecoration(
                                   color: existing
-                                      ? SColors.warning.withOpacity(0.15)
-                                      : SColors.success.withOpacity(0.15),
+                                      ? SColors.warning.withValues(alpha: 0.15)
+                                      : SColors.success.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -282,7 +282,7 @@ class PreviewCtMarksScreen extends StatelessWidget {
                 color: SColors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: SColors.black.withOpacity(0.05),
+                    color: SColors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -4),
                   ),

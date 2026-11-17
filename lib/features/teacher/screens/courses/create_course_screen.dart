@@ -117,7 +117,7 @@ class CreateCourseScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: SSize.xs),
                       DropdownButtonFormField<String>(
-                        value: controller.selectedDept.value,
+                        initialValue: controller.selectedDept.value,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Iconsax.building,
                               color: SColors.grey),
@@ -207,7 +207,7 @@ class CreateCourseScreen extends StatelessWidget {
           color: SColors.white,
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.05),
+              color: SColors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),

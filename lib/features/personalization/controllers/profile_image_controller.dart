@@ -68,13 +68,13 @@ class ProfileImageController extends GetxController {
   /// Upload image to Cloudinary + save URL to Firestore
   Future<void> _uploadImage(File imageFile) async {
     try {
-      print('🔵 [Profile] _uploadImage called');
-      print('🔵 [Profile] File path: ${imageFile.path}');
-      print('🔵 [Profile] File exists: ${await imageFile.exists()}');
-      print('🔵 [Profile] File size: ${await imageFile.length()} bytes');
-      print('🔵 [Profile] User role: ${user.value.role}');
-      print('🔵 [Profile] Cloud name: ${SKeys.cloudname}');
-      print('🔵 [Profile] Upload preset: ${SKeys.uploadPreset}');
+      debugPrint('🔵 [Profile] _uploadImage called');
+      debugPrint('🔵 [Profile] File path: ${imageFile.path}');
+      debugPrint('🔵 [Profile] File exists: ${await imageFile.exists()}');
+      debugPrint('🔵 [Profile] File size: ${await imageFile.length()} bytes');
+      debugPrint('🔵 [Profile] User role: ${user.value.role}');
+      debugPrint('🔵 [Profile] Cloud name: ${SKeys.cloudname}');
+      debugPrint('🔵 [Profile] Upload preset: ${SKeys.uploadPreset}');
 
       isUploading.value = true;
       SFullScreenLoader.openLoadingDialog('Uploading image...');
@@ -83,20 +83,20 @@ class ProfileImageController extends GetxController {
           ? SKeys.teacherProfileFolder
           : SKeys.studentProfileFolder;
 
-      print('🔵 [Profile] Folder: $folder');
-      print('🔵 [Profile] Calling Cloudinary upload...');
+      debugPrint('🔵 [Profile] Folder: $folder');
+      debugPrint('🔵 [Profile] Calling Cloudinary upload...');
 
       final response = await CloudinaryServices.instance
           .uploadImage(imageFile, folder);
 
-      print('✅ [Profile] Cloudinary response status: ${response.statusCode}');
-      print('✅ [Profile] Cloudinary response data: ${response.data}');
+      debugPrint('✅ [Profile] Cloudinary response status: ${response.statusCode}');
+      debugPrint('✅ [Profile] Cloudinary response data: ${response.data}');
 
       final imageUrl = response.data['secure_url'] as String?;
       final publicId = response.data['public_id'] as String?;
 
-      print('🔵 [Profile] imageUrl: $imageUrl');
-      print('🔵 [Profile] publicId: $publicId');
+      debugPrint('🔵 [Profile] imageUrl: $imageUrl');
+      debugPrint('🔵 [Profile] publicId: $publicId');
 
       if (imageUrl == null || publicId == null) {
         throw 'Upload failed — no URL returned';
@@ -104,13 +104,13 @@ class ProfileImageController extends GetxController {
 
       // Delete old image
       if (user.value.profileImagePublicId.isNotEmpty) {
-        print('🔵 [Profile] Deleting old image...');
+        debugPrint('🔵 [Profile] Deleting old image...');
         try {
           await CloudinaryServices.instance
               .deleteImage(user.value.profileImagePublicId);
-          print('✅ [Profile] Old image deleted');
+          debugPrint('✅ [Profile] Old image deleted');
         } catch (e) {
-          print('⚠️ [Profile] Old image delete failed: $e');
+          debugPrint('⚠️ [Profile] Old image delete failed: $e');
         }
       }
 
@@ -120,9 +120,9 @@ class ProfileImageController extends GetxController {
         updatedAt: DateTime.now(),
       );
 
-      print('🔵 [Profile] Saving to Firestore...');
+      debugPrint('🔵 [Profile] Saving to Firestore...');
       await UserRepository.instance.updateUserRecord(updatedUser);
-      print('✅ [Profile] Firestore updated');
+      debugPrint('✅ [Profile] Firestore updated');
 
       user.value = updatedUser;
 
@@ -136,8 +136,8 @@ class ProfileImageController extends GetxController {
     } catch (e, stack) {
       SFullScreenLoader.stopLoading();
       isUploading.value = false;
-      print('❌ [Profile] Upload error: $e');
-      print('❌ [Profile] Stack: $stack');
+      debugPrint('❌ [Profile] Upload error: $e');
+      debugPrint('❌ [Profile] Stack: $stack');
       SSnackBarHelpers.errorSnackBar(
         title: 'Error',
         message: e.toString(),
@@ -234,7 +234,7 @@ class ProfileImageController extends GetxController {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: SColors.grey.withOpacity(0.3),
+                  color: SColors.grey.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

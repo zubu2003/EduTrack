@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/authentication/controllers/login/login_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -15,7 +15,7 @@ class LoginRoleSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: SColors.grey.withOpacity(0.15),
+        color: SColors.grey.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
       ),
       child: Obx(
@@ -35,7 +35,7 @@ class LoginRoleSelector extends StatelessWidget {
                     boxShadow: controller.selectedRole.value == SRoles.student
                         ? [
                       BoxShadow(
-                        color: SColors.black.withOpacity(0.05),
+                        color: SColors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -70,7 +70,7 @@ class LoginRoleSelector extends StatelessWidget {
                     boxShadow: controller.selectedRole.value == SRoles.teacher
                         ? [
                       BoxShadow(
-                        color: SColors.black.withOpacity(0.05),
+                        color: SColors.black.withValues(alpha: 0.05),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),

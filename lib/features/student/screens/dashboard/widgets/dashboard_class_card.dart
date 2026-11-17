@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/features/course/models/routine_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
@@ -31,7 +31,7 @@ class DashboardClassCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.cardRadius),
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.05),
+              color: SColors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -48,7 +48,7 @@ class DashboardClassCard extends StatelessWidget {
                   vertical: SSize.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: SColors.warning.withOpacity(0.1),
+                  color: SColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                 ),
                 child: Text(
@@ -83,7 +83,7 @@ class DashboardClassCard extends StatelessWidget {
                       vertical: SSize.xs,
                     ),
                     decoration: BoxDecoration(
-                      color: SColors.error.withOpacity(0.1),
+                      color: SColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                     ),
                     child: Row(

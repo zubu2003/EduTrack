@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -15,13 +15,13 @@ class RoutineEmptyState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(SSize.lg),
             decoration: BoxDecoration(
-              color: SColors.primary.withOpacity(0.05),
+              color: SColors.primary.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Iconsax.calendar_1,
               size: 64,
-              color: SColors.primary.withOpacity(0.3),
+              color: SColors.primary.withValues(alpha: 0.3),
             ),
           ),
           const SizedBox(height: SSize.spaceBtwItems),

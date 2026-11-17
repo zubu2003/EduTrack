@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -29,7 +29,7 @@ class CourseDetailsMenuCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.cardRadius),
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.04),
+              color: SColors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -41,7 +41,7 @@ class CourseDetailsMenuCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: SColors.primary.withOpacity(0.1),
+                color: SColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
               ),
               child: Icon(

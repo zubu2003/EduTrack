@@ -117,7 +117,7 @@ class CtModel {
   double get average {
     final numeric = marks.values.where((m) => !CtMark.isAbsent(m)).toList();
     if (numeric.isEmpty) return 0;
-    final total = numeric.fold<double>(0, (sum, m) => sum + m);
+    final total = numeric.fold<double>(0, (acc, m) => acc + m);
     return total / numeric.length;
   }
 }
@@ -244,7 +244,7 @@ class CtDataModel {
     if (n <= 0) return 0;
     final marks = numericMarksFor(studentUid);
     marks.sort((a, b) => b.compareTo(a));
-    return marks.take(n).fold<double>(0, (sum, m) => sum + m);
+    return marks.take(n).fold<double>(0, (acc, m) => acc + m);
   }
 
   double computeTotal(String studentUid, {int? credit}) {

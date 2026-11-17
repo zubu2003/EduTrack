@@ -40,7 +40,7 @@ class AssignStudentsScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(SSize.md),
                 decoration: BoxDecoration(
-                  color: SColors.primary.withOpacity(0.08),
+                  color: SColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(SSize.cardRadius),
                 ),
                 child: Column(
@@ -108,7 +108,7 @@ class AssignStudentsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: SSize.xs),
                     DropdownButtonFormField<String>(
-                      value: controller.assignDept.value,
+                      initialValue: controller.assignDept.value,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Iconsax.building,
                             color: SColors.grey),
@@ -243,8 +243,8 @@ class AssignStudentsScreen extends StatelessWidget {
                             BorderRadius.circular(SSize.borderRadiusMd),
                             border: Border.all(
                               color: isSelected
-                                  ? SColors.primary.withOpacity(0.3)
-                                  : SColors.grey.withOpacity(0.2),
+                                  ? SColors.primary.withValues(alpha: 0.3)
+                                  : SColors.grey.withValues(alpha: 0.2),
                             ),
                           ),
                           child: CheckboxListTile(
@@ -269,7 +269,7 @@ class AssignStudentsScreen extends StatelessWidget {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
 
                       // Space for sticky button
                       const SizedBox(height: 100),
@@ -299,7 +299,7 @@ class AssignStudentsScreen extends StatelessWidget {
               color: SColors.white,
               boxShadow: [
                 BoxShadow(
-                  color: SColors.black.withOpacity(0.05),
+                  color: SColors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -4),
                 ),
@@ -317,7 +317,7 @@ class AssignStudentsScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: SColors.primary,
                     disabledBackgroundColor:
-                    SColors.primary.withOpacity(0.4),
+                    SColors.primary.withValues(alpha: 0.4),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                       BorderRadius.circular(SSize.borderRadiusMd),

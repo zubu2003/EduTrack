@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -37,13 +37,13 @@ class RoutineCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.cardRadius),
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.04),
+              color: SColors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             width: 1,
           ),
         ),
@@ -67,7 +67,7 @@ class RoutineCard extends StatelessWidget {
                 vertical: SSize.xs,
               ),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
               ),
               child: Column(

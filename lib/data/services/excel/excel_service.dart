@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
 
@@ -166,8 +166,8 @@ class ExcelService {
         }
       }
     } catch (e, stackTrace) {
-      print('EXCEL ERROR: $e');
-      print('STACK TRACE: $stackTrace');
+      debugPrint('EXCEL ERROR: $e');
+      debugPrint('STACK TRACE: $stackTrace');
       errors.add('Failed to parse Excel: $e');
     }
 

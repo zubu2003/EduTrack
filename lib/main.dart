@@ -9,7 +9,7 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   // Widgets Flutter Binding
-  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   // Get Storage Initialization
   await GetStorage.init();

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -32,15 +32,15 @@ class AttendanceStudentItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.cardRadius),
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.04),
+              color: SColors.black.withValues(alpha: 0.04),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
           border: Border.all(
             color: isPresent
-                ? SColors.success.withOpacity(0.3)
-                : SColors.error.withOpacity(0.2),
+                ? SColors.success.withValues(alpha: 0.3)
+                : SColors.error.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -71,7 +71,7 @@ class AttendanceStudentItem extends StatelessWidget {
             // Avatar
             CircleAvatar(
               radius: 18,
-              backgroundColor: SColors.primary.withOpacity(0.08),
+              backgroundColor: SColors.primary.withValues(alpha: 0.08),
               child: Text(
                 name.isNotEmpty ? name[0] : '?',
                 style: TextStyle(
@@ -126,13 +126,13 @@ class AttendanceStudentItem extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: isPresent
-                    ? SColors.success.withOpacity(0.1)
-                    : SColors.error.withOpacity(0.1),
+                    ? SColors.success.withValues(alpha: 0.1)
+                    : SColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                 border: Border.all(
                   color: isPresent
-                      ? SColors.success.withOpacity(0.3)
-                      : SColors.error.withOpacity(0.3),
+                      ? SColors.success.withValues(alpha: 0.3)
+                      : SColors.error.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),

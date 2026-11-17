@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:http_parser/http_parser.dart';
@@ -34,9 +35,9 @@ class CloudinaryServices extends GetxController {
         ),
       });
 
-      print('🔵 [Cloudinary] POST $api');
-      print('🔵 [Cloudinary] preset=${SKeys.uploadPreset} folder=$foldername');
-      print('🔵 [Cloudinary] file=$fileName');
+      debugPrint('🔵 [Cloudinary] POST $api');
+      debugPrint('🔵 [Cloudinary] preset=${SKeys.uploadPreset} folder=$foldername');
+      debugPrint('🔵 [Cloudinary] file=$fileName');
 
       final response = await _dio.post(
         api,
@@ -46,8 +47,8 @@ class CloudinaryServices extends GetxController {
         ),
       );
 
-      print('🔵 [Cloudinary] status: ${response.statusCode}');
-      print('🔵 [Cloudinary] body: ${response.data}');
+      debugPrint('🔵 [Cloudinary] status: ${response.statusCode}');
+      debugPrint('🔵 [Cloudinary] body: ${response.data}');
 
       if (response.statusCode != 200) {
         throw _cloudinaryError(response.data) ??
@@ -56,12 +57,12 @@ class CloudinaryServices extends GetxController {
 
       return response;
     } on dio.DioException catch (e) {
-      print('❌ [Cloudinary] Dio status: ${e.response?.statusCode}');
-      print('❌ [Cloudinary] Dio body: ${e.response?.data}');
-      print('❌ [Cloudinary] Dio message: ${e.message}');
+      debugPrint('❌ [Cloudinary] Dio status: ${e.response?.statusCode}');
+      debugPrint('❌ [Cloudinary] Dio body: ${e.response?.data}');
+      debugPrint('❌ [Cloudinary] Dio message: ${e.message}');
       throw _cloudinaryError(e.response?.data) ?? 'failed to upload image';
     } catch (e) {
-      print('❌ [Cloudinary] $e');
+      debugPrint('❌ [Cloudinary] $e');
       rethrow;
     }
   }
@@ -84,7 +85,7 @@ class CloudinaryServices extends GetxController {
       final response = await _dio.post(api, data: formData);
       return response;
     } on dio.DioException catch (e) {
-      print('❌ [Cloudinary delete] ${e.response?.data}');
+      debugPrint('❌ [Cloudinary delete] ${e.response?.data}');
       throw _cloudinaryError(e.response?.data) ?? 'Something went wrong';
     } catch (e) {
       throw 'Something went wrong';

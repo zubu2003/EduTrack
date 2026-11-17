@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -24,7 +24,7 @@ class DashboardCtCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.05),
+            color: SColors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -71,10 +71,10 @@ class DashboardCtCard extends StatelessWidget {
               vertical: SSize.sm,
             ),
             decoration: BoxDecoration(
-              color: SColors.warning.withOpacity(0.1),
+              color: SColors.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
               border: Border.all(
-                color: SColors.warning.withOpacity(0.3),
+                color: SColors.warning.withValues(alpha: 0.3),
               ),
             ),
             child: Column(

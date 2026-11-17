@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
@@ -42,7 +42,7 @@ class UploadCtMarksScreen extends StatelessWidget {
                   vertical: SSize.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: SColors.primary.withOpacity(0.1),
+                  color: SColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
                 ),
                 child: Text(
@@ -88,7 +88,7 @@ class UploadCtMarksScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(SSize.md),
                 decoration: BoxDecoration(
-                  color: SColors.grey.withOpacity(0.05),
+                  color: SColors.grey.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(SSize.cardRadius),
                 ),
                 child: Column(
@@ -148,7 +148,7 @@ class UploadCtMarksScreen extends StatelessWidget {
         color: SColors.white,
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         border: Border.all(
-          color: SColors.primary.withOpacity(0.2),
+          color: SColors.primary.withValues(alpha: 0.2),
           width: 2,
           style: BorderStyle.solid,
         ),
@@ -230,7 +230,7 @@ class UploadCtMarksScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.04),
+            color: SColors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -245,7 +245,7 @@ class UploadCtMarksScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(SSize.sm),
                 decoration: BoxDecoration(
-                  color: SColors.success.withOpacity(0.1),
+                  color: SColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                 ),
                 child: Icon(
@@ -305,7 +305,7 @@ class UploadCtMarksScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(SSize.sm),
               decoration: BoxDecoration(
-                color: SColors.warning.withOpacity(0.1),
+                color: SColors.warning.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
               ),
               child: Row(
@@ -340,7 +340,7 @@ class UploadCtMarksScreen extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: controller.clearUploadState,
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: SColors.grey.withOpacity(0.3)),
+                    side: BorderSide(color: SColors.grey.withValues(alpha: 0.3)),
                     padding: const EdgeInsets.symmetric(vertical: SSize.md),
                     shape: RoundedRectangleBorder(
                       borderRadius:

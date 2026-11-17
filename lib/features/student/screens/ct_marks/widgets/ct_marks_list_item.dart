@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:iconsax/iconsax.dart';
@@ -44,13 +44,13 @@ class CtMarksListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.04),
+            color: SColors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
         border: Border.all(
-          color: statusColor.withOpacity(0.25),
+          color: statusColor.withValues(alpha: 0.25),
           width: 1.5,
         ),
       ),
@@ -61,7 +61,7 @@ class CtMarksListItem extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: SColors.primary.withOpacity(0.08),
+              color: SColors.primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
             ),
             child: Icon(
@@ -108,7 +108,7 @@ class CtMarksListItem extends StatelessWidget {
                   ? SColors.error
                   : mark != null
                       ? statusColor
-                      : SColors.grey.withOpacity(0.15),
+                      : SColors.grey.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
             ),
             child: Text(

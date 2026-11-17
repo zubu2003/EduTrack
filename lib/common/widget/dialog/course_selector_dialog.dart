@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/data/repositories/course/course_repository.dart';
 import 'package:edutrack/data/repositories/user/user_repository.dart';
@@ -80,7 +80,7 @@ class CourseSelectorDialog extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: SColors.grey.withOpacity(0.3),
+                    color: SColors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -108,7 +108,7 @@ class CourseSelectorDialog extends StatelessWidget {
               ),
               const SizedBox(height: SSize.spaceBtwItems),
 
-              Divider(color: SColors.grey.withOpacity(0.2), height: 1),
+              Divider(color: SColors.grey.withValues(alpha: 0.2), height: 1),
               const SizedBox(height: SSize.spaceBtwItems),
 
               // Course List
@@ -134,7 +134,7 @@ class CourseSelectorDialog extends StatelessWidget {
                             borderRadius:
                             BorderRadius.circular(SSize.cardRadius),
                             border: Border.all(
-                              color: SColors.grey.withOpacity(0.15),
+                              color: SColors.grey.withValues(alpha: 0.15),
                               width: 1,
                             ),
                           ),
@@ -145,7 +145,7 @@ class CourseSelectorDialog extends StatelessWidget {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: SColors.primary.withOpacity(0.08),
+                                  color: SColors.primary.withValues(alpha: 0.08),
                                   borderRadius: BorderRadius.circular(
                                       SSize.borderRadiusMd),
                                 ),
@@ -205,7 +205,7 @@ class CourseSelectorDialog extends StatelessWidget {
                                           ),
                                           decoration: BoxDecoration(
                                             color: SColors.primary
-                                                .withOpacity(0.08),
+                                                .withValues(alpha: 0.08),
                                             borderRadius:
                                             BorderRadius.circular(
                                                 SSize.borderRadiusSm),

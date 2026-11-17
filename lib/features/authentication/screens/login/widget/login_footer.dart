@@ -1,4 +1,3 @@
-import 'package:edutrack/features/authentication/controllers/login/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
@@ -12,8 +11,6 @@ class LoginFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = LoginController.instance;
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: SSize.defaultSpace,

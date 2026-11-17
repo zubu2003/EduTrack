@@ -128,7 +128,7 @@ class TeacherCtMarksScreen extends StatelessWidget {
                         onDelete: () => controller.deleteCt(ctTitle),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
 
                 const SizedBox(height: SSize.spaceBtwSections),
@@ -165,7 +165,7 @@ class TeacherCtMarksScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
           border: isPrimary
               ? null
-              : Border.all(color: SColors.primary.withOpacity(0.3), width: 1),
+              : Border.all(color: SColors.primary.withValues(alpha: 0.3), width: 1),
         ),
         child: Column(
           children: [
@@ -198,7 +198,7 @@ class TeacherCtMarksScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.04),
+            color: SColors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -209,7 +209,7 @@ class TeacherCtMarksScreen extends StatelessWidget {
           Icon(
             Iconsax.document_text,
             size: 64,
-            color: SColors.primary.withOpacity(0.3),
+            color: SColors.primary.withValues(alpha: 0.3),
           ),
           const SizedBox(height: SSize.spaceBtwItems),
           Text(

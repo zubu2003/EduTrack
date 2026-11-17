@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/personalization/controllers/profile_image_controller.dart';
@@ -38,7 +38,7 @@ class ProfileHeader extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: SColors.primary.withOpacity(0.15),
+                        color: SColors.primary.withValues(alpha: 0.15),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -52,7 +52,7 @@ class ProfileHeader extends StatelessWidget {
                       width: 100,
                       height: 100,
                       placeholder: (context, url) => Container(
-                        color: SColors.primary.withOpacity(0.1),
+                        color: SColors.primary.withValues(alpha: 0.1),
                         child: const Center(
                           child: CircularProgressIndicator(
                             color: SColors.primary,
@@ -71,7 +71,7 @@ class ProfileHeader extends StatelessWidget {
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: SColors.black.withOpacity(0.4),
+                        color: SColors.black.withValues(alpha: 0.4),
                         shape: BoxShape.circle,
                       ),
                       child: const Center(
@@ -154,7 +154,7 @@ class ProfileHeader extends StatelessWidget {
                 vertical: SSize.xs,
               ),
               decoration: BoxDecoration(
-                color: SColors.primary.withOpacity(0.08),
+                color: SColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
               ),
               child: Text(
@@ -174,7 +174,7 @@ class ProfileHeader extends StatelessWidget {
 
   Widget _defaultAvatar() {
     return Container(
-      color: SColors.primary.withOpacity(0.1),
+      color: SColors.primary.withValues(alpha: 0.1),
       child: const Center(
         child: Icon(
           Icons.person,

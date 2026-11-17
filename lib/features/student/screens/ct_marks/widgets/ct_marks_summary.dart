@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -38,7 +38,7 @@ class CtMarksSummary extends StatelessWidget {
             borderRadius: BorderRadius.circular(SSize.cardRadius),
             boxShadow: [
               BoxShadow(
-                color: SColors.black.withOpacity(0.1),
+                color: SColors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -53,7 +53,7 @@ class CtMarksSummary extends StatelessWidget {
                   Text(
                     'Best $bestOfCount Total',
                     style: TextStyle(
-                      color: SColors.white.withOpacity(0.7),
+                      color: SColors.white.withValues(alpha: 0.7),
                       fontSize: SSize.fontSizeMd,
                       fontWeight: FontWeight.w500,
                     ),
@@ -76,7 +76,7 @@ class CtMarksSummary extends StatelessWidget {
                         child: Text(
                           '/ ${(fullMarks * bestOfCount).toInt()}',
                           style: TextStyle(
-                            color: SColors.white.withOpacity(0.6),
+                            color: SColors.white.withValues(alpha: 0.6),
                             fontSize: SSize.fontSizeLg,
                           ),
                         ),
@@ -88,7 +88,7 @@ class CtMarksSummary extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(SSize.sm),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.15),
+                  color: Colors.amber.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                 ),
                 child: Icon(
@@ -119,7 +119,7 @@ class CtMarksSummary extends StatelessWidget {
             borderRadius: BorderRadius.circular(SSize.cardRadius),
             boxShadow: [
               BoxShadow(
-                color: SColors.black.withOpacity(0.1),
+                color: SColors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -134,7 +134,7 @@ class CtMarksSummary extends StatelessWidget {
                   Text(
                     'Average Score',
                     style: TextStyle(
-                      color: SColors.white.withOpacity(0.7),
+                      color: SColors.white.withValues(alpha: 0.7),
                       fontSize: SSize.fontSizeMd,
                       fontWeight: FontWeight.w500,
                     ),
@@ -157,7 +157,7 @@ class CtMarksSummary extends StatelessWidget {
                         child: Text(
                           '/ ${fullMarks.toInt()}',
                           style: TextStyle(
-                            color: SColors.white.withOpacity(0.6),
+                            color: SColors.white.withValues(alpha: 0.6),
                             fontSize: SSize.fontSizeLg,
                           ),
                         ),
@@ -172,10 +172,10 @@ class CtMarksSummary extends StatelessWidget {
                   vertical: SSize.sm,
                 ),
                 decoration: BoxDecoration(
-                  color: SColors.success.withOpacity(0.15),
+                  color: SColors.success.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
                   border: Border.all(
-                    color: SColors.success.withOpacity(0.2),
+                    color: SColors.success.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Text(

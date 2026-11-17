@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/appbar/common_appbar.dart';
 import 'package:edutrack/data/repositories/attendance/attendance_repository.dart';
@@ -112,7 +112,7 @@ class _ViewAllCtMarksScreenState extends State<ViewAllCtMarksScreen> {
                               BorderRadius.circular(SSize.cardRadius),
                           boxShadow: [
                             BoxShadow(
-                              color: SColors.black.withOpacity(0.04),
+                              color: SColors.black.withValues(alpha: 0.04),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -127,7 +127,7 @@ class _ViewAllCtMarksScreenState extends State<ViewAllCtMarksScreen> {
                             dataRowMinHeight: 56,
                             dataRowMaxHeight: 64,
                             headingRowColor: WidgetStateProperty.all(
-                              SColors.primary.withOpacity(0.06),
+                              SColors.primary.withValues(alpha: 0.06),
                             ),
                             columns: [
                               const DataColumn(
@@ -244,7 +244,7 @@ class _ViewAllCtMarksScreenState extends State<ViewAllCtMarksScreen> {
           Text(
             widget.course.courseCode,
             style: TextStyle(
-              color: SColors.white.withOpacity(0.7),
+              color: SColors.white.withValues(alpha: 0.7),
               fontSize: SSize.fontSizeSm,
               fontWeight: FontWeight.w600,
             ),
@@ -262,7 +262,7 @@ class _ViewAllCtMarksScreenState extends State<ViewAllCtMarksScreen> {
           Text(
             widget.course.courseName,
             style: TextStyle(
-              color: SColors.white.withOpacity(0.7),
+              color: SColors.white.withValues(alpha: 0.7),
               fontSize: SSize.fontSizeMd,
             ),
           ),
@@ -290,8 +290,8 @@ class _ViewAllCtMarksScreenState extends State<ViewAllCtMarksScreen> {
       ),
       decoration: BoxDecoration(
         color: highlight
-            ? Colors.amber.withOpacity(0.2)
-            : SColors.white.withOpacity(0.12),
+            ? Colors.amber.withValues(alpha: 0.2)
+            : SColors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
       ),
       child: Text(
@@ -312,7 +312,7 @@ class _ViewAllCtMarksScreenState extends State<ViewAllCtMarksScreen> {
       children: [
         CircleAvatar(
           radius: 14,
-          backgroundColor: SColors.primary.withOpacity(0.1),
+          backgroundColor: SColors.primary.withValues(alpha: 0.1),
           child: Text(
             initial.toUpperCase(),
             style: const TextStyle(
@@ -357,7 +357,7 @@ class _ViewAllCtMarksScreenState extends State<ViewAllCtMarksScreen> {
             Icon(
               Iconsax.document_text,
               size: 72,
-              color: SColors.primary.withOpacity(0.3),
+              color: SColors.primary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: SSize.spaceBtwItems),
             Text(

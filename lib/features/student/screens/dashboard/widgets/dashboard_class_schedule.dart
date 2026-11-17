@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/student/controllers/dashboard/student_dashboard_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -21,7 +21,7 @@ class DashboardClassSchedule extends StatelessWidget {
         borderRadius: BorderRadius.circular(SSize.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.05),
+            color: SColors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -62,7 +62,7 @@ class DashboardClassSchedule extends StatelessWidget {
           const SizedBox(height: SSize.spaceBtwItems),
 
           Divider(
-            color: SColors.grey.withOpacity(0.2),
+            color: SColors.grey.withValues(alpha: 0.2),
             height: 1,
           ),
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -28,7 +28,7 @@ class UploadCtMarksHeader extends StatelessWidget {
                 vertical: SSize.xs,
               ),
               decoration: BoxDecoration(
-                color: SColors.primary.withOpacity(0.1),
+                color: SColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
               ),
               child: Text(
@@ -47,7 +47,7 @@ class UploadCtMarksHeader extends StatelessWidget {
                 vertical: SSize.xs,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF6C63FF).withOpacity(0.1),
+                color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusSm),
               ),
               child: Text(

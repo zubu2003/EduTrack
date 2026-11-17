@@ -34,7 +34,7 @@ class TeacherCourseProgress extends StatelessWidget {
               value: course['value']! as double,
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

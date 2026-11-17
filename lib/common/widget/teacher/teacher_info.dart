@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -23,7 +23,7 @@ class STeacherInfoWidget extends StatelessWidget {
         if (showIcon) ...[
           CircleAvatar(
             radius: avatarRadius ?? 14,
-            backgroundColor: SColors.primary.withOpacity(0.1),
+            backgroundColor: SColors.primary.withValues(alpha: 0.1),
             child: Icon(
               Icons.person_outline,
               color: SColors.primary,

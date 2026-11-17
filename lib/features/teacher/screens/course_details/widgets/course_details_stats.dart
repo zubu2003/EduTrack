@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 
@@ -63,11 +63,11 @@ class CourseDetailsStats extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(SSize.cardRadius),
               border: Border.all(
-                color: SColors.primary.withOpacity(0.10),
+                color: SColors.primary.withValues(alpha: 0.10),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: SColors.primary.withOpacity(0.10),
+                  color: SColors.primary.withValues(alpha: 0.10),
                   blurRadius: 15,
                   offset: const Offset(0, 6),
                 ),
@@ -80,7 +80,7 @@ class CourseDetailsStats extends StatelessWidget {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: SColors.primary.withOpacity(0.10),
+                    color: SColors.primary.withValues(alpha: 0.10),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

@@ -68,7 +68,7 @@ class ProfileInfoCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.cardRadius),
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.04),
+              color: SColors.black.withValues(alpha: 0.04),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -97,7 +97,7 @@ class ProfileInfoCard extends StatelessWidget {
             const SizedBox(height: SSize.spaceBtwItems),
 
             Divider(
-              color: SColors.grey.withOpacity(0.2),
+              color: SColors.grey.withValues(alpha: 0.2),
               height: 1,
             ),
             const SizedBox(height: SSize.spaceBtwItems),
@@ -139,7 +139,7 @@ class ProfileInfoCard extends StatelessWidget {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       );

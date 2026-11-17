@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
@@ -21,8 +19,6 @@ class TeacherCtMarksController extends GetxController {
   RxBool isLoading = true.obs;
 
   // Upload flow
-  Uint8List? _uploadedFileBytes;
-  String? _uploadedFileName;
   Rx<ParsedExcelData?> parsedData = Rx<ParsedExcelData?>(null);
   RxBool isUploading = false.obs;
 
@@ -78,9 +74,6 @@ class TeacherCtMarksController extends GetxController {
         );
         return false;
       }
-
-      _uploadedFileBytes = file.bytes;
-      _uploadedFileName = file.name;
 
       // Parse
       final parsed = ExcelService.instance.parseCtMarks(file.bytes!);
@@ -142,16 +135,16 @@ debugPrint('TOTAL ROWS: ${parsed.totalRows}');
         return;
       }
 
-      print('🔵 [CT] submitParsedData called');
-      print('🔵 [CT] courseId: ${course.courseId}');
-      print('🔵 [CT] editableMarks keys: ${editableMarks.keys.toList()}');
+      debugPrint('🔵 [CT] submitParsedData called');
+      debugPrint('🔵 [CT] courseId: ${course.courseId}');
+      debugPrint('🔵 [CT] editableMarks keys: ${editableMarks.keys.toList()}');
 
       editableMarks.forEach((ct, marks) {
-        print('🔵 [CT] $ct → ${marks.length} students');
+        debugPrint('🔵 [CT] $ct → ${marks.length} students');
       });
 
-      print('🔵 [CT] editableTotals: ${editableTotals.length}');
-      print('🔵 [CT] fullMarks: ${editableFullMarks.value}');
+      debugPrint('🔵 [CT] editableTotals: ${editableTotals.length}');
+      debugPrint('🔵 [CT] fullMarks: ${editableFullMarks.value}');
 
       isUploading.value = true;
       SFullScreenLoader.openLoadingDialog('Saving marks...');
@@ -167,10 +160,10 @@ debugPrint('TOTAL ROWS: ${parsed.totalRows}');
         totals[uid] = val;
       });
 
-      print('🔵 [CT] marksByCt (plain): $marksByCt');
-      print('🔵 [CT] totals (plain): $totals');
+      debugPrint('🔵 [CT] marksByCt (plain): $marksByCt');
+      debugPrint('🔵 [CT] totals (plain): $totals');
 
-      print('🔵 [CT] Calling repository.mergeExcelData...');
+      debugPrint('🔵 [CT] Calling repository.mergeExcelData...');
 
       await CtMarksRepository.instance.mergeExcelData(
         courseId: course.courseId,
@@ -181,7 +174,7 @@ debugPrint('TOTAL ROWS: ${parsed.totalRows}');
         totalCTs: course.credit > 0 ? course.credit + 1 : 4,
       );
 
-      print('✅ [CT] mergeExcelData succeeded');
+      debugPrint('✅ [CT] mergeExcelData succeeded');
 
       SFullScreenLoader.stopLoading();
       isUploading.value = false;
@@ -197,15 +190,13 @@ debugPrint('TOTAL ROWS: ${parsed.totalRows}');
     } catch (e, stack) {
       SFullScreenLoader.stopLoading();
       isUploading.value = false;
-      print('❌ [CT] submitParsedData error: $e');
-      print('❌ [CT] Stack: $stack');
+      debugPrint('❌ [CT] submitParsedData error: $e');
+      debugPrint('❌ [CT] Stack: $stack');
       SSnackBarHelpers.errorSnackBar(title: 'Error', message: e.toString());
     }
   }
 
   void clearUploadState() {
-    _uploadedFileBytes = null;
-    _uploadedFileName = null;
     parsedData.value = null;
     editableMarks.clear();
     editableTotals.clear();

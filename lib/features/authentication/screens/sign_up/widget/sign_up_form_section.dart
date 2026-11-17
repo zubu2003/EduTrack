@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/features/authentication/controllers/sign_up/sign_up_controller.dart';
 import 'package:edutrack/utils/constant/colors.dart';
@@ -22,7 +22,7 @@ class SignUpFormSection extends StatelessWidget {
                 () => Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: SColors.grey.withOpacity(0.15),
+                color: SColors.grey.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
               ),
               child: Row(

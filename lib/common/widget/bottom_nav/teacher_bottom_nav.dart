@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/routes/app_routes.dart';
@@ -19,7 +19,7 @@ class TeacherBottomNav extends StatelessWidget {
         color: SColors.white,
         boxShadow: [
           BoxShadow(
-            color: SColors.black.withOpacity(0.05),
+            color: SColors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),

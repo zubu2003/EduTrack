@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../constant/colors.dart';
 import '../../constant/size.dart';
 
@@ -14,7 +14,7 @@ class STextFormFieldTheme {
     labelStyle: const TextStyle().copyWith(fontSize: SSize.fontSizeMd, color: SColors.primary),
     hintStyle: const TextStyle().copyWith(fontSize: SSize.fontSizeSm, color: SColors.grey),
     errorStyle: const TextStyle().copyWith(fontStyle: FontStyle.normal),
-    floatingLabelStyle: const TextStyle().copyWith(color: SColors.primary.withOpacity(0.8)),
+    floatingLabelStyle: const TextStyle().copyWith(color: SColors.primary.withValues(alpha: 0.8)),
     border: const OutlineInputBorder().copyWith(
       borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
       borderSide: BorderSide.none,
@@ -42,10 +42,10 @@ class STextFormFieldTheme {
     prefixIconColor: SColors.grey,
     suffixIconColor: SColors.grey,
     filled: true,
-    fillColor: SColors.darkerGrey.withOpacity(0.2),
+    fillColor: SColors.darkerGrey.withValues(alpha: 0.2),
     labelStyle: const TextStyle().copyWith(fontSize: SSize.fontSizeMd, color: SColors.white),
-    hintStyle: const TextStyle().copyWith(fontSize: SSize.fontSizeSm, color: SColors.white.withOpacity(0.5)),
-    floatingLabelStyle: const TextStyle().copyWith(color: SColors.white.withOpacity(0.8)),
+    hintStyle: const TextStyle().copyWith(fontSize: SSize.fontSizeSm, color: SColors.white.withValues(alpha: 0.5)),
+    floatingLabelStyle: const TextStyle().copyWith(color: SColors.white.withValues(alpha: 0.8)),
     border: const OutlineInputBorder().copyWith(
       borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
       borderSide: BorderSide.none,

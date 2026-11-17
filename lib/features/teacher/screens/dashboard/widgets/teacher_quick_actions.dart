@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edutrack/common/widget/dialog/course_selector_dialog.dart';
 import 'package:edutrack/features/course/models/course_model.dart';
@@ -166,12 +166,12 @@ class TeacherQuickActions extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.cardRadius),
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.04),
+              color: SColors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(color: color.withOpacity(0.15), width: 1),
+          border: Border.all(color: color.withValues(alpha: 0.15), width: 1),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -180,7 +180,7 @@ class TeacherQuickActions extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.08),
+                color: color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
               ),
               child: Icon(icon, color: color, size: SSize.iconMd),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/features/course/models/ct_data_model.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
@@ -32,15 +32,15 @@ class CtMarksListItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(SSize.cardRadius),
           boxShadow: [
             BoxShadow(
-              color: SColors.black.withOpacity(0.04),
+              color: SColors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
             color: isPublished
-                ? SColors.success.withOpacity(0.2)
-                : SColors.warning.withOpacity(0.2),
+                ? SColors.success.withValues(alpha: 0.2)
+                : SColors.warning.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -51,7 +51,7 @@ class CtMarksListItem extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: SColors.primary.withOpacity(0.08),
+                color: SColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(SSize.borderRadiusMd),
               ),
               child: Icon(
@@ -115,8 +115,8 @@ class CtMarksListItem extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isPublished
-                          ? SColors.success.withOpacity(0.1)
-                          : SColors.warning.withOpacity(0.1),
+                          ? SColors.success.withValues(alpha: 0.1)
+                          : SColors.warning.withValues(alpha: 0.1),
                       borderRadius:
                       BorderRadius.circular(SSize.borderRadiusSm),
                     ),

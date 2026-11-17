@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:edutrack/utils/constant/colors.dart';
 import 'package:edutrack/utils/constant/size.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -32,10 +32,10 @@ class UploadCtMarksForm extends StatelessWidget {
             vertical: SSize.sm,
           ),
           decoration: BoxDecoration(
-            color: SColors.grey.withOpacity(0.05),
+            color: SColors.grey.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(SSize.inputFieldRadius),
             border: Border.all(
-              color: SColors.grey.withOpacity(0.2),
+              color: SColors.grey.withValues(alpha: 0.2),
             ),
           ),
           child: const Text(
@@ -54,10 +54,10 @@ class UploadCtMarksForm extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(SSize.lg),
           decoration: BoxDecoration(
-            color: SColors.grey.withOpacity(0.03),
+            color: SColors.grey.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(SSize.cardRadius),
             border: Border.all(
-              color: SColors.grey.withOpacity(0.2),
+              color: SColors.grey.withValues(alpha: 0.2),
               style: BorderStyle.solid,
               width: 2,
             ),
