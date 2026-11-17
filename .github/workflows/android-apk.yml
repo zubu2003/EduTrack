@@ -13,6 +13,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
   workflow_dispatch:
 
@@ -20,18 +22,24 @@ permissions:
   contents: read
 
 jobs:
+
+  # ==========================================
+  # CI: Analyze, Test and Build Debug APK
+  # ==========================================
+
   flutter-ci:
     name: Flutter CI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-      # 1. Get source code
+
+      # 1. Checkout source code
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 2. Setup Java
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
@@ -48,23 +56,107 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # 5. Analyze code
+      # 5. Create .env.json from Secrets
+      - name: Create .env.json
+        run: |
+          cat <<EOF > .env.json
+          {
+            "FIREBASE_ANDROID_API_KEY": "${{ secrets.FIREBASE_ANDROID_API_KEY }}",
+            "FIREBASE_IOS_API_KEY": "${{ secrets.FIREBASE_IOS_API_KEY }}",
+            "CLOUDINARY_CLOUD_NAME": "${{ secrets.CLOUDINARY_CLOUD_NAME }}",
+            "CLOUDINARY_API_KEY": "${{ secrets.CLOUDINARY_API_KEY }}",
+            "CLOUDINARY_API_SECRET": "${{ secrets.CLOUDINARY_API_SECRET }}",
+            "CLOUDINARY_UPLOAD_PRESET": "${{ secrets.CLOUDINARY_UPLOAD_PRESET }}",
+            "GOOGLE_WEB_CLIENT_ID": "${{ secrets.GOOGLE_WEB_CLIENT_ID }}"
+          }
+          EOF
+
+      # 6. Analyze code
       - name: Flutter Analyze
         run: flutter analyze
 
-      # 6. Run tests
+      # 7. Run tests
       - name: Flutter Tests
-        run: flutter test
+        run: flutter test --dart-define-from-file=.env.json
 
-      # 7. Build APK
-      - name: Build Android APK
-        run: flutter build apk --debug
+      # 8. Build Debug APK
+      - name: Build Debug APK
+        run: flutter build apk --debug --dart-define-from-file=.env.json
 
-      # 8. Upload APK
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      # 9. Upload Debug APK artifact
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v7
         with:
-          name: flutter-apk-${{ github.run_number }}
+          name: flutter-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 7
           if-no-files-found: error
+
+
+  # ==========================================
+  # CD: Build Release APK and Publish Release
+  # ==========================================
+
+  release:
+    name: Create GitHub Release
+    needs: flutter-ci
+
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: write
+
+    steps:
+
+      # 1. Checkout tagged source code
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # 2. Setup Java
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # 3. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.1'
+          channel: stable
+          cache: true
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. Create .env.json from Secrets
+      - name: Create .env.json
+        run: |
+          cat <<EOF > .env.json
+          {
+            "FIREBASE_ANDROID_API_KEY": "${{ secrets.FIREBASE_ANDROID_API_KEY }}",
+            "FIREBASE_IOS_API_KEY": "${{ secrets.FIREBASE_IOS_API_KEY }}",
+            "CLOUDINARY_CLOUD_NAME": "${{ secrets.CLOUDINARY_CLOUD_NAME }}",
+            "CLOUDINARY_API_KEY": "${{ secrets.CLOUDINARY_API_KEY }}",
+            "CLOUDINARY_API_SECRET": "${{ secrets.CLOUDINARY_API_SECRET }}",
+            "CLOUDINARY_UPLOAD_PRESET": "${{ secrets.CLOUDINARY_UPLOAD_PRESET }}",
+            "GOOGLE_WEB_CLIENT_ID": "${{ secrets.GOOGLE_WEB_CLIENT_ID }}"
+          }
+          EOF
+
+      # 6. Build Release APK
+      - name: Build Release APK
+        run: flutter build apk --release --dart-define-from-file=.env.json
+
+      # 6. Create GitHub Release and upload APK
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: EduTrack ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: build/app/outputs/flutter-apk/app-release.apk
