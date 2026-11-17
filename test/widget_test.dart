@@ -1,4 +1,4 @@
-import 'package:edutrack/App.dart';
+import 'package:edutrack/app.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
