@@ -29,6 +29,7 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tag = 'search_$role';
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     final controller = Get.isRegistered<AppSearchController>(tag: tag)
         ? Get.find<AppSearchController>(tag: tag)
         : Get.put(AppSearchController(role: role), tag: tag);
@@ -57,28 +58,30 @@ class SearchScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: SSize.spaceBtwItems),
-            Text(
-              'Quick searches',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: SColors.textPrimary,
-                fontWeight: FontWeight.bold,
+            if (!isKeyboardVisible) ...[
+              const SizedBox(height: SSize.spaceBtwItems),
+              Text(
+                'Quick searches',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: SColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: SSize.sm),
-            Wrap(
-              spacing: SSize.sm,
-              runSpacing: SSize.sm,
-              children: _quickActions
-                  .map(
-                    (action) => ActionChip(
-                      label: Text(action),
-                      onPressed: () => controller.runQuickSearch(action),
-                    ),
-                  )
-                  .toList(),
-            ),
-            const SizedBox(height: SSize.spaceBtwItems),
+              const SizedBox(height: SSize.sm),
+              Wrap(
+                spacing: SSize.sm,
+                runSpacing: SSize.sm,
+                children: _quickActions
+                    .map(
+                      (action) => ActionChip(
+                        label: Text(action),
+                        onPressed: () => controller.runQuickSearch(action),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: SSize.spaceBtwItems),
+            ],
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {

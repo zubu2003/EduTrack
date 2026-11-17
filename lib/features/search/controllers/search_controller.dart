@@ -43,8 +43,8 @@ class AppSearchController extends GetxController {
           final courses = await CourseRepository.instance.getStudentCourses(
             user.uid,
           );
-          final output = <SearchResultModel>[];
-          for (final course in courses) {
+          return _mapCoursesConcurrently(courses, (course) async {
+            final output = <SearchResultModel>[];
             final records = await AttendanceRepository.instance
                 .getStudentAttendance(
                   courseId: course.courseId,
@@ -68,8 +68,8 @@ class AppSearchController extends GetxController {
                 detail: '${records.length} recorded sessions',
               ),
             );
-          }
-          return output;
+            return output;
+          });
         case 'My CT Marks':
           final courses = await CourseRepository.instance.getStudentCourses(
             user.uid,
@@ -112,12 +112,12 @@ class AppSearchController extends GetxController {
           final courses = await CourseRepository.instance.getTeacherCourses(
             user.uid,
           );
-          final output = <SearchResultModel>[];
-          for (final course in courses) {
+          return _mapCoursesConcurrently(courses, (course) async {
+            final output = <SearchResultModel>[];
             final session = await AttendanceRepository.instance.getTodaySession(
               course.courseId,
             );
-            if (session == null) continue;
+            if (session == null) return output;
             final percent = session.totalStudents == 0
                 ? 0
                 : session.presentCount / session.totalStudents * 100;
@@ -129,11 +129,12 @@ class AppSearchController extends GetxController {
                     '${session.presentCount}/${session.totalStudents} present',
               ),
             );
-          }
-          return output;
+            return output;
+          });
         case 'Low Attendance Students':
           return _teacherLowAttendance(user);
         case 'Recent CT Performance':
+        case 'Recent CT Performance(Avg.)':
           return _teacherCtPerformance(user);
         case "Students Who Missed Today's Class":
           return _teacherMissedTodaysClass(user);
@@ -162,6 +163,14 @@ class AppSearchController extends GetxController {
         return directAttendanceResults;
       }
 
+      final directCtMarkResults = await _searchDirectStudentCtMarkQuery(
+        query.value,
+      );
+      if (directCtMarkResults != null) {
+        explanation.value = 'CT marks matching your query';
+        return directCtMarkResults;
+      }
+
       final directTeacherResults = await _searchDirectTeacherQuery(query.value);
       if (directTeacherResults != null) {
         explanation.value = 'Teacher results matching your query';
@@ -176,6 +185,70 @@ class AppSearchController extends GetxController {
       explanation.value = request.humanReadable;
       return _executeValidatedQuery(request);
     });
+  }
+
+  Future<List<SearchResultModel>?> _searchDirectStudentCtMarkQuery(
+    String text,
+  ) async {
+    if (role != 'student') return null;
+    final normalized = text.toLowerCase();
+    final asksForCtMark =
+        RegExp(r'\bct\b').hasMatch(normalized) &&
+        (normalized.contains('mark') ||
+            normalized.contains('score') ||
+            normalized.contains('grade'));
+    final requiresAggregation = RegExp(
+      r'\b(highest|lowest|best|top|maximum|minimum|average|avg|mean|compare|count|total|how many)\b',
+    ).hasMatch(normalized);
+    if (!asksForCtMark || requiresAggregation) {
+      return null;
+    }
+
+    final courseCodeMatch = RegExp(
+      r'\b[a-z]{2,5}[- ]?\d{3}\b',
+      caseSensitive: false,
+    ).firstMatch(text);
+    if (courseCodeMatch == null) return null;
+
+    final filters = <SearchFilterModel>[
+      SearchFilterModel(
+        field: 'courseCode',
+        operator: SearchOperator.equals,
+        value: courseCodeMatch.group(0),
+      ),
+    ];
+    final ctTitleMatch = RegExp(
+      r'\bct\s*[- ]?\s*\d+\b',
+      caseSensitive: false,
+    ).firstMatch(text);
+    if (ctTitleMatch != null) {
+      filters.add(
+        SearchFilterModel(
+          field: 'ctTitle',
+          operator: SearchOperator.equals,
+          value: ctTitleMatch.group(0),
+        ),
+      );
+    }
+
+    final user = await _dataSource.getCurrentUser();
+    if (user == null) return <SearchResultModel>[];
+    final courses = await _dataSource.getAuthorizedCourses(
+      uid: user.uid,
+      role: role,
+    );
+    return _searchCtMarks(
+      user: user,
+      courses: courses,
+      request: SearchQueryModel(
+        collection: SearchCollection.ctMarks,
+        filters: filters,
+        sortField: null,
+        sortDirection: null,
+        limit: 20,
+        humanReadable: 'CT marks matching your query',
+      ),
+    );
   }
 
   Future<List<SearchResultModel>?> _searchUpcomingCtDate(String text) async {
@@ -209,8 +282,8 @@ class AppSearchController extends GetxController {
             return code == requestedCode;
           }).toList();
 
-    final output = <SearchResultModel>[];
-    for (final course in matchingCourses) {
+    return _mapCoursesConcurrently(matchingCourses, (course) async {
+      final output = <SearchResultModel>[];
       final alerts = await _dataSource.getCourseAlerts(course.courseId);
       for (final alert in alerts.take(1)) {
         output.add(
@@ -223,8 +296,8 @@ class AppSearchController extends GetxController {
           ),
         );
       }
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>?> _searchDirectAttendanceQuery(
@@ -292,8 +365,8 @@ class AppSearchController extends GetxController {
   Future<List<SearchResultModel>> _upcomingCtResults(
     List<CourseModel> courses,
   ) async {
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
+    return _mapCoursesConcurrently(courses, (course) async {
+      final output = <SearchResultModel>[];
       final alerts = await _dataSource.getCourseAlerts(course.courseId);
       for (final alert in alerts) {
         if (alert.daysRemaining < 0) continue;
@@ -307,8 +380,8 @@ class AppSearchController extends GetxController {
           ),
         );
       }
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<void> _run(Future<List<SearchResultModel>> Function() action) async {
@@ -326,14 +399,28 @@ class AppSearchController extends GetxController {
     }
   }
 
+  Future<List<T>> _mapCoursesConcurrently<T>(
+    List<CourseModel> courses,
+    Future<List<T>> Function(CourseModel course) action,
+  ) async {
+    const batchSize = 4;
+    final output = <T>[];
+    for (var start = 0; start < courses.length; start += batchSize) {
+      final batch = courses.skip(start).take(batchSize);
+      final batchResults = await Future.wait(batch.map(action));
+      output.addAll(batchResults.expand((results) => results));
+    }
+    return output;
+  }
+
   Future<List<SearchResultModel>> _studentCtResults(
     List<CourseModel> courses,
     UserModel user,
   ) async {
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
+    return _mapCoursesConcurrently(courses, (course) async {
+      final output = <SearchResultModel>[];
       final data = await CtMarksRepository.instance.getCtData(course.courseId);
-      if (data == null) continue;
+      if (data == null) return output;
       final marks = data.numericMarksFor(user.uid);
       final average = marks.isEmpty
           ? 0
@@ -345,20 +432,23 @@ class AppSearchController extends GetxController {
           detail: '${marks.length} CT marks available',
         ),
       );
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _teacherLowAttendance(UserModel user) async {
     final courses = await CourseRepository.instance.getTeacherCourses(user.uid);
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
-      final students = await AttendanceRepository.instance.getEnrolledStudents(
+    return _mapCoursesConcurrently(courses, (course) async {
+      final studentsFuture = AttendanceRepository.instance.getEnrolledStudents(
         course.courseId,
       );
-      final sessions = await AttendanceRepository.instance.getSessions(
+      final sessionsFuture = AttendanceRepository.instance.getSessions(
         course.courseId,
       );
+      await Future.wait([studentsFuture, sessionsFuture]);
+      final students = await studentsFuture;
+      final sessions = await sessionsFuture;
+      final output = <SearchResultModel>[];
       for (final student in students) {
         final records = sessions
             .expand((session) => session.records)
@@ -381,21 +471,24 @@ class AppSearchController extends GetxController {
           );
         }
       }
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _teacherCtPerformance(UserModel user) async {
-    final courses = await CourseRepository.instance.getTeacherCourses(user.uid);
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
-      final data = await CtMarksRepository.instance.getCtData(course.courseId);
-      if (data == null) continue;
+    final courses = await _dataSource.getAuthorizedCourses(
+      uid: user.uid,
+      role: 'teacher',
+    );
+    return _mapCoursesConcurrently(courses, (course) async {
+      final output = <SearchResultModel>[];
+      final data = await _dataSource.getCtData(course.courseId);
+      if (data == null) return output;
       final marks = data.cts.values
           .expand((ct) => ct.marks.values)
           .where((mark) => !CtMark.isAbsent(mark))
           .toList();
-      if (marks.isEmpty) continue;
+      if (marks.isEmpty) return output;
       final average = marks.reduce((a, b) => a + b) / marks.length;
       output.add(
         SearchResultModel(
@@ -404,8 +497,8 @@ class AppSearchController extends GetxController {
           detail: 'Recent recorded CT performance',
         ),
       );
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _teacherMissedTodaysClass(
@@ -416,12 +509,15 @@ class AppSearchController extends GetxController {
       role: 'teacher',
     );
     final today = _todayIso();
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
-      final students = await _dataSource.getEnrolledStudents(course.courseId);
-      final sessions = await _dataSource.getAttendanceSessions(course.courseId);
+    return _mapCoursesConcurrently(courses, (course) async {
+      final studentsFuture = _dataSource.getEnrolledStudents(course.courseId);
+      final sessionsFuture = _dataSource.getAttendanceSessions(course.courseId);
+      await Future.wait([studentsFuture, sessionsFuture]);
+      final students = await studentsFuture;
+      final sessions = await sessionsFuture;
       final todaySessions = sessions.where((session) => session.date == today);
-      if (todaySessions.isEmpty) continue;
+      if (todaySessions.isEmpty) return <SearchResultModel>[];
+      final output = <SearchResultModel>[];
       for (final student in students) {
         final missed = todaySessions
             .where(
@@ -443,8 +539,8 @@ class AppSearchController extends GetxController {
           );
         }
       }
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>?> _searchDirectTeacherQuery(
@@ -550,10 +646,10 @@ class AppSearchController extends GetxController {
                 _normalizeCourseCode(course.courseCode) ==
                 _normalizeCourseCode(code),
           );
-    final output = <SearchResultModel>[];
-    for (final course in matchingCourses) {
+    return _mapCoursesConcurrently(matchingCourses.toList(), (course) async {
+      final output = <SearchResultModel>[];
       final data = await _dataSource.getCtData(course.courseId);
-      if (data == null) continue;
+      if (data == null) return output;
       final happened = data.cts.values.where((ct) => ct.isPublished).length;
       output.add(
         SearchResultModel(
@@ -562,8 +658,8 @@ class AppSearchController extends GetxController {
           detail: course.courseCode,
         ),
       );
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _teacherCtAbsentees({
@@ -583,10 +679,10 @@ class AppSearchController extends GetxController {
                 _normalizeCourseCode(course.courseCode) ==
                 _normalizeCourseCode(courseCode),
           );
-    final output = <SearchResultModel>[];
-    for (final course in matchingCourses) {
+    return _mapCoursesConcurrently(matchingCourses.toList(), (course) async {
+      final output = <SearchResultModel>[];
       final data = await _dataSource.getCtData(course.courseId);
-      if (data == null) continue;
+      if (data == null) return output;
       final selectedCt = ctTitle == null
           ? null
           : _findCtByTitle(data.cts.values, ctTitle);
@@ -595,7 +691,7 @@ class AppSearchController extends GetxController {
           : selectedCt == null
           ? <CtModel>[]
           : [selectedCt];
-      if (matchingCts.isEmpty) continue;
+      if (matchingCts.isEmpty) return output;
       final students = await _dataSource.getEnrolledStudents(course.courseId);
       for (final student in students) {
         final absentCts = matchingCts.where(
@@ -615,8 +711,8 @@ class AppSearchController extends GetxController {
           ),
         );
       }
-    }
-    return output;
+      return output;
+    });
   }
 
   String _todayIso() {
@@ -751,35 +847,42 @@ class AppSearchController extends GetxController {
     required bool descending,
   }) async {
     if (role != 'student') return [];
-    final summaries = <({CourseModel course, double score, String detail})>[];
-    for (final course in courses) {
-      final attendance = await _dataSource.getStudentAttendance(
-        courseId: course.courseId,
-        studentUid: user.uid,
-        studentCode: user.studentId,
-      );
-      final attended = attendance
-          .where(
-            (record) =>
-                record['status'] == 'present' || record['status'] == 'late',
-          )
-          .length;
-      final attendancePercent = attendance.isEmpty
-          ? 0.0
-          : attended / attendance.length * 100;
-      final data = await _dataSource.getCtData(course.courseId);
-      final marks = data?.numericMarksFor(user.uid) ?? const <double>[];
-      final markAverage = marks.isEmpty
-          ? 0.0
-          : marks.reduce((a, b) => a + b) / marks.length;
-      final score = attendancePercent + markAverage * 5;
-      summaries.add((
-        course: course,
-        score: score,
-        detail:
-            '${attendancePercent.toStringAsFixed(1)}% attendance • ${markAverage.toStringAsFixed(1)} CT average',
-      ));
-    }
+    final summaries =
+        await _mapCoursesConcurrently<
+          ({CourseModel course, double score, String detail})
+        >(courses, (course) async {
+          final attendanceFuture = _dataSource.getStudentAttendance(
+            courseId: course.courseId,
+            studentUid: user.uid,
+            studentCode: user.studentId,
+          );
+          final ctDataFuture = _dataSource.getCtData(course.courseId);
+          await Future.wait([attendanceFuture, ctDataFuture]);
+          final attendance = await attendanceFuture;
+          final attended = attendance
+              .where(
+                (record) =>
+                    record['status'] == 'present' || record['status'] == 'late',
+              )
+              .length;
+          final attendancePercent = attendance.isEmpty
+              ? 0.0
+              : attended / attendance.length * 100;
+          final data = await ctDataFuture;
+          final marks = data?.numericMarksFor(user.uid) ?? const <double>[];
+          final markAverage = marks.isEmpty
+              ? 0.0
+              : marks.reduce((a, b) => a + b) / marks.length;
+          final score = attendancePercent + markAverage * 5;
+          return [
+            (
+              course: course,
+              score: score,
+              detail:
+                  '${attendancePercent.toStringAsFixed(1)}% attendance • ${markAverage.toStringAsFixed(1)} CT average',
+            ),
+          ];
+        });
     summaries.sort(
       (a, b) =>
           descending ? b.score.compareTo(a.score) : a.score.compareTo(b.score),
@@ -818,10 +921,10 @@ class AppSearchController extends GetxController {
   Future<List<SearchResultModel>> _teacherCtCountFromCourses({
     required List<CourseModel> courses,
   }) async {
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
+    return _mapCoursesConcurrently(courses, (course) async {
+      final output = <SearchResultModel>[];
       final data = await _dataSource.getCtData(course.courseId);
-      if (data == null) continue;
+      if (data == null) return output;
       final count = data.cts.values.where((ct) => ct.isPublished).length;
       output.add(
         SearchResultModel(
@@ -830,16 +933,16 @@ class AppSearchController extends GetxController {
           detail: _displayCourseCode(course.courseCode),
         ),
       );
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _searchTeacherAbsentees({
     required List<CourseModel> courses,
     required bool todayOnly,
   }) async {
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
+    return _mapCoursesConcurrently(courses, (course) async {
+      final output = <SearchResultModel>[];
       final students = await _dataSource.getEnrolledStudents(course.courseId);
       final sessions = await _dataSource.getAttendanceSessions(course.courseId);
       final selected = todayOnly
@@ -866,18 +969,18 @@ class AppSearchController extends GetxController {
           ),
         );
       }
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _teacherCtAbsenteesFromCourses({
     required List<CourseModel> courses,
     required String? ctTitle,
   }) async {
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
+    return _mapCoursesConcurrently(courses, (course) async {
+      final output = <SearchResultModel>[];
       final data = await _dataSource.getCtData(course.courseId);
-      if (data == null) continue;
+      if (data == null) return output;
       final cts = ctTitle == null
           ? data.cts.values.where((ct) => ct.isPublished).toList()
           : data.cts.values
@@ -887,7 +990,7 @@ class AppSearchController extends GetxController {
                       _normalizeCtTitle(ctTitle),
                 )
                 .toList();
-      if (cts.isEmpty) continue;
+      if (cts.isEmpty) return output;
       final students = await _dataSource.getEnrolledStudents(course.courseId);
       for (final student in students) {
         final absent = cts
@@ -908,8 +1011,8 @@ class AppSearchController extends GetxController {
           ),
         );
       }
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _searchHighestCtMarks({
@@ -917,10 +1020,10 @@ class AppSearchController extends GetxController {
     required List<CourseModel> courses,
     required SearchQueryModel request,
   }) async {
-    final output = <SearchResultModel>[];
-    for (final course in courses) {
+    return _mapCoursesConcurrently(courses, (course) async {
+      final output = <SearchResultModel>[];
       final data = await _dataSource.getCtData(course.courseId);
-      if (data == null) continue;
+      if (data == null) return output;
       final title = _filterValue(request.filters, 'ctTitle');
       final cts = title == null
           ? data.cts.values.where((ct) => ct.isPublished).toList()
@@ -940,7 +1043,7 @@ class AppSearchController extends GetxController {
           }
         }
       }
-      if (marks.isEmpty) continue;
+      if (marks.isEmpty) return output;
       if (role == 'student') {
         final mark = marks[user.uid];
         if (mark != null) {
@@ -954,9 +1057,10 @@ class AppSearchController extends GetxController {
             ),
           );
         }
-        continue;
+        return output;
       }
       final students = await _dataSource.getEnrolledStudents(course.courseId);
+      if (students.isEmpty) return output;
       final highest = marks.entries.reduce(
         (a, b) => a.value >= b.value ? a : b,
       );
@@ -974,8 +1078,8 @@ class AppSearchController extends GetxController {
           highlightSubtitle: true,
         ),
       );
-    }
-    return output;
+      return output;
+    });
   }
 
   Future<List<SearchResultModel>> _searchAttendance({
@@ -989,8 +1093,11 @@ class AppSearchController extends GetxController {
       );
     }
 
-    final output = <SearchResultModel>[];
-    for (final course in _matchingCourses(courses, request.filters)) {
+    final matchingCourses = _matchingCourses(courses, request.filters);
+    final output = await _mapCoursesConcurrently(matchingCourses, (
+      course,
+    ) async {
+      final courseResults = <SearchResultModel>[];
       final records = await _dataSource.getStudentAttendance(
         courseId: course.courseId,
         studentUid: user.uid,
@@ -999,7 +1106,7 @@ class AppSearchController extends GetxController {
       final matchingRecords = records
           .where((record) => _attendanceMatches(record, request.filters))
           .toList();
-      if (matchingRecords.isEmpty) continue;
+      if (matchingRecords.isEmpty) return courseResults;
 
       final attended = matchingRecords
           .where(
@@ -1020,7 +1127,7 @@ class AppSearchController extends GetxController {
           : hasStatusFilter
           ? '${matchingRecords.length} matching classes'
           : '${matchingRecords.length} classes recorded';
-      output.add(
+      courseResults.add(
         SearchResultModel(
           title: course.courseName,
           subtitle: subtitle,
@@ -1032,9 +1139,9 @@ class AppSearchController extends GetxController {
           highlightSubtitle: hasDateFilter,
         ),
       );
-      if (output.length == request.limit) break;
-    }
-    return output;
+      return courseResults;
+    });
+    return output.take(request.limit).toList();
   }
 
   Future<List<SearchResultModel>> _searchCtMarks({
@@ -1048,10 +1155,13 @@ class AppSearchController extends GetxController {
       );
     }
 
-    final output = <SearchResultModel>[];
-    for (final course in _matchingCourses(courses, request.filters)) {
+    final matchingCourses = _matchingCourses(courses, request.filters);
+    final output = await _mapCoursesConcurrently(matchingCourses, (
+      course,
+    ) async {
+      final courseResults = <SearchResultModel>[];
       final data = await _dataSource.getCtData(course.courseId);
-      if (data == null) continue;
+      if (data == null) return courseResults;
 
       final matchingCts = data.cts.values.where((ct) {
         final mark = ct.marks[user.uid];
@@ -1066,11 +1176,11 @@ class AppSearchController extends GetxController {
                   : _matchesNumber(mark, filter),
             );
       }).toList();
-      if (matchingCts.isEmpty) continue;
+      if (matchingCts.isEmpty) return courseResults;
 
       for (final ct in matchingCts) {
         final mark = ct.marks[user.uid]!;
-        output.add(
+        courseResults.add(
           SearchResultModel(
             title: '${course.courseName} • ${ct.ctTitle}',
             subtitle: '${mark.toStringAsFixed(1)} / ${data.fullMarks}',
@@ -1078,10 +1188,10 @@ class AppSearchController extends GetxController {
             highlightSubtitle: true,
           ),
         );
-        if (output.length == request.limit) return output;
       }
-    }
-    return output;
+      return courseResults;
+    });
+    return output.take(request.limit).toList();
   }
 
   Future<List<SearchResultModel>> _searchRoutines(
