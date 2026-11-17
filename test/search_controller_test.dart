@@ -126,6 +126,119 @@ void main() {
   );
 
   test(
+    'answers a course-specific CT mark query without waiting for AI',
+    () async {
+      final ctData = CtDataModel(
+        courseId: course.courseId,
+        fullMarks: 20,
+        bestOfCount: 3,
+        totalCTs: 4,
+        cts: {
+          'CT-3': CtModel(
+            ctTitle: 'CT-3',
+            date: '2026-09-01',
+            status: 'published',
+            marks: {'student-1': 18, 'student-2': 5},
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+        },
+        totals: {'student-1': 18, 'student-2': 5},
+        updatedAt: DateTime(2026),
+      );
+      final controller = AppSearchController(
+        role: 'student',
+        dataSource: source(ctData: ctData),
+        askAi: (_) async => fail('Explicit CT mark lookup should be local'),
+      );
+
+      await controller.runNaturalLanguageSearch(
+        'What is my CT-3 mark for CSE321?',
+      );
+
+      expect(controller.errorMessage.value, isNull);
+      expect(controller.results, hasLength(1));
+      expect(controller.results.single.subtitle, '18.0 / 20.0');
+    },
+  );
+
+  test('uses AI for an aggregated CT mark question', () async {
+    var aiCalled = false;
+    final controller = AppSearchController(
+      role: 'student',
+      dataSource: source(),
+      askAi: (_) async {
+        aiCalled = true;
+        return responseWithIntent('ct_highest_mark', 'ct_marks', [
+          {'field': 'courseCode', 'op': '==', 'value': 'CSE321'},
+        ]);
+      },
+    );
+
+    await controller.runNaturalLanguageSearch(
+      'What is my top CT mark for CSE321?',
+    );
+
+    expect(aiCalled, isTrue);
+    expect(controller.errorMessage.value, isNull);
+  });
+
+  test('loads upcoming CT alerts concurrently in bounded batches', () async {
+    final fakeSource = FakeSearchDataSource(
+      user: user,
+      courses: List.filled(6, course),
+      attendance: const [],
+      ctData: null,
+      failure: null,
+      alerts: const [],
+      enrolledStudents: const [],
+      attendanceSessions: const [],
+      routines: const [],
+      role: 'student',
+    );
+    final controller = AppSearchController(
+      role: 'student',
+      dataSource: fakeSource,
+    );
+
+    await controller.runQuickSearch('Upcoming CTs');
+
+    expect(fakeSource.maxConcurrentAlertCalls, greaterThan(1));
+    expect(fakeSource.maxConcurrentAlertCalls, lessThanOrEqualTo(4));
+  });
+
+  test('teacher CT performance quick-search label returns results', () async {
+    final ctData = CtDataModel(
+      courseId: course.courseId,
+      fullMarks: 20,
+      bestOfCount: 3,
+      totalCTs: 1,
+      cts: {
+        'CT-1': CtModel(
+          ctTitle: 'CT-1',
+          date: '2026-09-01',
+          status: 'published',
+          marks: {'student-1': 18},
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+      },
+      totals: {'student-1': 18},
+      updatedAt: DateTime(2026),
+    );
+    final controller = AppSearchController(
+      role: 'teacher',
+      dataSource: source(role: 'teacher', ctData: ctData),
+    );
+
+    await controller.runQuickSearch('Recent CT Performance(Avg.)');
+
+    expect(controller.errorMessage.value, isNull);
+    expect(controller.results, hasLength(1));
+    expect(controller.results.single.subtitle, '18.0 / 20.0');
+  });
+
+  test(
     'answers an attendance percentage question for a specific course',
     () async {
       final controller = AppSearchController(
@@ -739,6 +852,8 @@ class FakeSearchDataSource implements SearchDataSource {
   final List<AttendanceSessionModel> attendanceSessions;
   final List<RoutineModel> routines;
   final String role;
+  var activeAlertCalls = 0;
+  var maxConcurrentAlertCalls = 0;
 
   FakeSearchDataSource({
     required this.user,
@@ -815,6 +930,15 @@ class FakeSearchDataSource implements SearchDataSource {
   @override
   Future<List<CtAlertModel>> getCourseAlerts(String courseId) async {
     _throwIfNeeded();
-    return alerts;
+    activeAlertCalls++;
+    if (activeAlertCalls > maxConcurrentAlertCalls) {
+      maxConcurrentAlertCalls = activeAlertCalls;
+    }
+    try {
+      await Future<void>.delayed(Duration.zero);
+      return alerts;
+    } finally {
+      activeAlertCalls--;
+    }
   }
 }
